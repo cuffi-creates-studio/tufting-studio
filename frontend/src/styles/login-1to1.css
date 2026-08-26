@@ -191,3 +191,23 @@
     bottom:6%;
   }
 }
+@media (max-width: 760px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .login-page {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    overflow: hidden !important;
+  }
+}
