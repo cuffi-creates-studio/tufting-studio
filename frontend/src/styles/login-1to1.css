@@ -194,94 +194,119 @@
 
 
 /* =========================================================
-   IPHONE LOGIN LAYOUT FIX
-   - keeps the artwork at its natural width
-   - avoids zoom/crop from background-size: cover
-   - moves the glass panel lower so it does not cover the gun
-   - allows Safari to scroll only when its toolbars reduce the viewport
+   FINAL MOBILE LOGIN — FIXED SCREEN, NO PAGE SCROLL
+   iPhone/Safari + installed PWA
    ========================================================= */
 @media (max-width: 600px) {
+
   html,
   body,
   #root {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    width: 100% !important;
-    min-height: 100% !important;
+    overflow: hidden !important;
     background: #fff8ea !important;
   }
 
+  html {
+    overscroll-behavior: none !important;
+  }
+
   body {
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
+    position: fixed !important;
+    inset: 0 !important;
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto !important;
   }
 
   .login-clean-ready {
-    position: relative !important;
-    width: 100% !important;
-    min-height: 112svh !important;
-    height: auto !important;
-    overflow: visible !important;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
     background: #fff8ea !important;
   }
 
   .login-clean-ready-bg {
     position: absolute !important;
-    inset: 0 auto auto 0 !important;
+    inset: 0 !important;
     width: 100% !important;
-    height: 100svh !important;
+    height: 100% !important;
 
     background-image: url('/mobile-login-approved-hero.jpg') !important;
-    background-size: 100% auto !important;
-    background-position: center top !important;
     background-repeat: no-repeat !important;
-    background-color: #078f88 !important;
+
+    /* Keep full artwork visible without zooming/cropping aggressively */
+    background-size: 100% 100% !important;
+    background-position: center center !important;
 
     z-index: 1 !important;
   }
 
   .login-clean-ready-form {
     position: absolute !important;
-    left: 50% !important;
-    top: 76svh !important;
-    bottom: auto !important;
-    transform: translateX(-50%) !important;
+    left: 7% !important;
+    right: 7% !important;
+    bottom: calc(2.5% + env(safe-area-inset-bottom)) !important;
+    top: auto !important;
+    transform: none !important;
 
-    width: 86% !important;
+    width: auto !important;
+    max-width: none !important;
     margin: 0 !important;
-    padding: 15px !important;
+
+    padding: 14px 14px 16px !important;
     border-radius: 20px !important;
+    box-sizing: border-box !important;
 
     z-index: 3 !important;
+  }
+
+  .login-clean-ready-field {
+    min-height: 58px !important;
   }
 
   .login-clean-ready-field input {
     font-size: 16px !important;
   }
 
+  .login-clean-ready-form button[type="submit"],
+  .login-clean-ready-submit {
+    min-height: 56px !important;
+  }
+
+  /* Shorter iPhones: compact the form slightly, but keep it inside screen */
+  @media (max-height: 760px) {
+    .login-clean-ready-form {
+      left: 6% !important;
+      right: 6% !important;
+      bottom: calc(1.5% + env(safe-area-inset-bottom)) !important;
+      padding: 10px 12px 12px !important;
+    }
+
+    .login-clean-ready-field {
+      min-height: 52px !important;
+    }
+
+    .login-clean-ready-form button[type="submit"],
+    .login-clean-ready-submit {
+      min-height: 50px !important;
+    }
+  }
+
   @supports (height: 100dvh) {
     .login-clean-ready {
-      min-height: 112dvh !important;
-    }
-
-    .login-clean-ready-bg {
       height: 100dvh !important;
+      min-height: 100dvh !important;
+      max-height: 100dvh !important;
     }
-
-    .login-clean-ready-form {
-      top: 76dvh !important;
-    }
-  }
-}
-
-/* Slightly shorter iPhones */
-@media (max-width: 600px) and (max-height: 760px) {
-  .login-clean-ready {
-    min-height: 118svh !important;
-  }
-
-  .login-clean-ready-form {
-    top: 78svh !important;
   }
 }
