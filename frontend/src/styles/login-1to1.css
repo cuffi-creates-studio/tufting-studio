@@ -194,59 +194,54 @@
 
 
 /* =========================================================
-   FINAL MOBILE LOGIN — FIXED SCREEN, NO PAGE SCROLL
-   iPhone/Safari + installed PWA
+   IPHONE FINAL — STRETCH ONLY VERTICALLY
+   Keep original width, remove bottom white gap, no page scroll.
    ========================================================= */
 @media (max-width: 600px) {
-
   html,
   body,
   #root {
     width: 100% !important;
     height: 100% !important;
-    min-height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
-    background: #fff8ea !important;
-  }
-
-  html {
+    background: #078f88 !important;
     overscroll-behavior: none !important;
   }
 
   body {
     position: fixed !important;
     inset: 0 !important;
-    overscroll-behavior: none !important;
-    -webkit-overflow-scrolling: auto !important;
   }
 
   .login-clean-ready {
     position: fixed !important;
     inset: 0 !important;
-    width: 100vw !important;
-    height: 100svh !important;
-    min-height: 100svh !important;
-    max-height: 100svh !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
-    background: #fff8ea !important;
+    background: #078f88 !important;
   }
 
   .login-clean-ready-bg {
     position: absolute !important;
-    inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+
+    /* Keep width exactly the phone width.
+       Stretch only vertically a little past the viewport. */
     width: 100% !important;
-    height: 100% !important;
+    height: calc(100% + 34px) !important;
 
     background-image: url('/mobile-login-approved-hero.jpg') !important;
     background-repeat: no-repeat !important;
-
-    /* Keep full artwork visible without zooming/cropping aggressively */
+    background-position: center top !important;
     background-size: 100% 100% !important;
-    background-position: center center !important;
 
     z-index: 1 !important;
   }
@@ -255,58 +250,39 @@
     position: absolute !important;
     left: 7% !important;
     right: 7% !important;
-    bottom: calc(2.5% + env(safe-area-inset-bottom)) !important;
+    bottom: calc(10px + env(safe-area-inset-bottom)) !important;
     top: auto !important;
-    transform: none !important;
 
     width: auto !important;
-    max-width: none !important;
     margin: 0 !important;
-
-    padding: 14px 14px 16px !important;
-    border-radius: 20px !important;
+    padding: 14px !important;
+    transform: none !important;
     box-sizing: border-box !important;
-
+    border-radius: 20px !important;
     z-index: 3 !important;
   }
 
   .login-clean-ready-field {
-    min-height: 58px !important;
+    height: 50px !important;
+    margin-bottom: 9px !important;
   }
 
   .login-clean-ready-field input {
     font-size: 16px !important;
   }
 
-  .login-clean-ready-form button[type="submit"],
-  .login-clean-ready-submit {
-    min-height: 56px !important;
+  .login-clean-ready-forgot {
+    margin-bottom: 10px !important;
   }
 
-  /* Shorter iPhones: compact the form slightly, but keep it inside screen */
-  @media (max-height: 760px) {
-    .login-clean-ready-form {
-      left: 6% !important;
-      right: 6% !important;
-      bottom: calc(1.5% + env(safe-area-inset-bottom)) !important;
-      padding: 10px 12px 12px !important;
-    }
-
-    .login-clean-ready-field {
-      min-height: 52px !important;
-    }
-
-    .login-clean-ready-form button[type="submit"],
-    .login-clean-ready-submit {
-      min-height: 50px !important;
-    }
+  .login-clean-ready-signin {
+    height: 50px !important;
   }
+}
 
-  @supports (height: 100dvh) {
-    .login-clean-ready {
-      height: 100dvh !important;
-      min-height: 100dvh !important;
-      max-height: 100dvh !important;
-    }
+/* A little more vertical room on taller iPhones */
+@media (max-width: 600px) and (min-height: 800px) {
+  .login-clean-ready-bg {
+    height: calc(100% + 46px) !important;
   }
 }
