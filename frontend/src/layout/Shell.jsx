@@ -1,8 +1,9 @@
 import React,{useEffect,useState} from 'react'
 import {NavLink,Outlet,useNavigate} from 'react-router-dom'
 import {Home,FolderKanban,Images,WandSparkles,Projector,Calculator,Boxes,Settings,Menu,Search,LogOut,X} from 'lucide-react'
-import {token} from '../api/client'
 import {useI18n} from '../i18n/I18n'
+import {signOut} from 'firebase/auth'
+import {auth} from '../lib/firebase'
 
 const getProfile=()=>({
  name:localStorage.getItem('tufting_profile_name')||localStorage.getItem('tufting_name')||'Studio Owner',
@@ -14,6 +15,18 @@ export default function Shell(){
  const {t}=useI18n()
  const [drawer,setDrawer]=useState(false),[p,setP]=useState(getProfile())
  const nav=useNavigate()
+
+ async function logout(){
+  try{
+   await signOut(auth)
+  }catch(err){
+   console.error('FIREBASE LOGOUT ERROR:',err)
+  }finally{
+   localStorage.removeItem('tufting_auth')
+   localStorage.removeItem('tufting_name')
+   nav('/login',{replace:true})
+  }
+ }
 
  useEffect(()=>{
   const f=()=>setP(getProfile())
@@ -41,7 +54,7 @@ export default function Shell(){
    <div className="sidebar-bottom">
     <div className="profile-avatar">{avatar}</div>
     <div className="profile-text"><b>{p.name}</b><small>Professional</small></div>
-    <button className="sidebar-logout-mobile" onClick={()=>{token.clear();nav('/login')}} aria-label="Logout"><LogOut/></button>
+    <button className="sidebar-logout-mobile" onClick={logout} aria-label="Logout"><LogOut/></button>
    </div>
   </aside>
 
@@ -54,7 +67,7 @@ export default function Shell(){
     <div className="topbar-spacer"/>
     <div className="top-profile">
       <div className="top-profile-avatar">{avatar}</div>
-      <button className="logout-button" onClick={()=>{token.clear();nav('/login')}}><LogOut/></button>
+      <button className="logout-button" onClick={logout}><LogOut/></button>
     </div>
    </header>
    <div className="page-wrap"><Outlet/></div>
