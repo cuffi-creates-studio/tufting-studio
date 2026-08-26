@@ -202,18 +202,16 @@
   body,
   #root {
     width: 100% !important;
-    height: 100% !important;
     min-height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden !important;
-    overscroll-behavior: none !important;
     background: #fff8ea !important;
   }
 
   body {
-    position: fixed !important;
-    inset: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .login-page,
@@ -221,30 +219,25 @@
   .login-mobile,
   .login-wrap,
   .login-shell {
-    position: fixed !important;
-    inset: 0 !important;
+    position: relative !important;
     width: 100% !important;
-    height: 100svh !important;
     min-height: 100svh !important;
-    max-height: 100svh !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
     margin: 0 !important;
-    overflow: hidden !important;
-    overscroll-behavior: none !important;
   }
 
-  @supports (height: 100dvh) {
+  @supports (min-height: 100dvh) {
     .login-page,
     .login-screen,
     .login-mobile,
     .login-wrap,
     .login-shell {
-      height: 100dvh !important;
       min-height: 100dvh !important;
-      max-height: 100dvh !important;
     }
   }
 
-  /* Prevent iOS auto-zoom when focusing email/password fields */
   input[type="email"],
   input[type="password"],
   input[type="text"] {
