@@ -1,0 +1,1 @@
+Complete frontend: back buttons, retro homebar, sidebar drawer, 3-language i18n, dashboard calendar/statistics/appointments carousel, settings notifications.

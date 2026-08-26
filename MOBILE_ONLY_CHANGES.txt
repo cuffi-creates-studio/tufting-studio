@@ -1,0 +1,14 @@
+Only mobile/tablet behavior was intentionally changed.
+
+Mobile fixes:
+- 4 retro dashboard cards, readable 2x2
+- functional notification panel
+- 3-page Calendar / Statistics / Appointments carousel starts on Calendar
+- balanced 4-item black retro Home Bar
+- Design Studio performs actual browser-side image conversion:
+  Original -> Sketch -> Cartoon
+- dominant color palette is extracted from the uploaded image
+- palette colors are numbered and show HEX codes
+- upload/camera mobile workflow refined
+
+Desktop CSS selectors were not changed by the appended repair block.

@@ -1,0 +1,9 @@
+Mobile exact reference build:
+- Login
+- Dashboard
+- New Project/Upload
+- Sketch & Cartoon Preview
+- Projector Tools + Calculator
+
+Desktop files remain usable. Mobile breakpoint: <=760px.
+Replace only the frontend folder in the main project.
