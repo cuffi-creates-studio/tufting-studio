@@ -3,7 +3,6 @@ import { auth } from '../lib/firebase'
 import React,{useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {Eye,EyeOff,Mail,Lock} from 'lucide-react'
-import {login,token} from '../api/client'
 
 export default function Login(){
   const [username,setUsername]=useState('')
@@ -14,24 +13,42 @@ export default function Login(){
   const nav=useNavigate()
 
   async function submit(e){
-  e.preventDefault()
-  setError('')
-  setBusy(true)
+    e.preventDefault()
+    setError('')
+    setBusy(true)
 
-  try {
-    await signInWithEmailAndPassword(auth, username, password)
+    try{
+      const result = await signInWithEmailAndPassword(
+        auth,
+        username.trim(),
+        password
+      )
 
-    localStorage.setItem('tufting_auth', '1')
-    localStorage.setItem('tufting_name', 'Studio Owner')
+      localStorage.setItem('tufting_auth','1')
+      localStorage.setItem(
+        'tufting_name',
+        result.user.email || 'Studio Owner'
+      )
 
-    nav('/')
-  } catch (err) {
-    console.error(err)
-    setError('Email ose password i gabuar')
-  } finally {
-    setBusy(false)
+      nav('/')
+    }catch(err){
+      console.error('FIREBASE LOGIN ERROR:', err.code, err.message)
+
+      if(err.code==='auth/invalid-credential'){
+        setError('Email ose password është gabim')
+      }else if(err.code==='auth/user-not-found'){
+        setError('Ky përdorues nuk ekziston')
+      }else if(err.code==='auth/wrong-password'){
+        setError('Password-i është gabim')
+      }else if(err.code==='auth/unauthorized-domain'){
+        setError('Ky domain nuk është autorizuar në Firebase')
+      }else{
+        setError(err.code || 'Login failed')
+      }
+    }finally{
+      setBusy(false)
+    }
   }
-}
 
   return (
     <div className="login-clean-ready">
