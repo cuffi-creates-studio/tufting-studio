@@ -1,6 +1,5 @@
 import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { token } from './api/client'
 import Login from './pages/Login'
 import Shell from './layout/Shell'
 import Dashboard from './pages/Dashboard'
@@ -13,7 +12,8 @@ import Materials from './pages/Materials'
 import Settings from './pages/Settings'
 
 function Guard({children}) {
-  return token.get() ? children : <Navigate to="/login" replace />
+  const isLoggedIn = localStorage.getItem('tufting_auth') === '1'
+  return isLoggedIn ? children : <Navigate to="/login" replace />
 }
 
 export default function App() {
