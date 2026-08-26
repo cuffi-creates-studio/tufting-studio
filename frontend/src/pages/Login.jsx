@@ -1,31 +1,37 @@
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../lib/firebase'
 import React,{useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {Eye,EyeOff,Mail,Lock} from 'lucide-react'
 import {login,token} from '../api/client'
 
 export default function Login(){
-  const [username,setUsername]=useState('admin')
-  const [password,setPassword]=useState('admin123')
+  const [username,setUsername]=useState('')
+  const [password,setPassword]=useState('')
   const [show,setShow]=useState(false)
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
   const nav=useNavigate()
 
   async function submit(e){
-    e.preventDefault()
-    setError('')
-    setBusy(true)
-    try{
-      const data=await login(username,password)
-      token.set(data.access_token)
-      localStorage.setItem('tufting_name',data.display_name||'Studio Owner')
-      nav('/')
-    }catch(err){
-      setError(err.message||'Login failed')
-    }finally{
-      setBusy(false)
-    }
+  e.preventDefault()
+  setError('')
+  setBusy(true)
+
+  try {
+    await signInWithEmailAndPassword(auth, username, password)
+
+    localStorage.setItem('tufting_auth', '1')
+    localStorage.setItem('tufting_name', 'Studio Owner')
+
+    nav('/')
+  } catch (err) {
+    console.error(err)
+    setError('Email ose password i gabuar')
+  } finally {
+    setBusy(false)
   }
+}
 
   return (
     <div className="login-clean-ready">
