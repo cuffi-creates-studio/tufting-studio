@@ -1,0 +1,28 @@
+TUFTING STUDIO - GITHUB PAGES READY
+
+Ky version është për repository:
+cuffi-creates-studio/tufting-studio
+
+Është shtuar:
+1. frontend/vite.config.js
+   base: '/tufting-studio/'
+
+2. frontend/src/main.jsx
+   HashRouter, që rrugët e React të funksionojnë në GitHub Pages.
+
+3. .github/workflows/deploy.yml
+   GitHub Actions ndërton automatikisht frontend-in dhe publikon frontend/dist.
+
+4. .gitignore
+   node_modules, .venv, dist, cache dhe .env nuk ngarkohen.
+
+NË GITHUB:
+Settings -> Pages -> Source = GitHub Actions
+
+Pastaj ngarko/replace file-t e këtij ZIP-i në repository dhe bëj Commit.
+Workflow nis automatikisht.
+
+SHËNIM:
+Backend-i aktual është http://127.0.0.1:8000/api.
+Ai nuk mund të arrihet nga telefoni përmes GitHub Pages.
+Për login/projekte/foto online duhet hapi tjetër: Supabase ose backend i hostuar.
