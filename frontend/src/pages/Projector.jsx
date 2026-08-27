@@ -1,5 +1,5 @@
 import React,{useMemo,useState} from 'react'
-import {ArrowLeft,ArrowUp,ArrowRight,Minus,Plus} from 'lucide-react'
+import {ArrowLeft,ArrowUp,ArrowDown,ArrowRight,Minus,Plus} from 'lucide-react'
 import {useNavigate} from 'react-router-dom'
 import {useI18n} from '../i18n/I18n'
 import {createProject} from '../lib/projectsStore'
@@ -19,6 +19,7 @@ export default function Projector(){
  const image=useMemo(()=>sessionStorage.getItem('tufting_projector_image')||'',[ ])
  const style=useMemo(()=>sessionStorage.getItem('tufting_projector_style')||'Cartoon',[ ])
  const palette=useMemo(()=>{try{return JSON.parse(sessionStorage.getItem('tufting_projector_palette')||'[]')}catch{return[]}},[])
+ const lastCalc=useMemo(()=>{try{return JSON.parse(localStorage.getItem('tufting_last_calculation')||'{}')}catch{return{}}},[])
 
  const yarn=fiber==='Acrylic'?620:690
  const cost=fiber==='Acrylic'?24.80:31.50
@@ -32,6 +33,8 @@ export default function Projector(){
        name,
        status:'In Progress',
        material_cost:cost,
+       width_cm:Number(lastCalc.width_cm)||80,
+       height_cm:Number(lastCalc.height_cm)||60,
        yarn_type:fiber,
        yarn_g:yarn,
        coverage_area:.85,
@@ -54,6 +57,7 @@ export default function Projector(){
      <div className="mirror-row"><b>◫ {t('mirror')}</b><button className={`switch ${mirror?'on':''}`} onClick={()=>setMirror(!mirror)}><i/></button></div>
      <div className="projector-controls">
        <button className="p-arrow top" onClick={()=>setY(v=>v-8)}><ArrowUp/></button>
+       <button className="p-arrow bottom" style={{bottom:18}} onClick={()=>setY(v=>v+8)}><ArrowDown/></button>
        <button className="p-arrow left" onClick={()=>setX(v=>v-8)}>←</button>
 
        <div className="projector-preview-dog" style={{overflow:'hidden',display:'grid',placeItems:'center'}}>

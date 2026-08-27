@@ -46,16 +46,16 @@ export default function Projects(){
    </div>
 
    <div className="project-grid">
-     {items.map(p=><article className="card project-card" key={p.id}>
-       <div className="project-cover">
+     {items.map(p=><article className="card project-card" key={p.id} style={{display:'block',overflow:'hidden',background:'#fffdf8'}}>
+       <div className="project-cover" style={{position:'relative',width:'100%',height:270,overflow:'hidden',background:'#f5eee3'}}>
          {p.image_data
            ? <img src={p.image_data} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
            : '🧶'}
        </div>
-       <div className="project-content">
+       <div className="project-content" style={{position:'static',display:'block',padding:'16px 18px 18px',background:'#fffdf8',color:'#172033'}}>
          <h3>{p.name}</h3>
          <div className="project-meta">
-           <span>{p.width_cm} × {p.height_cm} cm</span>
+           <span>{p.width_cm>0&&p.height_cm>0?`${p.width_cm} × ${p.height_cm} cm`:''}</span>
            <span>{translateStatus(p.status,t)}</span>
          </div>
          <p>{t('materialCost')}: €{Number(p.material_cost||0).toFixed(2)}</p>

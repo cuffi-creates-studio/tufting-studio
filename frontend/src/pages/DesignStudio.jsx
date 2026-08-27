@@ -11,13 +11,14 @@ export default function DesignStudio(){
  const [preview,setPreview]=useState('')
  const [style,setStyle]=useState('Cartoon')
  const [processed,setProcessed]=useState({original:'',sketch:'',cartoon:'',palette:[]})
+ const [paletteCount,setPaletteCount]=useState(8)
 
  async function pick(e){
   const f=e.target.files?.[0]
   if(!f)return
   const url=URL.createObjectURL(f)
   setPreview(url)
-  const result=await processImage(url)
+  const result=await processImage(url,paletteCount)
   setProcessed(result)
   setStep(1)
  }
@@ -61,10 +62,10 @@ export default function DesignStudio(){
    </div>
  }
 
- return <MobileDesignStudio nav={nav} step={step} setStep={setStep} pick={pick} processed={processed} style={style} setStyle={setStyle} continueToProjector={continueToProjector} t={t}/>
+ return <MobileDesignStudio nav={nav} step={step} setStep={setStep} pick={pick} preview={preview} processed={processed} setProcessed={setProcessed} style={style} setStyle={setStyle} paletteCount={paletteCount} setPaletteCount={setPaletteCount} continueToProjector={continueToProjector} t={t}/>
 }
 
-function MobileDesignStudio({nav,step,setStep,pick,processed,style,setStyle,continueToProjector,t}){
+function MobileDesignStudio({nav,step,setStep,pick,preview,processed,setProcessed,style,setStyle,paletteCount,setPaletteCount,continueToProjector,t}){
  const [view,setView]=useState('cartoon')
  if(step===0){
    return <div className="m-design-page">
@@ -109,7 +110,7 @@ function MobileDesignStudio({nav,step,setStep,pick,processed,style,setStyle,cont
      {['Sketch','Cartoon','Pop Art'].map(s=><button key={s} className={style===s?'active':''} onClick={()=>{setStyle(s);if(s==='Sketch')setView('sketch');else if(s==='Cartoon')setView('cartoon')}}>{styleLabel(s,t)}</button>)}
    </div>
 
-   <div className="m-palette-head"><h3>{t('colorPalette')}</h3><span>{processed.palette.length} {t('colors')}</span></div>
+   <div className="m-palette-head"><h3>{t('colorPalette')}</h3><div className="palette-count-control" style={{display:'flex',alignItems:'center',gap:8,fontSize:10,fontWeight:800}}><span>{t('numberOfColors')}</span><select style={{height:32,border:'1px solid #e4d9c9',borderRadius:9,background:'#fff',padding:'0 8px',fontWeight:800}} value={paletteCount} onChange={async e=>{const n=+e.target.value;setPaletteCount(n);if(preview)setProcessed(await processImage(preview,n))}}>{[6,8,10,12,16].map(n=><option key={n} value={n}>{n}</option>)}</select></div></div>
    <div className="m-numbered-palette">
      {processed.palette.map((c,i)=><div className="m-color-item" key={c}>
        <span className="m-color-number">{i+1}</span><i style={{background:c}}></i>
@@ -143,7 +144,7 @@ function useMedia(query){
  return matches
 }
 
-async function processImage(url){
+async function processImage(url,paletteCount=8){
  const img=await loadImage(url)
  const max=900
  const scale=Math.min(1,max/Math.max(img.width,img.height))
@@ -154,14 +155,14 @@ async function processImage(url){
  const original=base.toDataURL('image/jpeg',.92)
 
  const source=bctx.getImageData(0,0,w,h)
- const palette=extractPalette(source.data,6)
+ const palette=extractPalette(source.data,paletteCount)
 
  const cartoonCanvas=document.createElement('canvas');cartoonCanvas.width=w;cartoonCanvas.height=h
  const cctx=cartoonCanvas.getContext('2d')
  const cartoon=new ImageData(new Uint8ClampedArray(source.data),w,h)
  for(let i=0;i<cartoon.data.length;i+=4){
    const r=cartoon.data[i],g=cartoon.data[i+1],b=cartoon.data[i+2]
-   const nearest=nearestColor([r,g,b],palette.map(hexToRgb))
+   const nearest=boostColor(nearestColor([r,g,b],palette.map(hexToRgb)))
    cartoon.data[i]=nearest[0];cartoon.data[i+1]=nearest[1];cartoon.data[i+2]=nearest[2]
  }
  cctx.putImageData(cartoon,0,0)
@@ -192,16 +193,37 @@ async function processImage(url){
 function loadImage(url){return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=url})}
 function extractPalette(data,count){
  const buckets=new Map()
- const step=Math.max(4,Math.floor(data.length/(4*18000)))
+ const step=Math.max(2,Math.floor(data.length/(4*26000)))
  for(let p=0;p<data.length;p+=4*step){
-  if(data[p+3]<200)continue
-  const r=Math.round(data[p]/32)*32,g=Math.round(data[p+1]/32)*32,b=Math.round(data[p+2]/32)*32
-  const key=`${Math.min(255,r)},${Math.min(255,g)},${Math.min(255,b)}`
-  buckets.set(key,(buckets.get(key)||0)+1)
+  if(data[p+3]<220)continue
+  const r=data[p],g=data[p+1],b=data[p+2]
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),light=(max+min)/510
+  const sat=max===min?0:(max-min)/(255-Math.abs(max+min-255))
+  if(light<.055||light>.965)continue
+  const q=24
+  const rr=Math.min(255,Math.round(r/q)*q),gg=Math.min(255,Math.round(g/q)*q),bb=Math.min(255,Math.round(b/q)*q)
+  const key=`${rr},${gg},${bb}`
+  const weight=.55+sat*1.7+(light>.2&&light<.82?.35:0)
+  buckets.set(key,(buckets.get(key)||0)+weight)
  }
- return [...buckets.entries()].sort((a,b)=>b[1]-a[1]).slice(0,count).map(([k])=>{
-   const [r,g,b]=k.split(',').map(Number);return rgbToHex(r,g,b)
- })
+ const ranked=[...buckets.entries()].sort((a,b)=>b[1]-a[1]).map(([k,score])=>({rgb:k.split(',').map(Number),score}))
+ const chosen=[]
+ for(const item of ranked){
+   if(chosen.every(c=>colorDistance(c.rgb,item.rgb)>52))chosen.push(item)
+   if(chosen.length>=count)break
+ }
+ if(chosen.length<count){
+   for(const item of ranked){
+     if(!chosen.includes(item))chosen.push(item)
+     if(chosen.length>=count)break
+   }
+ }
+ return chosen.slice(0,count).map(x=>rgbToHex(...x.rgb))
+}
+function colorDistance(a,b){return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2)}
+function boostColor(rgb){
+ const avg=(rgb[0]+rgb[1]+rgb[2])/3
+ return rgb.map(v=>Math.max(0,Math.min(255,Math.round((avg+(v-avg)*1.12)*1.04+3))))
 }
 function nearestColor(rgb,palette){
  let best=palette[0]||rgb,dist=Infinity
