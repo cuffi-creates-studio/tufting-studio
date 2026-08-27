@@ -1,175 +1,100 @@
-import React,{useRef,useState} from 'react'
+import React,{useMemo,useRef,useState} from 'react'
 import {
   ArrowLeft,ArrowRight,ArrowUp,ArrowDown,
   ZoomIn,ZoomOut,FlipHorizontal2,Grid3X3,
   Maximize2,RotateCcw,X,Move,Focus,
-  Crosshair,Blend,HelpCircle
+  SquareDashedMousePointer,Blend,Save
 } from 'lucide-react'
 import {useNavigate} from 'react-router-dom'
 import {useI18n} from '../i18n/I18n'
-import '../styles/projector-all-controls.css'
+import {createProject} from '../lib/projectsStore'
+import '../styles/projector-retro-big-save.css'
 
 export default function Projector(){
   const nav=useNavigate()
   const {t}=useI18n()
   const stageRef=useRef(null)
 
-  const [image,setImage]=useState(
-    ()=>sessionStorage.getItem('tufting_projector_image')||''
-  )
-
   const [mirror,setMirror]=useState(false)
   const [grid,setGrid]=useState(true)
-  const [gridSize,setGridSize]=useState(22)
   const [opacity,setOpacity]=useState(60)
   const [zoom,setZoom]=useState(100)
   const [x,setX]=useState(0)
   const [y,setY]=useState(0)
   const [fullscreenMode,setFullscreenMode]=useState(false)
-  const [moveMode,setMoveMode]=useState(false)
-  const [blendIndex,setBlendIndex]=useState(0)
+  const [busy,setBusy]=useState(false)
+  const [saved,setSaved]=useState(false)
+  const [error,setError]=useState('')
 
-  const blendModes=['normal','multiply','screen','overlay']
-
-  const pointers=useRef(new Map())
-  const gesture=useRef({
-    dragging:false,
-    startX:0,
-    startY:0,
-    baseX:0,
-    baseY:0,
-    pinchStartDistance:0,
-    pinchStartZoom:100
+  const drag=useRef({
+    active:false,startX:0,startY:0,baseX:0,baseY:0
   })
 
-  function distance(a,b){
-    return Math.hypot(a.x-b.x,a.y-b.y)
-  }
+  const image=useMemo(
+    ()=>sessionStorage.getItem('tufting_projector_image')||'',
+    []
+  )
 
-  function reset(){
-    setMirror(false)
-    setGrid(true)
-    setGridSize(22)
-    setOpacity(60)
-    setZoom(100)
-    setX(0)
-    setY(0)
-    setMoveMode(false)
-    setBlendIndex(0)
-  }
+  const style=useMemo(
+    ()=>sessionStorage.getItem('tufting_projector_style')||'Projector',
+    []
+  )
 
-  function fitImage(){
-    setX(0)
-    setY(0)
-    setZoom(100)
-    setOpacity(100)
-  }
-
-  function centerImage(){
-    setX(0)
-    setY(0)
-  }
-
-  function cycleBlend(){
-    setBlendIndex(i=>(i+1)%blendModes.length)
-  }
-
-  function cycleGrid(){
-    setGrid(true)
-    setGridSize(s=>s===16?22:s===22?32:16)
-  }
-
-  function removeImage(){
-    if(!image)return
-    if(window.confirm('Ta heq foton nga projektori?')){
-      sessionStorage.removeItem('tufting_projector_image')
-      setImage('')
-      setX(0)
-      setY(0)
-      setZoom(100)
+  const palette=useMemo(()=>{
+    try{
+      return JSON.parse(sessionStorage.getItem('tufting_projector_palette')||'[]')
+    }catch{
+      return []
     }
-  }
+  },[])
 
   function move(dx,dy){
     setX(v=>v+dx)
     setY(v=>v+dy)
   }
 
-  function handlePointerDown(e){
-    const canDrag=fullscreenMode||moveMode
-    if(!canDrag)return
+  function reset(){
+    setMirror(false)
+    setGrid(true)
+    setOpacity(60)
+    setZoom(100)
+    setX(0)
+    setY(0)
+  }
 
-    e.preventDefault()
+  function beginDrag(clientX,clientY){
+    drag.current={
+      active:true,
+      startX:clientX,
+      startY:clientY,
+      baseX:x,
+      baseY:y
+    }
+  }
+
+  function updateDrag(clientX,clientY){
+    if(!drag.current.active)return
+    setX(drag.current.baseX+(clientX-drag.current.startX))
+    setY(drag.current.baseY+(clientY-drag.current.startY))
+  }
+
+  function endDrag(){
+    drag.current.active=false
+  }
+
+  function onPointerDown(e){
+    if(!fullscreenMode)return
     e.currentTarget.setPointerCapture?.(e.pointerId)
-    pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY})
-
-    const pts=[...pointers.current.values()]
-
-    if(pts.length===1){
-      gesture.current.dragging=true
-      gesture.current.startX=e.clientX
-      gesture.current.startY=e.clientY
-      gesture.current.baseX=x
-      gesture.current.baseY=y
-    }
-
-    if(pts.length===2){
-      gesture.current.dragging=false
-      gesture.current.pinchStartDistance=distance(pts[0],pts[1])
-      gesture.current.pinchStartZoom=zoom
-    }
+    beginDrag(e.clientX,e.clientY)
   }
 
-  function handlePointerMove(e){
-    const canDrag=fullscreenMode||moveMode
-    if(!canDrag || !pointers.current.has(e.pointerId))return
-
-    e.preventDefault()
-    pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY})
-    const pts=[...pointers.current.values()]
-
-    if(pts.length===1 && gesture.current.dragging){
-      setX(gesture.current.baseX+(e.clientX-gesture.current.startX))
-      setY(gesture.current.baseY+(e.clientY-gesture.current.startY))
-      return
-    }
-
-    if(pts.length===2){
-      const d=distance(pts[0],pts[1])
-      if(gesture.current.pinchStartDistance>0){
-        const ratio=d/gesture.current.pinchStartDistance
-        setZoom(
-          Math.round(
-            Math.max(
-              20,
-              Math.min(300,gesture.current.pinchStartZoom*ratio)
-            )
-          )
-        )
-      }
-    }
-  }
-
-  function handlePointerEnd(e){
-    pointers.current.delete(e.pointerId)
-
-    const pts=[...pointers.current.values()]
-    if(pts.length===1){
-      const p=pts[0]
-      gesture.current.dragging=true
-      gesture.current.startX=p.x
-      gesture.current.startY=p.y
-      gesture.current.baseX=x
-      gesture.current.baseY=y
-    }else if(pts.length===0){
-      gesture.current.dragging=false
-      gesture.current.pinchStartDistance=0
-    }
+  function onPointerMove(e){
+    if(!fullscreenMode)return
+    updateDrag(e.clientX,e.clientY)
   }
 
   async function openFullscreen(){
     setFullscreenMode(true)
-    document.documentElement.classList.add('projector-fullscreen-open')
     try{
       await stageRef.current?.requestFullscreen?.()
     }catch{}
@@ -177,133 +102,107 @@ export default function Projector(){
 
   async function closeFullscreen(){
     setFullscreenMode(false)
-    pointers.current.clear()
-    gesture.current.dragging=false
-    document.documentElement.classList.remove('projector-fullscreen-open')
-
+    endDrag()
     try{
-      if(document.fullscreenElement){
-        await document.exitFullscreen()
-      }
+      if(document.fullscreenElement)await document.exitFullscreen()
     }catch{}
   }
 
-  const blendMode=blendModes[blendIndex]
+  async function saveToProject(){
+    if(!image){
+      setError('Hap fillimisht një foto nga Studio Dizajni.')
+      return
+    }
+
+    setBusy(true)
+    setSaved(false)
+    setError('')
+
+    try{
+      const defaultName=`${style} Project`
+      const entered=window.prompt('Emri i projektit',defaultName)
+      if(entered===null){
+        setBusy(false)
+        return
+      }
+
+      const name=entered.trim()||defaultName
+      const savedImage=await compressDataUrl(image,720,.76)
+
+      await createProject({
+        name,
+        status:'In Progress',
+        style,
+        palette,
+        image_data:savedImage,
+        notes:`Projector: zoom ${zoom}%, opacity ${opacity}%, x ${Math.round(x)}, y ${Math.round(y)}, mirror ${mirror?'on':'off'}`,
+        material_cost:0
+      })
+
+      setSaved(true)
+      setTimeout(()=>nav('/projects'),700)
+    }catch(err){
+      console.error(err)
+      setError(t('saveFailed')||'Nuk u ruajt.')
+    }finally{
+      setBusy(false)
+    }
+  }
 
   return (
-    <div className="projector-all-page">
+    <div className="retro-big-page">
 
-      <header className="projector-all-header">
-        <div className="projector-title">
-          <div className="projector-app-icon">📽️</div>
+      <header className="retro-big-header">
+        <button className="retro-back" onClick={()=>nav(-1)} aria-label="Mbrapa">
+          <ArrowLeft/>
+        </button>
+
+        <div className="retro-big-title">
+          <div className="retro-camera">📽️</div>
           <div>
             <h1>{t('projectorTools')}</h1>
-            <small>{moveMode?'Prekja për lëvizje është aktive':'Projektim & kontroll me prekje'}</small>
+            <p>Projektim & kontroll me prekje</p>
           </div>
         </div>
 
-        <button
-          className="projector-help"
-          onClick={()=>alert(
-            'Move: lëviz me gisht\nZoom + / -\nPasqyrë\nGrid\nFullscreen\nReset\nNë fullscreen: 1 gisht lëviz, 2 gishta bëjnë zoom.'
-          )}
-        >
-          <HelpCircle/>
+        <button className="retro-help" onClick={reset} aria-label="Reset">
+          <RotateCcw/>
         </button>
       </header>
 
-      <section className="projector-all-shell">
+      <section className="retro-big-shell">
 
-        {/* 7 FUNCTIONAL TOP BUTTONS */}
-        <div className="projector-top-seven">
-
-          <button
-            className={moveMode?'active-teal':''}
-            onClick={()=>setMoveMode(v=>!v)}
-            title="Move with finger"
-          >
-            <Move/>
-          </button>
-
-          <button
-            onClick={()=>setZoom(v=>Math.min(300,v+10))}
-            title="Zoom in"
-          >
-            <ZoomIn/>
-          </button>
-
-          <button
-            onClick={()=>setZoom(v=>Math.max(20,v-10))}
-            title="Zoom out"
-          >
-            <ZoomOut/>
-          </button>
-
-          <button
-            className={mirror?'active-plum':''}
-            onClick={()=>setMirror(v=>!v)}
-            title={t('mirror')}
-          >
-            <FlipHorizontal2/>
-          </button>
-
-          <button
-            className={grid?'active-gold':''}
-            onClick={()=>setGrid(v=>!v)}
-            title="Grid on/off"
-          >
-            <Grid3X3/>
-          </button>
-
-          <button onClick={openFullscreen} title="Fullscreen">
-            <Maximize2/>
-          </button>
-
-          <button className="reset-btn" onClick={reset} title="Reset all">
-            <RotateCcw/>
-          </button>
-
+        <div className="retro-top-tools">
+          <button title="Move"><Move/></button>
+          <button title="Zoom +" onClick={()=>setZoom(v=>Math.min(300,v+10))}><ZoomIn/></button>
+          <button title="Zoom -" onClick={()=>setZoom(v=>Math.max(20,v-10))}><ZoomOut/></button>
+          <button className={mirror?'active plum':''} title={t('mirror')} onClick={()=>setMirror(v=>!v)}><FlipHorizontal2/></button>
+          <button className={grid?'active yellow':''} title="Grid" onClick={()=>setGrid(v=>!v)}><Grid3X3/></button>
+          <button title="Fullscreen" onClick={openFullscreen}><Maximize2/></button>
+          <button className="reset-tool" title="Reset" onClick={reset}><RotateCcw/></button>
         </div>
 
-        <div className="projector-main">
+        <div className="retro-main-grid">
 
-          {/* 4 FUNCTIONAL LEFT BUTTONS */}
-          <aside className="projector-left-four">
+          <div className="retro-left-tools">
             <button onClick={()=>move(0,-10)}><ArrowUp/></button>
             <button onClick={()=>move(-10,0)}><ArrowLeft/></button>
             <button onClick={()=>move(10,0)}><ArrowRight/></button>
             <button onClick={()=>move(0,10)}><ArrowDown/></button>
-          </aside>
+          </div>
 
-          {/* STAGE */}
           <div
             ref={stageRef}
-            className={[
-              'projector-stage-all',
-              grid?'with-grid':'',
-              fullscreenMode?'is-fullscreen':'',
-              (fullscreenMode||moveMode)?'touch-enabled':''
-            ].join(' ')}
-            style={{
-              '--grid-size':`${gridSize}px`
-            }}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerEnd}
-            onPointerCancel={handlePointerEnd}
-            onContextMenu={e=>e.preventDefault()}
+            className={`retro-big-stage ${grid?'with-grid':''} ${fullscreenMode?'is-fullscreen':''}`}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
           >
-
             {fullscreenMode&&(
-              <>
-                <button className="projector-full-close" onClick={closeFullscreen}>
-                  <X/>
-                </button>
-
-                <div className="projector-full-info">
-                  1 gisht = lëviz • 2 gishta = zoom
-                </div>
-              </>
+              <button className="retro-full-close" onClick={closeFullscreen}>
+                <X/>
+              </button>
             )}
 
             {image ? (
@@ -313,77 +212,35 @@ export default function Projector(){
                 draggable="false"
                 style={{
                   opacity:opacity/100,
-                  mixBlendMode:blendMode,
-                  transform:`
-                    translate3d(${x}px,${y}px,0)
-                    scale(${zoom/100})
-                    scaleX(${mirror?-1:1})
-                  `
+                  transform:`translate(${x}px,${y}px) scale(${zoom/100}) scaleX(${mirror?-1:1})`
                 }}
               />
             ) : (
-              <div className="projector-empty-all">
+              <div className="retro-stage-empty">
                 <div>🖼️</div>
                 <b>{t('noProjectorImage')}</b>
               </div>
             )}
 
+            {fullscreenMode&&image&&(
+              <div className="retro-drag-label">
+                Lëvize foton me gisht
+              </div>
+            )}
           </div>
 
-          {/* 5 FUNCTIONAL RIGHT BUTTONS */}
-          <aside className="projector-right-five">
-
-            {/* 1: FIT */}
-            <button
-              onClick={fitImage}
-              title="Fit image"
-            >
-              <Focus/>
-            </button>
-
-            {/* 2: GRID DENSITY */}
-            <button
-              className="grid-density"
-              onClick={cycleGrid}
-              title="Change grid density"
-            >
-              <Grid3X3/>
-              <small>{gridSize}</small>
-            </button>
-
-            {/* 3: CENTER */}
-            <button
-              onClick={centerImage}
-              title="Center image"
-            >
-              <Crosshair/>
-            </button>
-
-            {/* 4: BLEND MODE */}
-            <button
-              className={blendIndex!==0?'active-plum':''}
-              onClick={cycleBlend}
-              title={`Blend: ${blendMode}`}
-            >
-              <Blend/>
-              <small>{blendIndex+1}</small>
-            </button>
-
-            {/* 5: REMOVE IMAGE */}
-            <button
-              className="danger"
-              onClick={removeImage}
-              title="Remove image"
-            >
-              <X/>
-            </button>
-
-          </aside>
+          <div className="retro-right-tools">
+            <button title="Focus"><Focus/></button>
+            <button className={grid?'active teal':''} onClick={()=>setGrid(v=>!v)} title="Grid"><Grid3X3/></button>
+            <button title="Selection"><SquareDashedMousePointer/></button>
+            <button title="Blend"><Blend/></button>
+            <button className="danger" onClick={reset} title="Reset"><X/></button>
+          </div>
 
         </div>
 
-        <div className="projector-opacity-all">
-          <span>Opacity</span>
+        <div className="retro-opacity">
+          <b>Opacity</b>
           <input
             type="range"
             min="20"
@@ -391,16 +248,39 @@ export default function Projector(){
             value={opacity}
             onChange={e=>setOpacity(Number(e.target.value))}
           />
-          <b>{opacity}%</b>
+          <strong>{opacity}%</strong>
         </div>
 
-        <div className="projector-status-row">
+        <div className="retro-status-row">
           <span>Zoom <b>{zoom}%</b></span>
-          <span>Blend <b>{blendMode}</b></span>
+          <span>Mirror <b>{mirror?'ON':'OFF'}</b></span>
         </div>
 
       </section>
 
+      {error&&<p className="retro-save-error">{error}</p>}
+
+      <button className="retro-save-project" disabled={busy} onClick={saveToProject}>
+        <Save/>
+        {busy?'Duke ruajtur...':saved?'U ruajt':'Ruaj foton në projekt'}
+      </button>
+
     </div>
   )
+}
+
+function compressDataUrl(src,max=720,quality=.76){
+  return new Promise(resolve=>{
+    const img=new Image()
+    img.onload=()=>{
+      const scale=Math.min(1,max/Math.max(img.width,img.height))
+      const canvas=document.createElement('canvas')
+      canvas.width=Math.max(1,Math.round(img.width*scale))
+      canvas.height=Math.max(1,Math.round(img.height*scale))
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height)
+      resolve(canvas.toDataURL('image/jpeg',quality))
+    }
+    img.onerror=()=>resolve('')
+    img.src=src
+  })
 }
