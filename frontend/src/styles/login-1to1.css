@@ -194,53 +194,36 @@
 
 
 /* =========================================================
-   IPHONE FINAL — STRETCH ONLY VERTICALLY
-   Keep original width, remove bottom white gap, no page scroll.
+   ONLY LOGIN IS FIXED
+   Other app pages keep normal scrolling.
    ========================================================= */
 @media (max-width: 600px) {
-  html,
-  body,
-  #root {
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    background: #078f88 !important;
-    overscroll-behavior: none !important;
-  }
-
-  body {
-    position: fixed !important;
-    inset: 0 !important;
-  }
 
   .login-clean-ready {
     position: fixed !important;
     inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden !important;
     background: #078f88 !important;
+    z-index: 9999 !important;
   }
 
   .login-clean-ready-bg {
     position: absolute !important;
-    left: 0 !important;
-    right: 0 !important;
-    top: 0 !important;
-
-    /* Keep width exactly the phone width.
-       Stretch only vertically a little past the viewport. */
+    inset: 0 !important;
     width: 100% !important;
-    height: calc(100% + 34px) !important;
+    height: calc(100% + 28px) !important;
 
     background-image: url('/mobile-login-approved-hero.jpg') !important;
     background-repeat: no-repeat !important;
     background-position: center top !important;
+
+    /* same width, only a little vertical stretch */
     background-size: 100% 100% !important;
 
     z-index: 1 !important;
@@ -259,30 +242,20 @@
     transform: none !important;
     box-sizing: border-box !important;
     border-radius: 20px !important;
-    z-index: 3 !important;
-  }
 
-  .login-clean-ready-field {
-    height: 50px !important;
-    margin-bottom: 9px !important;
+    z-index: 3 !important;
   }
 
   .login-clean-ready-field input {
     font-size: 16px !important;
   }
 
-  .login-clean-ready-forgot {
-    margin-bottom: 10px !important;
-  }
-
-  .login-clean-ready-signin {
-    height: 50px !important;
-  }
-}
-
-/* A little more vertical room on taller iPhones */
-@media (max-width: 600px) and (min-height: 800px) {
-  .login-clean-ready-bg {
-    height: calc(100% + 46px) !important;
+  /* fallback for browsers without dvh */
+  @supports not (height: 100dvh) {
+    .login-clean-ready {
+      height: 100svh !important;
+      min-height: 100svh !important;
+      max-height: 100svh !important;
+    }
   }
 }
