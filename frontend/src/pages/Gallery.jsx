@@ -1,4 +1,5 @@
 import React,{useEffect,useState} from 'react'
+import {X} from 'lucide-react'
 import {getProjects} from '../lib/projectsStore'
 import MobilePageHeader from '../components/MobilePageHeader'
 import {useI18n} from '../i18n/I18n'
@@ -6,18 +7,33 @@ import {useI18n} from '../i18n/I18n'
 export default function Gallery(){
  const {t}=useI18n()
  const [projects,setProjects]=useState([])
+ const [selected,setSelected]=useState(null)
  useEffect(()=>{getProjects().then(setProjects).catch(()=>setProjects([]))},[])
  return <div className="mobile-standard-page">
   <MobilePageHeader title={t('gallery')}/>
   <p className="page-subtitle">{t('projectLibrary')}</p>
+
   {projects.length
-    ? <div className="gallery-grid">{projects.map(p=><article className="gallery-card" key={p.id}>
-        <div className="gallery-art">
-          {p.image_data?<img src={p.image_data} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>:'🧶'}
+    ? <div className="gallery-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(155px,1fr))',gap:14}}>
+      {projects.map(p=><article className="gallery-card" key={p.id} style={{overflow:'hidden',borderRadius:18,background:'#fffdf8',border:'1px solid #eadfce'}}>
+        <button type="button" onClick={()=>p.image_data&&setSelected(p)} style={{display:'block',width:'100%',height:190,padding:0,border:0,background:'#f5eee3',overflow:'hidden',cursor:p.image_data?'zoom-in':'default'}}>
+          {p.image_data?<img src={p.image_data} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>:<span style={{fontSize:42}}>🧶</span>}
+        </button>
+        <div style={{padding:'11px 12px 13px',background:'#fffdf8',color:'#172033'}}>
+          <b style={{display:'block',fontSize:15,lineHeight:1.25,color:'#172033',marginBottom:4,wordBreak:'break-word'}}>{p.name}</b>
+          <small style={{display:'block',fontSize:12,color:p.status==='Completed'?'#00995E':'#FD5A46',fontWeight:800}}>{statusLabel(p.status,t)}</small>
         </div>
-        <b>{p.name}</b><small>{statusLabel(p.status,t)}</small>
-      </article>)}</div>
+      </article>)}
+    </div>
     : <div className="gallery-empty"><div>🖼️</div><h3>{t('noProjects')}</h3><p>{t('projectLibrary')}</p></div>}
+
+  {selected&&<div onClick={()=>setSelected(null)} style={{position:'fixed',inset:0,zIndex:10000,background:'rgba(9,13,22,.88)',display:'grid',placeItems:'center',padding:20}}>
+    <button onClick={()=>setSelected(null)} aria-label="Close" style={{position:'absolute',right:18,top:'calc(18px + env(safe-area-inset-top))',width:46,height:46,borderRadius:'50%',border:0,background:'#fff',display:'grid',placeItems:'center',zIndex:2}}><X/></button>
+    <div onClick={e=>e.stopPropagation()} style={{width:'min(94vw,720px)',maxHeight:'88dvh',display:'grid',gap:10}}>
+      <img src={selected.image_data} alt={selected.name} style={{width:'100%',maxHeight:'78dvh',objectFit:'contain',display:'block',borderRadius:18,background:'#fff'}}/>
+      <div style={{color:'#fff',textAlign:'center'}}><b style={{fontSize:18}}>{selected.name}</b><div style={{opacity:.8,marginTop:3}}>{statusLabel(selected.status,t)}</div></div>
+    </div>
+  </div>}
  </div>
 }
 function statusLabel(s,t){return s==='Completed'?t('completed'):s==='In Progress'?t('inProgress'):s}

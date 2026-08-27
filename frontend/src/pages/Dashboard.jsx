@@ -93,7 +93,7 @@ export default function Dashboard(){
    <button onClick={()=>nav('/calculator')} className="purple"><span><CalcIcon/></span><b>{t('calculator')}</b></button>
   </div></section>
 
-  {projects.length>0&&<section className="m-recent"><h3>{t('recentProjects')}</h3>{projects.slice(0,3).map(p=><button className="m-project-row" key={p.id} onClick={()=>nav('/projects')}><div className="m-project-img">{p.image_data?<img src={p.image_data} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>:<span>🧶</span>}</div><div><b>{p.name}</b><small className={p.status==='Completed'?'done':'progress'}>{p.status==='Completed'?t('completed'):t('inProgress')}</small></div><ChevronRight/></button>)}</section>}
+  {projects.length>0&&<section className="m-recent"><h3>{t('recentProjects')}</h3>{projects.slice(0,3).map(p=><button className="m-project-row" key={p.id} onClick={()=>nav('/projects')} style={{overflow:'hidden',alignItems:'center'}}><div className="m-project-img" style={{width:64,height:64,minWidth:64,borderRadius:12,overflow:'hidden',flex:'0 0 64px'}}>{p.image_data?<img src={p.image_data} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>:<span>🧶</span>}</div><div style={{minWidth:0,flex:1,textAlign:'left'}}><b style={{display:'block',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.name}</b><small className={p.status==='Completed'?'done':'progress'}>{p.status==='Completed'?t('completed'):t('inProgress')}</small></div><ChevronRight style={{flex:'0 0 auto'}}/></button>)}</section>}
  </div>
 }
 

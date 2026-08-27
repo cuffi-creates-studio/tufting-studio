@@ -2,7 +2,7 @@ import MobilePageHeader from '../components/MobilePageHeader'
 import {useI18n} from '../i18n/I18n'
 import React,{useEffect,useState} from 'react'
 import {Plus,Trash2} from 'lucide-react'
-import {createProject,deleteProject,getProjects} from '../lib/projectsStore'
+import {createProject,deleteProject,getProjects,updateProject} from '../lib/projectsStore'
 
 export default function Projects(){
  const {t}=useI18n()
@@ -38,6 +38,13 @@ export default function Projects(){
    catch(e){console.error(e)}
  }
 
+ async function changeStatus(id,status){
+   try{
+     await updateProject(id,{status})
+     setItems(v=>v.map(p=>p.id===id?{...p,status}:p))
+   }catch(e){console.error(e);setError(t('saveFailed'))}
+ }
+
  return <>
    <MobilePageHeader title={t('projects')}/>
    <div className="page-title">
@@ -54,9 +61,14 @@ export default function Projects(){
        </div>
        <div className="project-content" style={{position:'static',display:'block',padding:'16px 18px 18px',background:'#fffdf8',color:'#172033'}}>
          <h3>{p.name}</h3>
-         <div className="project-meta">
+         <div className="project-meta" style={{display:'flex',gap:10,alignItems:'center',justifyContent:'space-between',flexWrap:'wrap'}}>
            <span>{p.width_cm>0&&p.height_cm>0?`${p.width_cm} × ${p.height_cm} cm`:''}</span>
-           <span>{translateStatus(p.status,t)}</span>
+           <label style={{display:'flex',alignItems:'center',gap:6,fontSize:12,fontWeight:800}}>{t('status')}
+             <select value={p.status||'In Progress'} onChange={e=>changeStatus(p.id,e.target.value)} style={{height:36,border:'1px solid #eadfce',borderRadius:10,padding:'0 8px',background:'#fff'}}>
+               <option value="In Progress">{t('inProgress')}</option>
+               <option value="Completed">{t('completed')}</option>
+             </select>
+           </label>
          </div>
          <p>{t('materialCost')}: €{Number(p.material_cost||0).toFixed(2)}</p>
          <button className="text-button danger-text" onClick={()=>remove(p.id)}>
