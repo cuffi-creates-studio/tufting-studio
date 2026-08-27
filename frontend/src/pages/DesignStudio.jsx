@@ -1,12 +1,13 @@
-import React,{useEffect,useMemo,useState} from 'react'
+import React,{useEffect,useState} from 'react'
 import {ArrowLeft,X,UploadCloud,Camera,Check,Palette,Image as ImageIcon} from 'lucide-react'
 import {useNavigate} from 'react-router-dom'
+import {useI18n} from '../i18n/I18n'
 
 export default function DesignStudio(){
  const nav=useNavigate()
+ const {t}=useI18n()
  const isMobile=useMedia('(max-width: 760px)')
  const [step,setStep]=useState(0)
- const [file,setFile]=useState(null)
  const [preview,setPreview]=useState('')
  const [style,setStyle]=useState('Cartoon')
  const [processed,setProcessed]=useState({original:'',sketch:'',cartoon:'',palette:[]})
@@ -14,133 +15,129 @@ export default function DesignStudio(){
  async function pick(e){
   const f=e.target.files?.[0]
   if(!f)return
-  setFile(f)
   const url=URL.createObjectURL(f)
   setPreview(url)
-  if(isMobile){
-    const result=await processImage(url)
-    setProcessed(result)
-  }
+  const result=await processImage(url)
+  setProcessed(result)
   setStep(1)
  }
 
+ function continueToProjector(view='cartoon'){
+   const key=style==='Sketch'?'sketch':style==='Cartoon'?'cartoon':view
+   const image=processed[key]||processed.cartoon||processed.original||preview
+   try{
+     sessionStorage.setItem('tufting_projector_image',image||'')
+     sessionStorage.setItem('tufting_projector_style',style)
+     sessionStorage.setItem('tufting_projector_palette',JSON.stringify(processed.palette||[]))
+   }catch(e){console.warn('Could not cache projector image',e)}
+   nav('/projector')
+ }
+
  if(!isMobile){
-   if(step===0) return <div className="mobile-flow-page exact-upload desktop-design-preserved">
-     <div className="flow-top"><button onClick={()=>nav(-1)}><X/></button><h1>New Project</h1><button onClick={()=>nav(-1)}><X/></button></div>
-     <FlowSteps active={0}/>
+   if(step===0)return <div className="mobile-flow-page exact-upload desktop-design-preserved">
+     <div className="flow-top"><button onClick={()=>nav(-1)}><X/></button><h1>{t('newProject')}</h1><button onClick={()=>nav(-1)}><X/></button></div>
+     <FlowSteps active={0} t={t}/>
      <div className="upload-panel">
        <UploadCloud size={62}/>
-       <h2>Upload Your Photo</h2><p>JPG, PNG up to 20MB</p>
-       <label className="big-action teal">From Gallery<input type="file" accept="image/*" onChange={pick}/></label>
-       <label className="big-action purple"><Camera/>Take Photo<input type="file" accept="image/*" capture="environment" onChange={pick}/></label>
+       <h2>{t('uploadPhoto')}</h2><p>{t('photoFormats')}</p>
+       <label className="big-action teal">{t('fromGallery')}<input type="file" accept="image/*" onChange={pick}/></label>
+       <label className="big-action purple"><Camera/>{t('takePhoto')}<input type="file" accept="image/*" capture="environment" onChange={pick}/></label>
      </div>
-     <div className="tips-panel"><h3>💡 Tips for best results</h3><p>✧ Use clear, well-lit photos</p><p>☼ Front-facing works best</p><p>▣ High resolution is ideal</p></div>
+     <div className="tips-panel"><h3>{t('tipsBestResults')}</h3><p>✧ {t('tipClear')}</p><p>☼ {t('tipCentered')}</p><p>▣ {t('tipResolution')}</p></div>
    </div>
 
    return <div className="mobile-flow-page exact-preview desktop-design-preserved">
-     <div className="flow-top"><button onClick={()=>setStep(0)}><ArrowLeft/></button><h1>Preview</h1><button onClick={()=>nav(-1)}><X/></button></div>
-     <FlowSteps active={2}/>
+     <div className="flow-top"><button onClick={()=>setStep(0)}><ArrowLeft/></button><h1>{t('preview')}</h1><button onClick={()=>nav(-1)}><X/></button></div>
+     <FlowSteps active={2} t={t}/>
      <div className="preview-pair">
-       <div><div className="img-stage sketch-stage">{preview?<img src={preview}/>:<span>Sketch</span>}</div><b>Sketch</b></div>
-       <div><div className="img-stage cartoon-stage">{preview?<img src={preview}/>:<span>Cartoon</span>}</div><b>Cartoon</b></div>
+       <div><div className="img-stage sketch-stage">{processed.sketch?<img src={processed.sketch}/>:preview?<img src={preview}/>:<span>{t('sketch')}</span>}</div><b>{t('sketch')}</b></div>
+       <div><div className="img-stage cartoon-stage">{processed.cartoon?<img src={processed.cartoon}/>:preview?<img src={preview}/>:<span>{t('cartoon')}</span>}</div><b>{t('cartoon')}</b></div>
      </div>
-     <h3 className="style-title">Style</h3>
-     <div className="style-segment">{['Sketch','Cartoon','Pop Art'].map(s=><button className={style===s?'active':''} onClick={()=>setStyle(s)} key={s}>{s}</button>)}</div>
-     <div className="palette-head"><h3>Color Palette</h3><button><Palette/></button></div>
-     <div className="palette-dots">{['#30208f','#ff5b26','#ff8d22','#6243c7','#2c7ca9','#359647'].map(c=><span key={c} style={{background:c}}></span>)}<button>Customize</button></div>
-     <button className="continue-tools" onClick={()=>nav('/projector')}>Continue to Tools</button>
+     <h3 className="style-title">{t('style')}</h3>
+     <div className="style-segment">{['Sketch','Cartoon','Pop Art'].map(s=><button className={style===s?'active':''} onClick={()=>setStyle(s)} key={s}>{styleLabel(s,t)}</button>)}</div>
+     <div className="palette-head"><h3>{t('colorPalette')}</h3><button><Palette/></button></div>
+     <div className="palette-dots">{processed.palette.map(c=><span key={c} style={{background:c}}></span>)}</div>
+     <button className="continue-tools" onClick={()=>continueToProjector()}>{t('continueTools')}</button>
    </div>
  }
 
- return <MobileDesignStudio
-   nav={nav}
-   step={step}
-   setStep={setStep}
-   pick={pick}
-   processed={processed}
-   style={style}
-   setStyle={setStyle}
- />
+ return <MobileDesignStudio nav={nav} step={step} setStep={setStep} pick={pick} processed={processed} style={style} setStyle={setStyle} continueToProjector={continueToProjector} t={t}/>
 }
 
-function MobileDesignStudio({nav,step,setStep,pick,processed,style,setStyle}){
+function MobileDesignStudio({nav,step,setStep,pick,processed,style,setStyle,continueToProjector,t}){
  const [view,setView]=useState('cartoon')
  if(step===0){
    return <div className="m-design-page">
-     <div className="m-design-head"><button onClick={()=>nav(-1)}><ArrowLeft/></button><h1>New Project</h1><span/></div>
-     <FlowSteps active={0}/>
+     <div className="m-design-head"><button onClick={()=>nav(-1)}><ArrowLeft/></button><h1>{t('newProject')}</h1><span/></div>
+     <FlowSteps active={0} t={t}/>
      <div className="m-upload-card">
        <div className="m-upload-icon"><UploadCloud/></div>
-       <h2>Upload Your Photo</h2>
-       <p>JPG or PNG · clear photo works best</p>
-       <label className="m-upload-primary">From Gallery<input type="file" accept="image/*" onChange={pick}/></label>
-       <label className="m-upload-secondary"><Camera/>Take Photo<input type="file" accept="image/*" capture="environment" onChange={pick}/></label>
+       <h2>{t('uploadPhoto')}</h2>
+       <p>{t('photoFormatsMobile')}</p>
+       <label className="m-upload-primary">{t('fromGallery')}<input type="file" accept="image/*" onChange={pick}/></label>
+       <label className="m-upload-secondary"><Camera/>{t('takePhoto')}<input type="file" accept="image/*" capture="environment" onChange={pick}/></label>
      </div>
      <div className="m-upload-tips">
-       <b>Tips for best results</b>
-       <span>• Use a clear, well-lit photo</span>
-       <span>• Keep the subject centered</span>
-       <span>• Higher resolution gives cleaner outlines</span>
+       <b>{t('tipsBestResults')}</b>
+       <span>• {t('tipClear')}</span>
+       <span>• {t('tipCentered')}</span>
+       <span>• {t('tipResolution')}</span>
      </div>
    </div>
  }
 
- const current=processed[view] || processed.original
+ const current=processed[view]||processed.original
  return <div className="m-design-page m-preview-page">
-   <div className="m-design-head"><button onClick={()=>setStep(0)}><ArrowLeft/></button><h1>Preview</h1><button onClick={()=>nav(-1)}><X/></button></div>
-   <FlowSteps active={2}/>
+   <div className="m-design-head"><button onClick={()=>setStep(0)}><ArrowLeft/></button><h1>{t('preview')}</h1><button onClick={()=>nav(-1)}><X/></button></div>
+   <FlowSteps active={2} t={t}/>
 
    <div className="m-preview-tabs">
-     {[
-       ['original','Original'],
-       ['sketch','Sketch'],
-       ['cartoon','Cartoon']
-     ].map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)}>{label}</button>)}
+     {[['original',t('original')],['sketch',t('sketch')],['cartoon',t('cartoon')]].map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)}>{label}</button>)}
    </div>
 
    <div className={`m-main-preview ${view}`}>
-     {current?<img src={current} alt={view}/>:<div className="m-preview-placeholder"><ImageIcon/><span>No image</span></div>}
+     {current?<img src={current} alt={view}/>:<div className="m-preview-placeholder"><ImageIcon/><span>{t('noImage')}</span></div>}
    </div>
 
    <div className="m-mini-comparison">
-     <button className={view==='sketch'?'active':''} onClick={()=>setView('sketch')}>
-       {processed.sketch&&<img src={processed.sketch}/>}<b>Sketch</b>
-     </button>
-     <button className={view==='cartoon'?'active':''} onClick={()=>setView('cartoon')}>
-       {processed.cartoon&&<img src={processed.cartoon}/>}<b>Cartoon</b>
-     </button>
+     <button className={view==='sketch'?'active':''} onClick={()=>setView('sketch')}>{processed.sketch&&<img src={processed.sketch}/>}<b>{t('sketch')}</b></button>
+     <button className={view==='cartoon'?'active':''} onClick={()=>setView('cartoon')}>{processed.cartoon&&<img src={processed.cartoon}/>}<b>{t('cartoon')}</b></button>
    </div>
 
-   <h3 className="m-section-title">Style</h3>
+   <h3 className="m-section-title">{t('style')}</h3>
    <div className="m-style-segment">
-     {['Sketch','Cartoon','Pop Art'].map(s=><button key={s} className={style===s?'active':''} onClick={()=>{setStyle(s); if(s==='Sketch')setView('sketch'); else if(s==='Cartoon')setView('cartoon')}}>{s}</button>)}
+     {['Sketch','Cartoon','Pop Art'].map(s=><button key={s} className={style===s?'active':''} onClick={()=>{setStyle(s);if(s==='Sketch')setView('sketch');else if(s==='Cartoon')setView('cartoon')}}>{styleLabel(s,t)}</button>)}
    </div>
 
-   <div className="m-palette-head"><h3>Color Palette</h3><span>{processed.palette.length} colors</span></div>
+   <div className="m-palette-head"><h3>{t('colorPalette')}</h3><span>{processed.palette.length} {t('colors')}</span></div>
    <div className="m-numbered-palette">
      {processed.palette.map((c,i)=><div className="m-color-item" key={c}>
-       <span className="m-color-number">{i+1}</span>
-       <i style={{background:c}}></i>
-       <div><b>Color {i+1}</b><small>{c.toUpperCase()}</small></div>
+       <span className="m-color-number">{i+1}</span><i style={{background:c}}></i>
+       <div><b>{t('color')} {i+1}</b><small>{c.toUpperCase()}</small></div>
      </div>)}
    </div>
 
-   <button className="m-continue-tools" onClick={()=>nav('/projector')}>Continue to Tools</button>
+   <button className="m-continue-tools" onClick={()=>continueToProjector(view)}>{t('continueTools')}</button>
  </div>
 }
 
-function FlowSteps({active}){
- const labels=['Photo','Style','Preview','Save']
- return <div className="flow-steps">{labels.map((l,i)=><div key={l} className={i<=active?'done':''}><span>{i<active?<Check size={15}/>:i+1}</span><b>{l}</b></div>)}</div>
+function FlowSteps({active,t}){
+ const labels=[t('photo'),t('style'),t('preview'),t('save')]
+ return <div className="flow-steps">{labels.map((l,i)=><div key={i} className={i<=active?'done':''}><span>{i<active?<Check size={15}/>:i+1}</span><b>{l}</b></div>)}</div>
+}
+
+function styleLabel(s,t){
+ if(s==='Sketch')return t('sketch')
+ if(s==='Cartoon')return t('cartoon')
+ if(s==='Pop Art')return t('popArt')
+ return s
 }
 
 function useMedia(query){
  const [matches,setMatches]=useState(()=>typeof window!=='undefined'&&window.matchMedia(query).matches)
  useEffect(()=>{
-   const m=window.matchMedia(query)
-   const f=()=>setMatches(m.matches)
-   f()
-   m.addEventListener?.('change',f)
+   const m=window.matchMedia(query),f=()=>setMatches(m.matches)
+   f();m.addEventListener?.('change',f)
    return()=>m.removeEventListener?.('change',f)
  },[query])
  return matches
