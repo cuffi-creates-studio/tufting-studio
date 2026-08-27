@@ -8,24 +8,31 @@ import {
   where
 } from 'firebase/firestore'
 import {auth,db} from './firebase'
+import {onAuthStateChanged} from 'firebase/auth'
 
-function user(){
-  const u=auth.currentUser
-  if(!u) throw new Error('auth/not-signed-in')
-  return u
+async function user(){
+  if(auth.currentUser)return auth.currentUser
+  return await new Promise((resolve,reject)=>{
+    const stop=onAuthStateChanged(auth,u=>{
+      stop()
+      if(u)resolve(u)
+      else reject(new Error('auth/not-signed-in'))
+    },reject)
+  })
+}
+function changed(){
+  if(typeof window!=='undefined')window.dispatchEvent(new Event('tufting-data-updated'))
 }
 
 export async function getProjects(){
-  const u=user()
+  const u=await user()
   const q=query(collection(db,'projects'),where('user_id','==',u.uid))
   const snap=await getDocs(q)
-  return snap.docs
-    .map(d=>({id:d.id,...d.data()}))
-    .sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')))
+  return snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')))
 }
 
 export async function createProject(data){
-  const u=user()
+  const u=await user()
   const clean={
     user_id:u.uid,
     name:String(data.name||'Untitled Project').trim()||'Untitled Project',
@@ -43,10 +50,10 @@ export async function createProject(data){
     created_at:new Date().toISOString()
   }
   const ref=await addDoc(collection(db,'projects'),clean)
+  changed()
   return {id:ref.id,...clean}
 }
 
 export async function deleteProject(id){
-  user()
-  await deleteDoc(doc(db,'projects',id))
+  await user(); await deleteDoc(doc(db,'projects',id)); changed()
 }
