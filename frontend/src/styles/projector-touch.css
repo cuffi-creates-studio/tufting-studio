@@ -1,0 +1,338 @@
+.projector-touch-page{
+  max-width:900px;
+  margin:0 auto;
+  padding:18px 18px 120px;
+}
+
+.projector-touch-header{
+  display:grid;
+  grid-template-columns:52px 1fr 52px;
+  align-items:center;
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.projector-touch-header h1{
+  margin:0;
+  text-align:center;
+  font-size:28px;
+  color:#17233a;
+}
+
+.projector-touch-header p{
+  margin:4px 0 0;
+  text-align:center;
+  color:#737987;
+  font-size:14px;
+}
+
+.projector-round{
+  width:48px;
+  height:48px;
+  border:1px solid #ead9c2;
+  border-radius:16px;
+  background:#fffaf2;
+  display:grid;
+  place-items:center;
+  color:#17233a;
+  box-shadow:0 6px 14px rgba(24,32,48,.08);
+}
+
+.projector-touch-card{
+  border:2px solid #2b918f;
+  border-radius:28px;
+  background:#fff9ef;
+  padding:20px;
+  box-shadow:0 12px 30px rgba(37,42,55,.08);
+}
+
+.projector-touch-toolbar{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.projector-touch-toolbar button{
+  min-height:62px;
+  border:1px solid #e9d8bf;
+  border-radius:18px;
+  background:#fffaf2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  color:#17233a;
+  font-weight:800;
+  box-shadow:0 5px 10px rgba(40,34,25,.06);
+}
+
+.projector-touch-toolbar button.active{
+  background:#2c928f;
+  color:#fff;
+  border-color:#2c928f;
+}
+
+.projector-touch-toolbar svg{
+  width:23px;
+  height:23px;
+}
+
+.projector-touch-toolbar span{
+  font-size:11px;
+}
+
+.projector-touch-layout{
+  display:grid;
+  grid-template-columns:72px 1fr 72px;
+  grid-template-rows:72px auto 72px;
+  align-items:center;
+  justify-items:center;
+}
+
+.p-touch-arrow{
+  width:62px;
+  height:62px;
+  border:1px solid #e5d6c2;
+  border-radius:18px;
+  background:#fffaf2;
+  color:#187f7d;
+  display:grid;
+  place-items:center;
+  box-shadow:0 5px 12px rgba(40,34,25,.07);
+}
+
+.p-touch-arrow svg{
+  width:30px;
+  height:30px;
+}
+
+.p-touch-arrow.up{
+  grid-column:2;
+  grid-row:1;
+}
+
+.p-touch-arrow.left{
+  grid-column:1;
+  grid-row:2;
+}
+
+.p-touch-arrow.right{
+  grid-column:3;
+  grid-row:2;
+}
+
+.p-touch-arrow.down{
+  grid-column:2;
+  grid-row:3;
+}
+
+.projector-touch-stage{
+  grid-column:2;
+  grid-row:2;
+  width:min(100%,560px);
+  aspect-ratio:1/1;
+  position:relative;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:2px solid #dcc6a9;
+  border-radius:24px;
+  background:#fffdf8;
+  touch-action:none;
+}
+
+.projector-touch-stage.with-grid{
+  background-color:#fffdf8;
+  background-image:
+    linear-gradient(rgba(40,90,90,.10) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(40,90,90,.10) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+
+.projector-touch-stage img{
+  max-width:84%;
+  max-height:84%;
+  object-fit:contain;
+  transform-origin:center center;
+  user-select:none;
+  -webkit-user-drag:none;
+  touch-action:none;
+}
+
+.projector-touch-empty{
+  text-align:center;
+  padding:24px;
+  color:#657080;
+}
+
+.projector-touch-empty div{
+  font-size:38px;
+  margin-bottom:12px;
+}
+
+.projector-touch-zoom{
+  display:grid;
+  grid-template-columns:64px 1fr 64px;
+  gap:16px;
+  align-items:center;
+  margin-top:18px;
+}
+
+.projector-touch-zoom button{
+  width:60px;
+  height:60px;
+  border:1px solid #e5d6c2;
+  border-radius:18px;
+  background:#fffaf2;
+  color:#187f7d;
+  display:grid;
+  place-items:center;
+}
+
+.projector-touch-zoom strong{
+  text-align:center;
+  font-size:34px;
+  color:#17233a;
+}
+
+.projector-touch-opacity{
+  margin-top:18px;
+  padding:15px 16px;
+  border:1px solid #e5d6c2;
+  border-radius:18px;
+  background:#fffaf2;
+}
+
+.projector-touch-opacity>div{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.projector-touch-opacity span{
+  font-weight:800;
+}
+
+.projector-touch-opacity input{
+  width:100%;
+  accent-color:#2c928f;
+}
+
+/* Fullscreen / iPhone fallback */
+.projector-touch-stage.is-fullscreen,
+.projector-touch-stage:fullscreen{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100dvh !important;
+  max-width:none !important;
+  aspect-ratio:auto !important;
+  border:0 !important;
+  border-radius:0 !important;
+  z-index:100000 !important;
+  background-color:#fff9ef !important;
+}
+
+.projector-touch-stage.is-fullscreen img,
+.projector-touch-stage:fullscreen img{
+  max-width:92vw !important;
+  max-height:88dvh !important;
+  transition:none !important;
+}
+
+.projector-full-close{
+  position:absolute;
+  top:max(18px,env(safe-area-inset-top));
+  right:18px;
+  width:54px;
+  height:54px;
+  border:0;
+  border-radius:50%;
+  background:rgba(23,35,58,.88);
+  color:#fff;
+  z-index:10;
+  display:grid;
+  place-items:center;
+}
+
+.projector-drag-hint{
+  position:absolute;
+  left:50%;
+  bottom:max(22px,env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  background:rgba(23,35,58,.78);
+  color:#fff;
+  padding:9px 16px;
+  border-radius:999px;
+  font-size:13px;
+  pointer-events:none;
+}
+
+@media(max-width:760px){
+  .projector-touch-page{
+    padding:12px 14px 118px;
+  }
+
+  .projector-touch-header{
+    grid-template-columns:46px 1fr 46px;
+  }
+
+  .projector-touch-header h1{
+    font-size:22px;
+  }
+
+  .projector-touch-header p{
+    font-size:12px;
+  }
+
+  .projector-round{
+    width:44px;
+    height:44px;
+  }
+
+  .projector-touch-card{
+    padding:14px;
+    border-radius:22px;
+  }
+
+  .projector-touch-toolbar button{
+    min-height:54px;
+    border-radius:15px;
+  }
+
+  .projector-touch-layout{
+    grid-template-columns:54px 1fr 54px;
+    grid-template-rows:54px auto 54px;
+  }
+
+  .p-touch-arrow{
+    width:48px;
+    height:48px;
+    border-radius:15px;
+  }
+
+  .p-touch-arrow svg{
+    width:26px;
+    height:26px;
+  }
+
+  .projector-touch-stage{
+    border-radius:18px;
+  }
+
+  .projector-touch-zoom{
+    grid-template-columns:54px 1fr 54px;
+  }
+
+  .projector-touch-zoom button{
+    width:50px;
+    height:50px;
+    border-radius:15px;
+  }
+
+  .projector-touch-zoom strong{
+    font-size:30px;
+  }
+}
