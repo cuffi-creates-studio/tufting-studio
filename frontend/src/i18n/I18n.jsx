@@ -20,7 +20,8 @@ const translations={
   yarnType:'Yarn type',density:'Density',light:'Light',standard:'Standard',dense:'Dense',price100g:'Price / 100g',waste:'Waste',calculate:'Calculate',
   area:'Area',baseYarn:'Base Yarn',totalYarn:'Total Yarn',planningEstimate:'This is a planning estimate. Real yarn usage depends on pile height, strand count and your tufting density.',
   displayName:'Display name',chooseDashboardPhoto:'Choose Dashboard profile photo',removePhoto:'Remove photo',
-  profilePhotoNote:'This photo is the round avatar next to “Hello” on the mobile Dashboard.',upload:'Upload'
+  profilePhotoNote:'This photo is the round avatar next to “Hello” on the mobile Dashboard.',upload:'Upload',
+  calculationSaved:'Calculation saved',savedCalculations:'Saved calculations',numberOfColors:'Colors',projectsThisWeek:'Projects',calculationsThisWeek:'Calculations',weeklyCost:'Weekly cost'
  },
  de:{
   dashboard:'Dashboard',projects:'Projekte',gallery:'Galerie',design:'Design Studio',projector:'Projektor',calculator:'Rechner',materials:'Materialien',settings:'Einstellungen',
@@ -41,7 +42,8 @@ const translations={
   yarnType:'Garntyp',density:'Dichte',light:'Leicht',standard:'Standard',dense:'Dicht',price100g:'Preis / 100g',waste:'Verschnitt',calculate:'Berechnen',
   area:'Fläche',baseYarn:'Basisgarn',totalYarn:'Gesamtgarn',planningEstimate:'Dies ist eine Planungsschätzung. Der echte Garnverbrauch hängt von Florhöhe, Fadenzahl und Tufting-Dichte ab.',
   displayName:'Anzeigename',chooseDashboardPhoto:'Dashboard-Profilfoto auswählen',removePhoto:'Foto entfernen',
-  profilePhotoNote:'Dieses Foto erscheint als runder Avatar neben „Hallo“ im mobilen Dashboard.',upload:'Hochladen'
+  profilePhotoNote:'Dieses Foto erscheint als runder Avatar neben „Hallo“ im mobilen Dashboard.',upload:'Hochladen',
+  calculationSaved:'Berechnung gespeichert',savedCalculations:'Gespeicherte Berechnungen',numberOfColors:'Farben',projectsThisWeek:'Projekte',calculationsThisWeek:'Berechnungen',weeklyCost:'Wochenkosten'
  },
  sq:{
   dashboard:'Paneli',projects:'Projektet',gallery:'Galeria',design:'Studio Dizajni',projector:'Projektori',calculator:'Llogaritësi',materials:'Materialet',settings:'Cilësimet',
@@ -50,19 +52,20 @@ const translations={
   noStats:'Ende nuk ka statistika',noAppointments:'Ende nuk ka termine',addAppointment:'Shto termin',language:'Gjuha',notifications:'Njoftimet',
   appointmentNotifications:'Njoftimet për termine',save:'Ruaj',saved:'U ruajt',saving:'Duke ruajtur...',profile:'Profili',studioLogo:'Logo e studios',logout:'Dil',
   uploadPhoto:'Ngarko fotografinë',fromGallery:'Nga Galeria',takePhoto:'Bëj Foto',preview:'Paraqitja',style:'Stili',colorPalette:'Paleta e ngjyrave',
-  continueTools:'Vazhdo te veglat',projectorTools:'Veglat e projektorit',mirror:'Pasqyrë',yarnCalculator:'Llogaritësi i fillit',saveProject:'Ruaj projektin',
+  continueTools:'Vazhdo te veglat',projectorTools:'Veglat e projektorit',mirror:'Pasqyrë',yarnCalculator:'Llogaritësi i leshit',saveProject:'Ruaj projektin',
   noProjects:'Ende nuk ka projekte',projectLibrary:'Biblioteka e projekteve.',home:'Kreu',new:'I ri',menu:'Menu',
   allSavedProjects:'Të gjitha projektet e ruajtura të tufting.',name:'Emri',widthCm:'Gjerësia cm',heightCm:'Lartësia cm',notes:'Shënime',
   createProject:'Krijo projektin',delete:'Fshi',deleteProjectConfirm:'Ta fshij projektin?',materialCost:'Kosto materiali',projectNameRequired:'Shkruaj emrin e projektit.',
   saveFailed:'Nuk u ruajt. Provo përsëri.',photo:'Foto',photoFormats:'JPG ose PNG · foto e qartë jep rezultat më të mirë',photoFormatsMobile:'JPG ose PNG · foto e qartë jep rezultat më të mirë',
   tipsBestResults:'Këshilla për rezultat më të mirë',tipClear:'Përdor foto të qartë dhe me dritë',tipCentered:'Mbaje subjektin në qendër',tipResolution:'Rezolucioni i lartë jep konture më të pastra',
   original:'Origjinali',sketch:'Skicë',cartoon:'Kartun',popArt:'Pop Art',colors:'ngjyra',color:'Ngjyra',noImage:'Nuk ka foto',
-  noProjectorImage:'Hap fillimisht një foto nga Studio Dizajni.',acrylic:'Akrilik',wool:'Lesh',estimatedYarn:'Filli i parashikuar',coverageArea:'Sipërfaqja',costEstimate:'Kosto e parashikuar',
-  projectName:'Emri i projektit',yarnCostCalculator:'Llogaritësi i fillit & kostos',calculatorDesc:'Llogarit gramët dhe koston e materialit para se të fillosh tufting.',
-  yarnType:'Lloji i fillit',density:'Dendësia',light:'E lehtë',standard:'Standarde',dense:'E dendur',price100g:'Çmimi / 100g',waste:'Humbje',calculate:'Llogarit',
-  area:'Sipërfaqja',baseYarn:'Filli bazë',totalYarn:'Filli total',planningEstimate:'Ky është një vlerësim planifikimi. Përdorimi real i fillit varet nga lartësia e fijes, numri i fijeve dhe dendësia e tufting.',
+  noProjectorImage:'Hap fillimisht një foto nga Studio Dizajni.',acrylic:'Akrilik',wool:'Lesh',estimatedYarn:'Leshi i parashikuar',coverageArea:'Sipërfaqja',costEstimate:'Kosto e parashikuar',
+  projectName:'Emri i projektit',yarnCostCalculator:'Llogaritësi i leshit & kostos',calculatorDesc:'Llogarit sasinë e leshit dhe koston e materialit para se të fillosh tufting.',
+  yarnType:'Lloji i leshit',density:'Dendësia',light:'E lehtë',standard:'Standarde',dense:'E dendur',price100g:'Çmimi / 100g',waste:'Humbje',calculate:'Llogarit',
+  area:'Sipërfaqja',baseYarn:'Leshi bazë',totalYarn:'Leshi total',planningEstimate:'Ky është një vlerësim planifikimi. Përdorimi real i leshit varet nga lartësia e fijes, numri i fijeve dhe dendësia e tufting.',
   displayName:'Emri i shfaqur',chooseDashboardPhoto:'Zgjidh foton e profilit në Dashboard',removePhoto:'Hiq foton',
-  profilePhotoNote:'Kjo foto shfaqet si avatar i rrumbullakët pranë “Përshëndetje” në Dashboard.',upload:'Ngarko'
+  profilePhotoNote:'Kjo foto shfaqet si avatar i rrumbullakët pranë “Përshëndetje” në Dashboard.',upload:'Ngarko',
+  calculationSaved:'Llogaritja u ruajt',savedCalculations:'Llogaritjet e ruajtura',numberOfColors:'Ngjyra',projectsThisWeek:'Projekte',calculationsThisWeek:'Llogaritje',weeklyCost:'Kosto javore'
  }
 }
 
