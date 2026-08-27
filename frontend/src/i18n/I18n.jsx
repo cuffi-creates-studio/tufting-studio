@@ -4,7 +4,7 @@ const translations={
  en:{
   dashboard:'Dashboard',projects:'Projects',gallery:'Gallery',design:'Design Studio',projector:'Projector',calculator:'Calculator',materials:'Materials',settings:'Settings',
   hello:'Hello',studioOwner:'Studio Owner',thisWeek:'This Week',quickActions:'Quick Actions',recentProjects:'Recent Projects',
-  newProject:'New Project',completed:'Completed',inProgress:'In Progress',back:'Back',calendar:'Calendar',statistics:'Statistics',appointments:'Appointments',
+  newProject:'New Project',status:'Status',completed:'Completed',inProgress:'In Progress',back:'Back',calendar:'Calendar',statistics:'Statistics',appointments:'Appointments',
   noStats:'No statistics yet',noAppointments:'No appointments yet',addAppointment:'Add appointment',language:'Language',notifications:'Notifications',
   appointmentNotifications:'Appointment notifications',save:'Save',saved:'Saved',saving:'Saving...',profile:'Profile',studioLogo:'Studio logo',logout:'Logout',
   uploadPhoto:'Upload Your Photo',fromGallery:'From Gallery',takePhoto:'Take Photo',preview:'Preview',style:'Style',colorPalette:'Color Palette',
@@ -26,7 +26,7 @@ const translations={
  de:{
   dashboard:'Dashboard',projects:'Projekte',gallery:'Galerie',design:'Design Studio',projector:'Projektor',calculator:'Rechner',materials:'Materialien',settings:'Einstellungen',
   hello:'Hallo',studioOwner:'Studioinhaber',thisWeek:'Diese Woche',quickActions:'Schnellaktionen',recentProjects:'Letzte Projekte',
-  newProject:'Neues Projekt',completed:'Fertig',inProgress:'In Arbeit',back:'Zurück',calendar:'Kalender',statistics:'Statistiken',appointments:'Termine',
+  newProject:'Neues Projekt',status:'Status',completed:'Fertig',inProgress:'In Arbeit',back:'Zurück',calendar:'Kalender',statistics:'Statistiken',appointments:'Termine',
   noStats:'Noch keine Statistiken',noAppointments:'Noch keine Termine',addAppointment:'Termin hinzufügen',language:'Sprache',notifications:'Benachrichtigungen',
   appointmentNotifications:'Termin-Benachrichtigungen',save:'Speichern',saved:'Gespeichert',saving:'Speichern...',profile:'Profil',studioLogo:'Studio-Logo',logout:'Abmelden',
   uploadPhoto:'Foto hochladen',fromGallery:'Aus Galerie',takePhoto:'Foto aufnehmen',preview:'Vorschau',style:'Stil',colorPalette:'Farbpalette',
@@ -48,7 +48,7 @@ const translations={
  sq:{
   dashboard:'Paneli',projects:'Projektet',gallery:'Galeria',design:'Studio Dizajni',projector:'Projektori',calculator:'Llogaritësi',materials:'Materialet',settings:'Cilësimet',
   hello:'Përshëndetje',studioOwner:'Pronari i Studios',thisWeek:'Këtë javë',quickActions:'Veprime të shpejta',recentProjects:'Projektet e fundit',
-  newProject:'Projekt i ri',completed:'Përfunduar',inProgress:'Në punë',back:'Mbrapa',calendar:'Kalendari',statistics:'Statistikat',appointments:'Terminet',
+  newProject:'Projekt i ri',status:'Statusi',completed:'Përfunduar',inProgress:'Në punë',back:'Mbrapa',calendar:'Kalendari',statistics:'Statistikat',appointments:'Terminet',
   noStats:'Ende nuk ka statistika',noAppointments:'Ende nuk ka termine',addAppointment:'Shto termin',language:'Gjuha',notifications:'Njoftimet',
   appointmentNotifications:'Njoftimet për termine',save:'Ruaj',saved:'U ruajt',saving:'Duke ruajtur...',profile:'Profili',studioLogo:'Logo e studios',logout:'Dil',
   uploadPhoto:'Ngarko fotografinë',fromGallery:'Nga Galeria',takePhoto:'Bëj Foto',preview:'Paraqitja',style:'Stili',colorPalette:'Paleta e ngjyrave',
