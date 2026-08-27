@@ -147,7 +147,7 @@ export default function Projector(){
           width:100%;
           max-width:980px;
           margin:0 auto;
-          padding:6px 6px 104px;
+          padding:8px 6px 110px;
           box-sizing:border-box;
           color:#14223b;
         }
@@ -157,7 +157,7 @@ export default function Projector(){
           grid-template-columns:46px 1fr 46px;
           align-items:center;
           gap:8px;
-          margin-bottom:6px;
+          margin-bottom:10px;
         }
 
         .pj-back,.pj-reset{
@@ -286,9 +286,9 @@ export default function Projector(){
 
         .pj-stage{
           width:100%;
-          height:52vh;
-          min-height:350px;
-          max-height:470px;
+          height:54vh;
+          min-height:360px;
+          max-height:500px;
           position:relative;
           display:grid;
           place-items:center;
@@ -331,7 +331,7 @@ export default function Projector(){
 
         .pj-opacity{
           margin-top:8px;
-          min-height:50px;
+          min-height:56px;
           display:grid;
           grid-template-columns:70px 1fr 48px;
           align-items:center;
@@ -351,7 +351,7 @@ export default function Projector(){
           display:flex;
           justify-content:center;
           gap:22px;
-          padding:5px 2px 0;
+          padding:8px 2px 0;
           color:#7b8089;
           font-size:14px;
         }
@@ -360,8 +360,8 @@ export default function Projector(){
 
         .pj-save{
           width:100%;
-          min-height:56px;
-          margin-top:8px;
+          min-height:60px;
+          margin-top:10px;
           border:0;
           border-radius:17px;
           background:#5a36c9;
@@ -428,22 +428,75 @@ export default function Projector(){
           pointer-events:none;
         }
 
-        @media(max-width:430px){
+        @media(max-width:760px){
+          .pj-page{
+            position:fixed;
+            inset:0;
+            width:100%;
+            height:100dvh;
+            max-width:none;
+            padding:6px 6px calc(94px + env(safe-area-inset-bottom));
+            overflow:hidden;
+            background:#fff8ea;
+          }
+
+          .pj-head{
+            margin-bottom:5px;
+          }
+
+          .pj-shell{
+            padding:7px;
+          }
+
+          .pj-top{
+            margin-bottom:5px;
+          }
+
+          .pj-top button{
+            height:38px;
+          }
+
+          .pj-stage{
+            height:43dvh;
+            min-height:300px;
+            max-height:390px;
+          }
+
+          .pj-left button,
+          .pj-right button{
+            height:42px;
+          }
+
+          .pj-opacity{
+            min-height:46px;
+            margin-top:6px;
+          }
+
+          .pj-info{
+            padding-top:4px;
+            font-size:13px;
+          }
+
+          .pj-save{
+            min-height:52px;
+            margin-top:6px;
+          }
+        }
+
+        @supports not (height:100dvh){
+          @media(max-width:760px){
+            .pj-page{height:100svh}
+            .pj-stage{height:43svh}
+          }
+        }
+
+        @media(max-width:390px){
           .pj-title p{display:none}
           .pj-title h1{font-size:20px}
           .pj-stage{
-            height:50vh;
-            min-height:330px;
-            max-height:430px;
-          }
-          .pj-left button,.pj-right button{
-            height:44px;
-          }
-          .pj-top button{
-            height:40px;
-          }
-          .pj-opacity{
-            min-height:48px;
+            height:41dvh;
+            min-height:285px;
+            max-height:350px;
           }
         }
       `}</style>
