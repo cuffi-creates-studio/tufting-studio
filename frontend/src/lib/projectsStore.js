@@ -5,7 +5,8 @@ import {
   doc,
   getDocs,
   query,
-  where
+  where,
+  updateDoc
 } from 'firebase/firestore'
 import {auth,db} from './firebase'
 import {onAuthStateChanged} from 'firebase/auth'
@@ -56,4 +57,12 @@ export async function createProject(data){
 
 export async function deleteProject(id){
   await user(); await deleteDoc(doc(db,'projects',id)); changed()
+}
+
+export async function updateProject(id,data){
+  await user()
+  const patch={...data,updated_at:new Date().toISOString()}
+  await updateDoc(doc(db,'projects',id),patch)
+  changed()
+  return {id,...patch}
 }
