@@ -1,117 +1,233 @@
-import React,{useMemo,useState} from 'react'
-import {ArrowLeft,ArrowUp,ArrowDown,ArrowRight,Minus,Plus} from 'lucide-react'
+import React,{useMemo,useRef,useState} from 'react'
+import {
+  ArrowLeft,ArrowRight,ArrowUp,ArrowDown,
+  Minus,Plus,FlipHorizontal2,Grid3X3,
+  Maximize2,RotateCcw,X
+} from 'lucide-react'
 import {useNavigate} from 'react-router-dom'
 import {useI18n} from '../i18n/I18n'
-import {createProject} from '../lib/projectsStore'
+import '../styles/projector-touch.css'
 
 export default function Projector(){
- const nav=useNavigate()
- const {t}=useI18n()
- const [mirror,setMirror]=useState(true)
- const [zoom,setZoom]=useState(125)
- const [fiber,setFiber]=useState('Acrylic')
- const [x,setX]=useState(0)
- const [y,setY]=useState(0)
- const [busy,setBusy]=useState(false)
- const [saved,setSaved]=useState(false)
- const [error,setError]=useState('')
+  const nav=useNavigate()
+  const {t}=useI18n()
+  const stageRef=useRef(null)
 
- const image=useMemo(()=>sessionStorage.getItem('tufting_projector_image')||'',[ ])
- const style=useMemo(()=>sessionStorage.getItem('tufting_projector_style')||'Cartoon',[ ])
- const palette=useMemo(()=>{try{return JSON.parse(sessionStorage.getItem('tufting_projector_palette')||'[]')}catch{return[]}},[])
- const lastCalc=useMemo(()=>{try{return JSON.parse(localStorage.getItem('tufting_last_calculation')||'{}')}catch{return{}}},[])
+  const [mirror,setMirror]=useState(false)
+  const [grid,setGrid]=useState(true)
+  const [opacity,setOpacity]=useState(100)
+  const [zoom,setZoom]=useState(125)
+  const [x,setX]=useState(0)
+  const [y,setY]=useState(0)
+  const [fullscreenMode,setFullscreenMode]=useState(false)
 
- const yarn=fiber==='Acrylic'?620:690
- const cost=fiber==='Acrylic'?24.80:31.50
+  const drag=useRef({
+    active:false,
+    startX:0,
+    startY:0,
+    baseX:0,
+    baseY:0
+  })
 
- async function saveProject(){
-   setBusy(true);setError('');setSaved(false)
-   try{
-     const name=prompt(t('projectName'),`${style} Project`)||`${style} Project`
-     const smallImage=image?await compressDataUrl(image,560,.68):''
-     await createProject({
-       name,
-       status:'In Progress',
-       material_cost:cost,
-       width_cm:Number(lastCalc.width_cm)||80,
-       height_cm:Number(lastCalc.height_cm)||60,
-       yarn_type:fiber,
-       yarn_g:yarn,
-       coverage_area:.85,
-       style,
-       palette,
-       image_data:smallImage
-     })
-     setSaved(true)
-     setTimeout(()=>nav('/projects'),650)
-   }catch(e){
-     console.error(e)
-     setError(t('saveFailed'))
-   }finally{setBusy(false)}
- }
+  const image=useMemo(
+    ()=>sessionStorage.getItem('tufting_projector_image')||'',
+    []
+  )
 
- return <div className="mobile-flow-page exact-projector">
-   <div className="flow-top"><button onClick={()=>nav(-1)}><ArrowLeft/></button><h1>{t('projectorTools')}</h1><span/></div>
+  function move(dx,dy){
+    setX(v=>v+dx)
+    setY(v=>v+dy)
+  }
 
-   <div className="projector-box">
-     <div className="mirror-row"><b>◫ {t('mirror')}</b><button className={`switch ${mirror?'on':''}`} onClick={()=>setMirror(!mirror)}><i/></button></div>
-     <div className="projector-controls">
-       <button className="p-arrow top" onClick={()=>setY(v=>v-8)}><ArrowUp/></button>
-       <button className="p-arrow bottom" style={{bottom:18}} onClick={()=>setY(v=>v+8)}><ArrowDown/></button>
-       <button className="p-arrow left" onClick={()=>setX(v=>v-8)}>←</button>
+  function reset(){
+    setX(0)
+    setY(0)
+    setZoom(125)
+    setOpacity(100)
+    setMirror(false)
+    setGrid(true)
+  }
 
-       <div className="projector-preview-dog" style={{overflow:'hidden',display:'grid',placeItems:'center'}}>
-         {image
-           ? <img
-               src={image}
-               alt={t('preview')}
-               style={{
-                 maxWidth:'82%',maxHeight:'82%',objectFit:'contain',
-                 transform:`translate(${x}px,${y}px) scale(${zoom/100}) scaleX(${mirror?-1:1})`,
-                 transformOrigin:'center',
-                 transition:'transform .15s ease'
-               }}
-             />
-           : <div style={{fontSize:18,textAlign:'center',padding:20}}>🖼️<br/><small>{t('noProjectorImage')}</small></div>}
-       </div>
+  function beginDrag(clientX,clientY){
+    drag.current={
+      active:true,
+      startX:clientX,
+      startY:clientY,
+      baseX:x,
+      baseY:y
+    }
+  }
 
-       <button className="p-arrow right" onClick={()=>setX(v=>v+8)}><ArrowRight/></button>
-     </div>
-     <div className="zoom-row">
-       <button onClick={()=>setZoom(Math.max(25,zoom-25))}><Minus/></button>
-       <b>{zoom}%</b>
-       <button onClick={()=>setZoom(Math.min(300,zoom+25))}><Plus/></button>
-     </div>
-   </div>
+  function updateDrag(clientX,clientY){
+    if(!drag.current.active)return
+    setX(drag.current.baseX+(clientX-drag.current.startX))
+    setY(drag.current.baseY+(clientY-drag.current.startY))
+  }
 
-   <div className="yarn-card">
-     <h2>{t('yarnCalculator')}</h2>
-     <div className="fiber-tabs">
-       <button className={fiber==='Acrylic'?'active':''} onClick={()=>setFiber('Acrylic')}>{t('acrylic')}</button>
-       <button className={fiber==='Wool'?'active':''} onClick={()=>setFiber('Wool')}>{t('wool')}</button>
-     </div>
-     <div className="calc-line"><span>{t('estimatedYarn')}</span><b>{yarn} g</b></div>
-     <div className="calc-line"><span>{t('coverageArea')}</span><b>0.85 m²</b></div>
-     <div className="calc-line"><span>{t('costEstimate')}</span><b>€{cost.toFixed(2)}</b></div>
-   </div>
+  function endDrag(){
+    drag.current.active=false
+  }
 
-   {error&&<p style={{textAlign:'center',color:'#b42318',fontWeight:800}}>{error}</p>}
-   <button className="save-project-btn" disabled={busy} onClick={saveProject}>{busy?t('saving'):saved?t('saved'):t('saveProject')}</button>
- </div>
-}
+  function onPointerDown(e){
+    if(!fullscreenMode)return
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+    beginDrag(e.clientX,e.clientY)
+  }
 
-function compressDataUrl(src,max=560,quality=.68){
- return new Promise(resolve=>{
-   const img=new Image()
-   img.onload=()=>{
-     const scale=Math.min(1,max/Math.max(img.width,img.height))
-     const c=document.createElement('canvas')
-     c.width=Math.max(1,Math.round(img.width*scale))
-     c.height=Math.max(1,Math.round(img.height*scale))
-     c.getContext('2d').drawImage(img,0,0,c.width,c.height)
-     resolve(c.toDataURL('image/jpeg',quality))
-   }
-   img.onerror=()=>resolve('')
-   img.src=src
- })
+  function onPointerMove(e){
+    if(!fullscreenMode)return
+    updateDrag(e.clientX,e.clientY)
+  }
+
+  function onPointerUp(){
+    endDrag()
+  }
+
+  async function openFullscreen(){
+    setFullscreenMode(true)
+    const el=stageRef.current
+    try{
+      await el?.requestFullscreen?.()
+    }catch{
+      // iOS Safari may not expose Fullscreen API for divs.
+      // The CSS fullscreen mode still fills the viewport.
+    }
+  }
+
+  async function closeFullscreen(){
+    setFullscreenMode(false)
+    endDrag()
+    try{
+      if(document.fullscreenElement){
+        await document.exitFullscreen()
+      }
+    }catch{}
+  }
+
+  return (
+    <div className="projector-touch-page">
+
+      <div className="projector-touch-header">
+        <button onClick={()=>nav(-1)} className="projector-round">
+          <ArrowLeft/>
+        </button>
+        <div>
+          <h1>{t('projectorTools')}</h1>
+          <p>Projekto dhe rregullo imazhin me precizion.</p>
+        </div>
+        <button onClick={reset} className="projector-round">
+          <RotateCcw/>
+        </button>
+      </div>
+
+      <section className="projector-touch-card">
+
+        <div className="projector-touch-toolbar">
+          <button className={mirror?'active':''} onClick={()=>setMirror(v=>!v)}>
+            <FlipHorizontal2/>
+            <span>{t('mirror')}</span>
+          </button>
+
+          <button className={grid?'active':''} onClick={()=>setGrid(v=>!v)}>
+            <Grid3X3/>
+            <span>Grid</span>
+          </button>
+
+          <button onClick={openFullscreen}>
+            <Maximize2/>
+            <span>Full</span>
+          </button>
+        </div>
+
+        <div className="projector-touch-layout">
+
+          <button className="p-touch-arrow up" onClick={()=>move(0,-10)}>
+            <ArrowUp/>
+          </button>
+
+          <button className="p-touch-arrow left" onClick={()=>move(-10,0)}>
+            <ArrowLeft/>
+          </button>
+
+          <div
+            ref={stageRef}
+            className={`projector-touch-stage ${grid?'with-grid':''} ${fullscreenMode?'is-fullscreen':''}`}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+          >
+            {fullscreenMode&&(
+              <button className="projector-full-close" onClick={closeFullscreen}>
+                <X/>
+              </button>
+            )}
+
+            {image ? (
+              <img
+                src={image}
+                alt={t('preview')}
+                draggable="false"
+                style={{
+                  opacity:opacity/100,
+                  transform:`
+                    translate(${x}px,${y}px)
+                    scale(${zoom/100})
+                    scaleX(${mirror?-1:1})
+                  `
+                }}
+              />
+            ) : (
+              <div className="projector-touch-empty">
+                <div>🖼️</div>
+                <b>{t('noProjectorImage')}</b>
+              </div>
+            )}
+
+            {fullscreenMode&&image&&(
+              <div className="projector-drag-hint">
+                Lëvize foton me gisht
+              </div>
+            )}
+          </div>
+
+          <button className="p-touch-arrow right" onClick={()=>move(10,0)}>
+            <ArrowRight/>
+          </button>
+
+          <button className="p-touch-arrow down" onClick={()=>move(0,10)}>
+            <ArrowDown/>
+          </button>
+        </div>
+
+        <div className="projector-touch-zoom">
+          <button onClick={()=>setZoom(v=>Math.max(25,v-10))}>
+            <Minus/>
+          </button>
+
+          <strong>{zoom}%</strong>
+
+          <button onClick={()=>setZoom(v=>Math.min(300,v+10))}>
+            <Plus/>
+          </button>
+        </div>
+
+        <div className="projector-touch-opacity">
+          <div>
+            <span>Opaciteti</span>
+            <b>{opacity}%</b>
+          </div>
+          <input
+            type="range"
+            min="20"
+            max="100"
+            value={opacity}
+            onChange={e=>setOpacity(Number(e.target.value))}
+          />
+        </div>
+
+      </section>
+
+    </div>
+  )
 }
