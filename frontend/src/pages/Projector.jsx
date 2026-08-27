@@ -147,7 +147,7 @@ export default function Projector(){
           width:100%;
           max-width:980px;
           margin:0 auto;
-          padding:8px 6px 120px;
+          padding:6px 6px 104px;
           box-sizing:border-box;
           color:#14223b;
         }
@@ -157,7 +157,7 @@ export default function Projector(){
           grid-template-columns:46px 1fr 46px;
           align-items:center;
           gap:8px;
-          margin-bottom:10px;
+          margin-bottom:6px;
         }
 
         .pj-back,.pj-reset{
@@ -286,8 +286,9 @@ export default function Projector(){
 
         .pj-stage{
           width:100%;
-          height:66vh;
-          min-height:470px;
+          height:52vh;
+          min-height:350px;
+          max-height:470px;
           position:relative;
           display:grid;
           place-items:center;
@@ -330,7 +331,7 @@ export default function Projector(){
 
         .pj-opacity{
           margin-top:8px;
-          min-height:56px;
+          min-height:50px;
           display:grid;
           grid-template-columns:70px 1fr 48px;
           align-items:center;
@@ -350,7 +351,7 @@ export default function Projector(){
           display:flex;
           justify-content:center;
           gap:22px;
-          padding:8px 2px 0;
+          padding:5px 2px 0;
           color:#7b8089;
           font-size:14px;
         }
@@ -359,8 +360,8 @@ export default function Projector(){
 
         .pj-save{
           width:100%;
-          min-height:60px;
-          margin-top:10px;
+          min-height:56px;
+          margin-top:8px;
           border:0;
           border-radius:17px;
           background:#5a36c9;
@@ -427,10 +428,23 @@ export default function Projector(){
           pointer-events:none;
         }
 
-        @media(max-width:390px){
+        @media(max-width:430px){
           .pj-title p{display:none}
           .pj-title h1{font-size:20px}
-          .pj-stage{height:63vh;min-height:430px}
+          .pj-stage{
+            height:50vh;
+            min-height:330px;
+            max-height:430px;
+          }
+          .pj-left button,.pj-right button{
+            height:44px;
+          }
+          .pj-top button{
+            height:40px;
+          }
+          .pj-opacity{
+            min-height:48px;
+          }
         }
       `}</style>
 
