@@ -41,3 +41,98 @@
   .retro-work-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px;position:relative;z-index:2}.retro-work-actions button{min-height:38px;border:0;border-radius:11px;color:#fff;font-weight:950;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px}.retro-work-actions button svg{width:15px;height:15px}.retro-work-actions .start{background:var(--r-green)}.retro-work-actions .stop{background:var(--r-coral)}.retro-work-actions .history{background:var(--r-purple)}
   .retro-work-live{width:100%;display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding:0 4px 14px;position:relative;z-index:2}.retro-work-live span{font-size:9px!important;color:#777!important}.retro-work-live b{font-size:11px;color:var(--r-blue)}
 }
+
+/* ===== Dashboard-only refinement: welcome, quick actions, smaller clock ===== */
+@media(min-width:761px){
+  .desktop-dashboard-final .dd-welcome-copy small{
+    display:block;
+    margin-bottom:4px;
+    font-size:15px!important;
+    font-weight:900!important;
+    color:var(--r-coral)!important;
+  }
+  .desktop-dashboard-final .dd-welcome-copy h1{
+    margin:0!important;
+    font-size:34px!important;
+    line-height:1.08!important;
+    letter-spacing:-.6px!important;
+    color:#172033!important;
+  }
+  .desktop-dashboard-final .dd-welcome-copy p{
+    margin:7px 0 0!important;
+    font-size:13px!important;
+    color:#756d64!important;
+  }
+
+  .desktop-dashboard-final .retro-work-clock-card{
+    min-height:395px!important;
+    padding-top:15px!important;
+  }
+  .desktop-dashboard-final .retro-analog-clock{
+    width:136px!important;
+    height:136px!important;
+    margin:10px auto 8px!important;
+    border-width:5px!important;
+    box-shadow:0 0 0 4px var(--r-pink),0 0 0 7px var(--r-purple),0 8px 20px rgba(63,38,17,.13)!important;
+  }
+  .desktop-dashboard-final .retro-clock-mark{
+    height:8px!important;
+    transform-origin:center center!important;
+  }
+  .desktop-dashboard-final .retro-clock-mark:nth-child(3n+1){height:11px!important}
+  .desktop-dashboard-final .retro-hour-hand{height:36px!important;width:6px!important}
+  .desktop-dashboard-final .retro-minute-hand{height:48px!important;width:4px!important}
+  .desktop-dashboard-final .retro-second-hand{height:54px!important}
+  .desktop-dashboard-final .retro-digital-time{
+    margin-top:3px!important;
+    font-size:25px!important;
+  }
+  .desktop-dashboard-final .retro-work-summary{margin-top:9px!important}
+
+  .desktop-dashboard-final .dd-quick>div{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(210px,1fr))!important;
+    gap:14px!important;
+    max-width:1120px!important;
+  }
+  .desktop-dashboard-final .dd-quick button{
+    min-height:82px!important;
+    padding:14px 17px!important;
+    border-radius:16px!important;
+    display:grid!important;
+    grid-template-columns:34px minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:12px!important;
+    text-align:left!important;
+  }
+  .desktop-dashboard-final .dd-quick button>svg{
+    width:27px!important;
+    height:27px!important;
+  }
+  .desktop-dashboard-final .dd-quick button>span{
+    min-width:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    gap:4px!important;
+  }
+  .desktop-dashboard-final .dd-quick button b{
+    display:block!important;
+    font-size:15px!important;
+    line-height:1.15!important;
+  }
+  .desktop-dashboard-final .dd-quick button small{
+    display:block!important;
+    font-size:10px!important;
+    line-height:1.28!important;
+    font-weight:700!important;
+    opacity:.86!important;
+  }
+  .desktop-dashboard-final .dd-quick .q-pink small{color:#3f2631!important}
+  .desktop-dashboard-final .dd-quick .q-teal small,
+  .desktop-dashboard-final .dd-quick .q-orange small,
+  .desktop-dashboard-final .dd-quick .q-purple small{color:rgba(255,255,255,.88)!important}
+}
+
+@media(min-width:761px) and (max-width:1250px){
+  .desktop-dashboard-final .dd-quick>div{grid-template-columns:repeat(2,minmax(230px,1fr))!important}
+}
