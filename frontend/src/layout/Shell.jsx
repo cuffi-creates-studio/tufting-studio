@@ -47,7 +47,7 @@ export default function Shell(){
    <nav>{items.map(([to,I,label])=><NavLink key={to} to={to} end={to==='/'} onClick={()=>setDrawer(false)}><span className="nav-icon"><I/></span><span>{label}</span></NavLink>)}</nav>
    <div className="sidebar-bottom">
     <div className="profile-avatar">{avatar}</div>
-    <div className="profile-text"><b>{p.name}</b><small>Professional</small></div>
+    <div className="profile-text"><b>{adminLabel(lang)}</b><small>Professional</small></div>
     <button className="sidebar-logout-mobile" onClick={logout} aria-label="Logout"><LogOut/></button>
    </div>
   </aside>
@@ -75,3 +75,4 @@ export default function Shell(){
 }
 
 function workHoursLabel(lang){return lang==='sq'?'Orët e punës':lang==='de'?'Arbeitszeit':'Work Hours'}
+function adminLabel(lang){return lang==='sq'?'Administratori':lang==='de'?'Administrator':'Administrator'}
