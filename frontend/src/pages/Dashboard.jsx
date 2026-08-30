@@ -6,7 +6,7 @@ import {signOut} from 'firebase/auth'
 import {auth} from '../lib/firebase'
 import {useNavigate} from 'react-router-dom'
 import {useI18n} from '../i18n/I18n'
-import '../styles/desktop-tablet.css'
+import '../styles/desktop-restore.css'
 
 export default function Dashboard(){
  const {t}=useI18n(),nav=useNavigate()
@@ -51,7 +51,7 @@ export default function Dashboard(){
  function swipeEnd(x){if(touchX.current==null)return;const dx=x-touchX.current;touchX.current=null;if(Math.abs(dx)>45)setPage(p=>Math.max(0,Math.min(2,p+(dx<0?1:-1))))}
 
  return <>
-  <DesktopDashboard
+  <DesktopDashboardRestore
     t={t}
     nav={nav}
     projects={projects}
@@ -112,106 +112,88 @@ export default function Dashboard(){
 }
 
 
-function DesktopDashboard({t,nav,projects,completed,progress,cost,stats,appointments,profile}){
+function DesktopDashboardRestore({t,nav,projects,completed,progress,cost,stats,appointments,profile}){
  const recent=projects.slice(0,5)
- return <div className="desktop-dashboard-only">
-   <div className="dt-welcome">
-     <div className="dt-welcome-copy">
-       <small>{t('hello')},</small>
+ const today=new Date()
+ const weekLabel=t('thisWeek')
+ return <div className="desktop-dashboard-only desktop-restore-dashboard">
+   <div className="page-title desktop-restore-title">
+     <div>
+       <p className="desktop-hello">{t('hello')},</p>
        <h1>{profile.name}</h1>
        <p>{t('dashboard')}</p>
      </div>
-     <button className="dt-new-project" onClick={()=>nav('/design')}>
-       <Plus/> {t('newProject')}
+     <button className="btn pink" onClick={()=>nav('/design')}><Plus/> {t('newProject')}</button>
+   </div>
+
+   <div className="metrics-grid desktop-restore-metrics">
+     <div className="card clock-card desktop-clock-card">
+       <div><small>{today.toLocaleDateString(undefined,{weekday:'long'})}</small><b>{today.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</b><em>{weekLabel}</em></div>
+       <span><CalendarDays/></span>
+     </div>
+     <button className="card metric-card desktop-metric-button" onClick={()=>nav('/projects')}>
+       <div className="metric-copy"><small>{t('projects')}</small><b>{projects.length}</b><em>{weekLabel}</em></div>
+       <div className="premium-icon blue"><div className="premium-icon-inner"><Folder/></div></div>
+     </button>
+     <button className="card metric-card desktop-metric-button" onClick={()=>nav('/projects')}>
+       <div className="metric-copy"><small>{t('completed')}</small><b>{completed}</b><em>{weekLabel}</em></div>
+       <div className="premium-icon green"><div className="premium-icon-inner"><CheckCircle2/></div></div>
+     </button>
+     <button className="card metric-card desktop-metric-button" onClick={()=>nav('/projects')}>
+       <div className="metric-copy"><small>{t('inProgress')}</small><b>{progress}</b><em>{weekLabel}</em></div>
+       <div className="premium-icon orange"><div className="premium-icon-inner"><RotateCw/></div></div>
+     </button>
+     <button className="card metric-card desktop-metric-button" onClick={()=>nav('/calculator')}>
+       <div className="metric-copy"><small>{t('materialCost')}</small><b>€{cost.toFixed(2)}</b><em>{weekLabel}</em></div>
+       <div className="premium-icon purple"><div className="premium-icon-inner"><Euro/></div></div>
      </button>
    </div>
 
-   <div className="dt-metrics">
-     <button className="dt-metric blue" onClick={()=>nav('/projects')}>
-       <Folder/><div><b>{projects.length}</b><span>{t('projects')}</span></div>
-     </button>
-     <button className="dt-metric green" onClick={()=>nav('/projects')}>
-       <CheckCircle2/><div><b>{completed}</b><span>{t('completed')}</span></div>
-     </button>
-     <button className="dt-metric orange" onClick={()=>nav('/projects')}>
-       <RotateCw/><div><b>{progress}</b><span>{t('inProgress')}</span></div>
-     </button>
-     <button className="dt-metric purple" onClick={()=>nav('/calculator')}>
-       <Euro/><div><b>€{cost.toFixed(2)}</b><span>{t('materialCost')}</span></div>
-     </button>
-   </div>
-
-   <div className="dt-grid">
-     <section className="dt-panel">
-       <div className="dt-panel-head">
-         <div><small>{t('thisWeek')}</small><h2>{t('calendar')}</h2></div>
-         <CalendarDays/>
-       </div>
+   <div className="dashboard-body desktop-restore-body">
+     <section className="card weather-card desktop-calendar-card">
+       <div className="section-head"><div><small>{weekLabel}</small><h3>{t('calendar')}</h3></div><CalendarDays/></div>
        <Calendar appointments={appointments} projects={projects}/>
      </section>
 
-     <section className="dt-panel">
-       <div className="dt-panel-head">
-         <div><small>{t('thisWeek')}</small><h2>{t('statistics')}</h2></div>
-         <TrendingUp/>
-       </div>
-       {stats.hasData ? (
-         <>
-           <div className="dt-stat-summary">
-             <span><b>{stats.projectTotal}</b>{t('projects')}</span>
-             <span><b>{stats.calcTotal}</b>{t('calculator')}</span>
-             <span><b>€{stats.weekCost.toFixed(2)}</b>{t('materialCost')}</span>
-           </div>
-           <DesktopBars stats={stats}/>
-         </>
-       ) : (
-         <div className="dt-empty"><TrendingUp/><b>{t('noStats')}</b></div>
-       )}
-     </section>
-
-     <section className="dt-panel">
-       <div className="dt-panel-head">
-         <div><small>Tufting Studio</small><h2>{t('quickActions')}</h2></div>
-       </div>
-       <div className="dt-quick">
-         <button className="pink" onClick={()=>nav('/design')}><Plus/><span>{t('newProject')}</span></button>
-         <button className="teal" onClick={()=>nav('/gallery')}><Images/><span>{t('gallery')}</span></button>
-         <button className="orange" onClick={()=>nav('/projector')}><Projector/><span>{t('projector')}</span></button>
-         <button className="purple" onClick={()=>nav('/calculator')}><CalcIcon/><span>{t('calculator')}</span></button>
-       </div>
-     </section>
-
-     <section className="dt-panel">
-       <div className="dt-panel-head">
-         <div><small>{t('projects')}</small><h2>{t('recentProjects')}</h2></div>
-         <button className="dt-text-btn" onClick={()=>nav('/projects')}>{t('projects')} <ChevronRight/></button>
-       </div>
-       {recent.length ? (
-         <div className="dt-recent">
-           {recent.map(p=><button key={p.id} className="dt-recent-row" onClick={()=>nav('/projects')}>
-             <div className="dt-thumb">{p.image_data?<img src={p.image_data} alt={p.name}/>:<span>🧶</span>}</div>
-             <div className="dt-recent-copy">
-               <b>{p.name}</b>
-               <small className={p.status==='Completed'?'done':'progress'}>{p.status==='Completed'?t('completed'):t('inProgress')}</small>
-             </div>
-             <ChevronRight/>
-           </button>)}
+     <section className="card stats-card desktop-stats-card">
+       <div className="section-head"><div><small>{weekLabel}</small><h3>{t('statistics')}</h3></div><TrendingUp/></div>
+       {stats.hasData?<>
+         <div className="desktop-stat-summary">
+           <span><i className="d-dot project"/>{t('projectsThisWeek')}: <b>{stats.projectTotal}</b></span>
+           <span><i className="d-dot calc"/>{t('calculationsThisWeek')}: <b>{stats.calcTotal}</b></span>
+           <span>{t('weeklyCost')}: <b>€{stats.weekCost.toFixed(2)}</b></span>
          </div>
-       ) : (
-         <div className="dt-empty compact"><Folder/><b>{t('noProjects')}</b></div>
-       )}
+         <DesktopWeeklyBars stats={stats}/>
+       </>:<div className="desktop-empty-state"><TrendingUp/><b>{t('noStats')}</b></div>}
      </section>
+
+     <section className="card recent-card desktop-recent-card">
+       <div className="section-head"><div><small>{t('projects')}</small><h3>{t('recentProjects')}</h3></div><button className="text-button" onClick={()=>nav('/projects')}>{t('projects')} <ChevronRight/></button></div>
+       {recent.length?recent.map(p=><button className="recent-row desktop-recent-row" key={p.id} onClick={()=>nav('/projects')}>
+         <div className="recent-art">{p.image_data?<img src={p.image_data} alt={p.name}/>:<span>🧶</span>}</div>
+         <div><b>{p.name}</b><small>{p.status==='Completed'?t('completed'):t('inProgress')}</small></div>
+         <ChevronRight/>
+       </button>):<div className="desktop-empty-state compact"><Folder/><b>{t('noProjects')}</b></div>}
+     </section>
+   </div>
+
+   <h3 className="quick-title">{t('quickActions')}</h3>
+   <div className="quick-grid desktop-restore-quick">
+     <button className="quick pink" onClick={()=>nav('/design')}><Plus/> {t('newProject')}</button>
+     <button className="quick teal" onClick={()=>nav('/gallery')}><Images/> {t('gallery')}</button>
+     <button className="quick orange" onClick={()=>nav('/projector')}><Projector/> {t('projector')}</button>
+     <button className="quick purple" onClick={()=>nav('/calculator')}><CalcIcon/> {t('calculator')}</button>
    </div>
  </div>
 }
 
-function DesktopBars({stats}){
+function DesktopWeeklyBars({stats}){
  const max=Math.max(1,...stats.projectCounts,...stats.calcCounts)
- return <div className="dt-bars">
-   {stats.labels.map((label,i)=><div className="dt-bar-col" key={label}>
-     <div className="dt-bar-track">
-       <i className="projects" style={{height:`${Math.max(4,(stats.projectCounts[i]/max)*100)}%`}}/>
-       <i className="calculations" style={{height:`${Math.max(4,(stats.calcCounts[i]/max)*100)}%`}}/>
+ return <div className="desktop-week-bars">
+   {stats.labels.map((label,i)=><div className="desktop-week-col" key={label}>
+     <div className="desktop-week-track">
+       <i className="project" style={{height:`${Math.max(3,(stats.projectCounts[i]/max)*100)}%`}}/>
+       <i className="calc" style={{height:`${Math.max(3,(stats.calcCounts[i]/max)*100)}%`}}/>
      </div>
      <small>{label}</small>
    </div>)}
