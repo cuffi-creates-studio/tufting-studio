@@ -6,6 +6,7 @@ import {signOut} from 'firebase/auth'
 import {auth} from '../lib/firebase'
 import {useNavigate} from 'react-router-dom'
 import {useI18n} from '../i18n/I18n'
+import '../styles/desktop-tablet.css'
 
 export default function Dashboard(){
  const {t}=useI18n(),nav=useNavigate()
@@ -49,7 +50,19 @@ export default function Dashboard(){
 
  function swipeEnd(x){if(touchX.current==null)return;const dx=x-touchX.current;touchX.current=null;if(Math.abs(dx)>45)setPage(p=>Math.max(0,Math.min(2,p+(dx<0?1:-1))))}
 
- return <div className="mobile-dashboard-exact">
+ return <>
+  <DesktopDashboard
+    t={t}
+    nav={nav}
+    projects={projects}
+    completed={completed}
+    progress={progress}
+    cost={cost}
+    stats={stats}
+    appointments={appointments}
+    profile={profile}
+  />
+  <div className="mobile-dashboard-exact">
   <div className="m-header-profile">
    <div className={`m-avatar ${profile.photo?'has-photo':''}`} key={profile.photo || 'no-photo'}>
      {profile.photo
@@ -94,6 +107,114 @@ export default function Dashboard(){
   </div></section>
 
   {projects.length>0&&<section className="m-recent"><h3>{t('recentProjects')}</h3>{projects.slice(0,3).map(p=><button className="m-project-row" key={p.id} onClick={()=>nav('/projects')} style={{overflow:'hidden',alignItems:'center'}}><div className="m-project-img" style={{width:64,height:64,minWidth:64,borderRadius:12,overflow:'hidden',flex:'0 0 64px'}}>{p.image_data?<img src={p.image_data} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>:<span>🧶</span>}</div><div style={{minWidth:0,flex:1,textAlign:'left'}}><b style={{display:'block',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.name}</b><small className={p.status==='Completed'?'done':'progress'}>{p.status==='Completed'?t('completed'):t('inProgress')}</small></div><ChevronRight style={{flex:'0 0 auto'}}/></button>)}</section>}
+ </div>
+ </>
+}
+
+
+function DesktopDashboard({t,nav,projects,completed,progress,cost,stats,appointments,profile}){
+ const recent=projects.slice(0,5)
+ return <div className="desktop-dashboard-only">
+   <div className="dt-welcome">
+     <div className="dt-welcome-copy">
+       <small>{t('hello')},</small>
+       <h1>{profile.name}</h1>
+       <p>{t('dashboard')}</p>
+     </div>
+     <button className="dt-new-project" onClick={()=>nav('/design')}>
+       <Plus/> {t('newProject')}
+     </button>
+   </div>
+
+   <div className="dt-metrics">
+     <button className="dt-metric blue" onClick={()=>nav('/projects')}>
+       <Folder/><div><b>{projects.length}</b><span>{t('projects')}</span></div>
+     </button>
+     <button className="dt-metric green" onClick={()=>nav('/projects')}>
+       <CheckCircle2/><div><b>{completed}</b><span>{t('completed')}</span></div>
+     </button>
+     <button className="dt-metric orange" onClick={()=>nav('/projects')}>
+       <RotateCw/><div><b>{progress}</b><span>{t('inProgress')}</span></div>
+     </button>
+     <button className="dt-metric purple" onClick={()=>nav('/calculator')}>
+       <Euro/><div><b>€{cost.toFixed(2)}</b><span>{t('materialCost')}</span></div>
+     </button>
+   </div>
+
+   <div className="dt-grid">
+     <section className="dt-panel">
+       <div className="dt-panel-head">
+         <div><small>{t('thisWeek')}</small><h2>{t('calendar')}</h2></div>
+         <CalendarDays/>
+       </div>
+       <Calendar appointments={appointments} projects={projects}/>
+     </section>
+
+     <section className="dt-panel">
+       <div className="dt-panel-head">
+         <div><small>{t('thisWeek')}</small><h2>{t('statistics')}</h2></div>
+         <TrendingUp/>
+       </div>
+       {stats.hasData ? (
+         <>
+           <div className="dt-stat-summary">
+             <span><b>{stats.projectTotal}</b>{t('projects')}</span>
+             <span><b>{stats.calcTotal}</b>{t('calculator')}</span>
+             <span><b>€{stats.weekCost.toFixed(2)}</b>{t('materialCost')}</span>
+           </div>
+           <DesktopBars stats={stats}/>
+         </>
+       ) : (
+         <div className="dt-empty"><TrendingUp/><b>{t('noStats')}</b></div>
+       )}
+     </section>
+
+     <section className="dt-panel">
+       <div className="dt-panel-head">
+         <div><small>Tufting Studio</small><h2>{t('quickActions')}</h2></div>
+       </div>
+       <div className="dt-quick">
+         <button className="pink" onClick={()=>nav('/design')}><Plus/><span>{t('newProject')}</span></button>
+         <button className="teal" onClick={()=>nav('/gallery')}><Images/><span>{t('gallery')}</span></button>
+         <button className="orange" onClick={()=>nav('/projector')}><Projector/><span>{t('projector')}</span></button>
+         <button className="purple" onClick={()=>nav('/calculator')}><CalcIcon/><span>{t('calculator')}</span></button>
+       </div>
+     </section>
+
+     <section className="dt-panel">
+       <div className="dt-panel-head">
+         <div><small>{t('projects')}</small><h2>{t('recentProjects')}</h2></div>
+         <button className="dt-text-btn" onClick={()=>nav('/projects')}>{t('projects')} <ChevronRight/></button>
+       </div>
+       {recent.length ? (
+         <div className="dt-recent">
+           {recent.map(p=><button key={p.id} className="dt-recent-row" onClick={()=>nav('/projects')}>
+             <div className="dt-thumb">{p.image_data?<img src={p.image_data} alt={p.name}/>:<span>🧶</span>}</div>
+             <div className="dt-recent-copy">
+               <b>{p.name}</b>
+               <small className={p.status==='Completed'?'done':'progress'}>{p.status==='Completed'?t('completed'):t('inProgress')}</small>
+             </div>
+             <ChevronRight/>
+           </button>)}
+         </div>
+       ) : (
+         <div className="dt-empty compact"><Folder/><b>{t('noProjects')}</b></div>
+       )}
+     </section>
+   </div>
+ </div>
+}
+
+function DesktopBars({stats}){
+ const max=Math.max(1,...stats.projectCounts,...stats.calcCounts)
+ return <div className="dt-bars">
+   {stats.labels.map((label,i)=><div className="dt-bar-col" key={label}>
+     <div className="dt-bar-track">
+       <i className="projects" style={{height:`${Math.max(4,(stats.projectCounts[i]/max)*100)}%`}}/>
+       <i className="calculations" style={{height:`${Math.max(4,(stats.calcCounts[i]/max)*100)}%`}}/>
+     </div>
+     <small>{label}</small>
+   </div>)}
  </div>
 }
 
