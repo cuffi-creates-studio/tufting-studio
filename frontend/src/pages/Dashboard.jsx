@@ -130,9 +130,10 @@ function DesktopDashboard({t,lang,nav,projects,completed,progress,cost,stats,app
  const time=now.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'})
  const date=now.toLocaleDateString(locale,{weekday:'long',day:'numeric',month:'long',year:'numeric'})
  const recent=projects.slice(0,5)
+ const greeting=dashboardGreeting(lang,now)
  return <div className="desktop-dashboard-final">
    <div className="dd-head">
-     <div><small>{t('hello')},</small><h1>{profile.name}</h1><p>{t('dashboard')}</p></div>
+     <div className="dd-welcome-copy"><small>{greeting.title}</small><h1>{greeting.welcome}</h1><p>{greeting.subtitle}</p></div>
      <button className="dd-new" onClick={()=>nav('/design')}><Plus/>{t('newProject')}</button>
    </div>
 
@@ -185,12 +186,34 @@ function DesktopDashboard({t,lang,nav,projects,completed,progress,cost,stats,app
    </div>
 
    <section className="dd-quick"><h2>{t('quickActions')}</h2><div>
-     <button className="q-pink" onClick={()=>nav('/design')}><Plus/><b>{t('newProject')}</b></button>
-     <button className="q-teal" onClick={()=>nav('/gallery')}><Images/><b>{t('gallery')}</b></button>
-     <button className="q-orange" onClick={()=>nav('/projector')}><Projector/><b>{t('projector')}</b></button>
-     <button className="q-purple" onClick={()=>nav('/calculator')}><CalcIcon/><b>{t('calculator')}</b></button>
+     <button className="q-pink" onClick={()=>nav('/design')}><Plus/><span><b>{t('newProject')}</b><small>{quickActionText(lang,'design')}</small></span></button>
+     <button className="q-teal" onClick={()=>nav('/gallery')}><Images/><span><b>{t('gallery')}</b><small>{quickActionText(lang,'gallery')}</small></span></button>
+     <button className="q-orange" onClick={()=>nav('/projector')}><Projector/><span><b>{t('projector')}</b><small>{quickActionText(lang,'projector')}</small></span></button>
+     <button className="q-purple" onClick={()=>nav('/calculator')}><CalcIcon/><span><b>{t('calculator')}</b><small>{quickActionText(lang,'calculator')}</small></span></button>
    </div></section>
  </div>
+}
+
+
+function dashboardGreeting(lang,now){
+ const h=now.getHours()
+ const period=h<12?'morning':h<18?'afternoon':'evening'
+ const copy={
+  sq:{morning:'Mirëmëngjes',afternoon:'Mirëdita',evening:'Mirëmbrëma',welcome:'Mirë se erdhe në studio!',subtitle:'Gati për një ditë kreative në studio.'},
+  de:{morning:'Guten Morgen',afternoon:'Guten Tag',evening:'Guten Abend',welcome:'Willkommen im Studio!',subtitle:'Bereit für einen kreativen Tag im Studio.'},
+  en:{morning:'Good morning',afternoon:'Good afternoon',evening:'Good evening',welcome:'Welcome to the studio!',subtitle:'Ready for a creative day in the studio.'}
+ }
+ const c=copy[lang]||copy.en
+ return {title:c[period],welcome:c.welcome,subtitle:c.subtitle}
+}
+
+function quickActionText(lang,key){
+ const copy={
+  sq:{design:'Krijo dhe konverto një dizajn të ri.',gallery:'Shiko projektet dhe fotot e ruajtura.',projector:'Hap dizajnin për projektim dhe pozicionim.',calculator:'Llogarit leshin, gramët dhe koston reale.'},
+  de:{design:'Neues Design erstellen und konvertieren.',gallery:'Gespeicherte Projekte und Bilder ansehen.',projector:'Design zum Projizieren und Positionieren öffnen.',calculator:'Garn, Gramm und reale Kosten berechnen.'},
+  en:{design:'Create and convert a new design.',gallery:'View saved projects and photos.',projector:'Open a design for projection and positioning.',calculator:'Calculate yarn, grams and real cost.'}
+ }
+ return (copy[lang]||copy.en)[key]
 }
 
 function DesktopStats({stats,t}){
