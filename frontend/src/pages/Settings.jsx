@@ -4,7 +4,32 @@ import MobilePageHeader from '../components/MobilePageHeader'
 import {useI18n} from '../i18n/I18n'
 import '../styles/settings-retro.css'
 
-const toData=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)})
+const readFileData=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)})
+
+async function prepareStoredImage(file,maxSide=900,quality=.88){
+ const raw=await readFileData(file)
+ const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=raw})
+ const scale=Math.min(1,maxSide/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height))
+ const w=Math.max(1,Math.round((img.naturalWidth||img.width)*scale))
+ const h=Math.max(1,Math.round((img.naturalHeight||img.height)*scale))
+ const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h
+ const ctx=canvas.getContext('2d',{alpha:true});ctx.drawImage(img,0,0,w,h)
+ let data=''
+ try{data=canvas.toDataURL('image/webp',quality)}catch{}
+ if(!data||data==='data:,') data=canvas.toDataURL(file.type==='image/png'?'image/png':'image/jpeg',quality)
+ return data
+}
+
+function persistImage(key,data){
+ try{
+   if(data)localStorage.setItem(key,data)
+   else localStorage.removeItem(key)
+   return true
+ }catch(err){
+   console.error('Could not save image',err)
+   return false
+ }
+}
 
 export default function Settings(){
  const {t,lang,setLang}=useI18n()
@@ -14,24 +39,52 @@ export default function Settings(){
  const [logo,setLogo]=useState(localStorage.getItem('tufting_studio_logo')||'')
  const [notif,setNotif]=useState(localStorage.getItem('tufting_appointment_notifications')!=='off')
  const [saved,setSaved]=useState(false)
+ const [saveError,setSaveError]=useState('')
 
  async function pickProfile(e){
    const f=e.target.files?.[0];if(!f)return
-   const data=await toData(f);setPhoto(data)
-   localStorage.setItem('tufting_profile_photo',data)
-   window.dispatchEvent(new Event('tufting-profile-updated'))
+   setSaveError('')
+   try{
+     const data=await prepareStoredImage(f,720,.88)
+     if(!persistImage('tufting_profile_photo',data)) throw new Error('storage')
+     setPhoto(data)
+     window.dispatchEvent(new Event('tufting-profile-updated'))
+   }catch(err){
+     console.error(err)
+     setSaveError('Fotoja e profilit nuk u ruajt. Provo një foto tjetër.')
+   }finally{e.target.value=''}
  }
  async function pickLogo(e){
    const f=e.target.files?.[0];if(!f)return
-   const data=await toData(f);setLogo(data)
+   setSaveError('')
+   try{
+     const data=await prepareStoredImage(f,900,.9)
+     if(!persistImage('tufting_studio_logo',data)) throw new Error('storage')
+     setLogo(data)
+     window.dispatchEvent(new Event('tufting-profile-updated'))
+   }catch(err){
+     console.error(err)
+     setSaveError('Logoja nuk u ruajt. Provo një imazh tjetër.')
+   }finally{e.target.value=''}
+ }
+ function removeProfilePhoto(){
+   setPhoto('')
+   persistImage('tufting_profile_photo','')
+   window.dispatchEvent(new Event('tufting-profile-updated'))
  }
  function save(){
-   localStorage.setItem('tufting_profile_name',name)
-   localStorage.setItem('tufting_profile_photo',photo)
-   localStorage.setItem('tufting_studio_logo',logo)
-   localStorage.setItem('tufting_appointment_notifications',notif?'on':'off')
-   window.dispatchEvent(new Event('tufting-profile-updated'))
-   setSaved(true);setTimeout(()=>setSaved(false),1400)
+   setSaveError('')
+   try{
+     localStorage.setItem('tufting_profile_name',name)
+     if(photo&&!persistImage('tufting_profile_photo',photo)) throw new Error('profile storage')
+     if(logo&&!persistImage('tufting_studio_logo',logo)) throw new Error('logo storage')
+     localStorage.setItem('tufting_appointment_notifications',notif?'on':'off')
+     window.dispatchEvent(new Event('tufting-profile-updated'))
+     setSaved(true);setTimeout(()=>setSaved(false),1400)
+   }catch(err){
+     console.error(err)
+     setSaveError('Nuk u ruajtën ndryshimet. Provo përsëri.')
+   }
  }
 
  if(isMobile){
@@ -45,7 +98,7 @@ export default function Settings(){
         <div className="settings-profile-fields">
           <label className="settings-name-label">{t('displayName')}<input value={name} onChange={e=>setName(e.target.value)} placeholder={t('studioOwner')}/></label>
           <label className="settings-upload profile-photo-upload"><ImagePlus/>{t('chooseDashboardPhoto')}<input type="file" accept="image/png,image/jpeg,image/webp" onChange={pickProfile}/></label>
-          {photo&&<button type="button" className="settings-remove-photo" onClick={()=>{setPhoto('');localStorage.removeItem('tufting_profile_photo');window.dispatchEvent(new Event('tufting-profile-updated'))}}>{t('removePhoto')}</button>}
+          {photo&&<button type="button" className="settings-remove-photo" onClick={removeProfilePhoto}>{t('removePhoto')}</button>}
         </div>
       </div>
       <p className="settings-photo-note">{t('profilePhotoNote')}</p>
@@ -64,6 +117,7 @@ export default function Settings(){
       <label className="settings-upload"><ImagePlus/>{t('upload')}<input type="file" accept="image/*" onChange={pickLogo}/></label>
     </section>
 
+    {saveError&&<p style={{color:'#b42318',fontWeight:800,margin:'4px 2px 0'}}>{saveError}</p>}
     <button className="settings-save" onClick={save}><Save/>{saved?t('saved'):t('save')}</button>
    </div>
   </div>
@@ -92,7 +146,7 @@ export default function Settings(){
            <label><span>{t('displayName')}</span><input value={name} onChange={e=>setName(e.target.value)} placeholder={t('studioOwner')}/></label>
            <div className="retro-actions">
              <label className="retro-btn teal"><ImagePlus size={18}/>{t('chooseDashboardPhoto')}<input type="file" accept="image/png,image/jpeg,image/webp" onChange={pickProfile}/></label>
-             {photo&&<button type="button" className="retro-btn soft" onClick={()=>{setPhoto('');localStorage.removeItem('tufting_profile_photo');window.dispatchEvent(new Event('tufting-profile-updated'))}}>{t('removePhoto')}</button>}
+             {photo&&<button type="button" className="retro-btn soft" onClick={removeProfilePhoto}>{t('removePhoto')}</button>}
            </div>
          </div>
        </div>
@@ -139,6 +193,7 @@ export default function Settings(){
      </section>
    </div>
 
+   {saveError&&<p style={{color:'#b42318',fontWeight:800,margin:'0 0 10px 4px'}}>{saveError}</p>}
    <div className="retro-save-bar">
      <div><h3>{saved?t('saved'):'Ruaj ndryshimet'}</h3><p>Ruaji cilësimet e studios.</p></div>
      <button className="retro-save-btn" onClick={save}>{saved?<CheckCircle2/>:<Save/>}{saved?t('saved'):t('save')}</button>
