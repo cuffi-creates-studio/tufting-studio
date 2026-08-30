@@ -234,8 +234,8 @@ function Calendar({appointments,projects,lang='en'}){
  }
  const copy=calendarCopy[lang]||calendarCopy.en
  const monthTitle=new Intl.DateTimeFormat(copy.locale,{month:'long',year:'numeric'}).format(d)
- return <div className="mini-calendar">
-   <div style={{textAlign:'center',fontWeight:900,fontSize:13,margin:'0 0 8px',textTransform:'capitalize'}}>{monthTitle}</div>
+ return <div className="mini-calendar" style={{maxWidth:'96%',margin:'0 auto',paddingBottom:4}}>
+   <div style={{textAlign:'center',fontWeight:900,fontSize:12,margin:'0 0 5px',textTransform:'capitalize'}}>{monthTitle}</div>
    <div className="cal-week">{copy.days.map((x,i)=>{
      const retroDays=[
        {bg:'#FFC567',fg:'#172033'},
@@ -247,9 +247,9 @@ function Calendar({appointments,projects,lang='en'}){
        {bg:'#FB7DA8',fg:'#172033'}
      ]
      const c=retroDays[i]
-     return <b key={i} style={{fontSize:'clamp(7px,0.68vw,10px)',lineHeight:1.05,whiteSpace:'normal',textAlign:'center',background:c.bg,color:c.fg,borderRadius:8,padding:'5px 2px',boxShadow:'inset 0 -1px 0 rgba(0,0,0,.08)'}}>{x}</b>
+     return <b key={i} style={{fontSize:'clamp(7px,0.62vw,9px)',lineHeight:1.05,whiteSpace:'normal',textAlign:'center',background:c.bg,color:c.fg,borderRadius:8,padding:'4px 2px',boxShadow:'inset 0 -1px 0 rgba(0,0,0,.08)'}}>{x}</b>
    })}</div>
-   <div className="cal-grid">{cells.map((n,i)=><div key={i} className={`cal-day ${n===d.getDate()?'today':''}`}>{n||''}</div>)}</div>
+   <div className="cal-grid" style={{gap:6}}>{cells.map((n,i)=><div key={i} className={`cal-day ${n===d.getDate()?'today':''}`} style={{minHeight:36,height:36,padding:0,display:'grid',placeItems:'center'}}>{n||''}</div>)}</div>
  </div>
 }
 function Appointments({items,onDelete,t}){return <div className="appt-list">{items.length?items.map(a=><div className="appt-row" key={a.id}><div><b>{a.title}</b><span><Clock/> {a.date} · {a.time}</span></div><button onClick={()=>onDelete(a.id)}>×</button></div>):<div className="m-empty-state"><CalendarDays/><b>{t('noAppointments')}</b></div>}</div>}
