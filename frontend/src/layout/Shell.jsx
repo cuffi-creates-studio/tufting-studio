@@ -12,7 +12,7 @@ const getProfile=()=>({
 })
 
 export default function Shell(){
- const {t}=useI18n()
+ const {t,lang,setLang}=useI18n()
  const [drawer,setDrawer]=useState(false),[p,setP]=useState(getProfile())
  const nav=useNavigate()
 
@@ -65,6 +65,14 @@ export default function Shell(){
     <button className="icon-button mobile-menu" onClick={()=>setDrawer(true)}><Menu/></button>
     <div className="search-box"><Search/><input placeholder="Search projects, materials..."/></div>
     <div className="topbar-spacer"/>
+    <label className="desktop-language-select" aria-label={t('language')}>
+      <span>🌐</span>
+      <select value={lang} onChange={e=>setLang(e.target.value)}>
+        <option value="sq">Shqip</option>
+        <option value="de">Deutsch</option>
+        <option value="en">English</option>
+      </select>
+    </label>
     <div className="top-profile">
       <div className="top-profile-avatar">{avatar}</div>
       <button className="logout-button" onClick={logout}><LogOut/></button>
