@@ -4,6 +4,7 @@ import MobilePageHeader from '../components/MobilePageHeader'
 import {useI18n} from '../i18n/I18n'
 import {deleteCalculation,getCalculations,saveCalculation} from '../lib/calculationsStore'
 import '../styles/calculator-retro.css'
+import '../styles/calculator-phone-retro.css'
 
 const num=v=>{
  const n=Number(String(v ?? '').replace(',','.'))
