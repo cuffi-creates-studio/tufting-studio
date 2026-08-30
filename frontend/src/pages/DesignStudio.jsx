@@ -1,662 +1,362 @@
-import React,{useEffect,useMemo,useRef,useState} from 'react'
-import {ArrowLeft,X,UploadCloud,Camera,Check,Palette,Image as ImageIcon,SlidersHorizontal,ChevronRight} from 'lucide-react'
+import React,{useEffect,useRef,useState} from 'react'
+import {ArrowLeft,UploadCloud,Camera,Check,Image as ImageIcon,Palette,ChevronRight,RefreshCw} from 'lucide-react'
 import {useNavigate} from 'react-router-dom'
 import {useI18n} from '../i18n/I18n'
 
 export default function DesignStudio(){
- const nav=useNavigate()
- const {t}=useI18n()
- const isMobile=useMedia('(max-width: 760px)')
- const [step,setStep]=useState(0)
- const [preview,setPreview]=useState('')
- const [style,setStyle]=useState('Cartoon')
- const [view,setView]=useState('cartoon')
- const [processed,setProcessed]=useState({original:'',sketch:'',cartoon:'',popArt:'',palette:[]})
- const [paletteCount,setPaletteCount]=useState(8)
- const [isProcessing,setIsProcessing]=useState(false)
+  const nav=useNavigate()
+  const {t}=useI18n()
+  const isMobile=useMedia('(max-width: 760px)')
+  const [step,setStep]=useState(0)
+  const [preview,setPreview]=useState('')
+  const [processed,setProcessed]=useState({original:'',sketch:'',cartoon:'',popArt:'',palette:[]})
+  const [view,setView]=useState('cartoon')
+  const [style,setStyle]=useState('Cartoon')
+  const [paletteCount,setPaletteCount]=useState(8)
+  const [busy,setBusy]=useState(false)
+  const galleryRef=useRef(null)
+  const cameraRef=useRef(null)
 
- async function pick(e){
-  const f=e.target.files?.[0]
-  if(!f)return
-  const url=URL.createObjectURL(f)
-  setPreview(url)
-  setIsProcessing(true)
-  try{
-    const result=await processImage(url,paletteCount)
-    setProcessed(result)
-    setStep(1)
-    setView('cartoon')
-    setStyle('Cartoon')
-  }finally{
-    setIsProcessing(false)
+  async function pick(e){
+    const file=e.target.files?.[0]
+    if(!file)return
+    const url=URL.createObjectURL(file)
+    setPreview(url)
+    setBusy(true)
+    try{
+      const result=await processImage(url,paletteCount)
+      setProcessed(result)
+      setView('cartoon')
+      setStyle('Cartoon')
+      setStep(1)
+    }finally{
+      setBusy(false)
+    }
   }
- }
 
- async function regenerate(nextCount){
-  setPaletteCount(nextCount)
-  if(!preview)return
-  setIsProcessing(true)
-  try{
-    const result=await processImage(preview,nextCount)
-    setProcessed(result)
-  }finally{
-    setIsProcessing(false)
+  async function changePaletteCount(n){
+    setPaletteCount(n)
+    if(!preview)return
+    setBusy(true)
+    try{ setProcessed(await processImage(preview,n)) }
+    finally{ setBusy(false) }
   }
- }
 
- const selectedKey=useMemo(()=>{
-   if(style==='Sketch')return 'sketch'
-   if(style==='Cartoon')return 'cartoon'
-   if(style==='Pop Art')return 'popArt'
-   return 'original'
- },[style])
+  function selectView(next){
+    setView(next)
+    if(next==='sketch')setStyle('Sketch')
+    else if(next==='cartoon')setStyle('Cartoon')
+    else setStyle('Pop Art')
+  }
 
- function continueToProjector(explicitView){
-   const key=explicitView||selectedKey
-   const image=processed[key]||processed.original||preview
-   try{
-     sessionStorage.setItem('tufting_projector_image',image||'')
-     sessionStorage.setItem('tufting_projector_style',style)
-     sessionStorage.setItem('tufting_projector_palette',JSON.stringify(processed.palette||[]))
-   }catch(e){console.warn('Could not cache projector image',e)}
-   nav('/projector')
- }
+  function sendToProjector(){
+    const key=style==='Sketch'?'sketch':style==='Cartoon'?'cartoon':'original'
+    const image=processed[key]||processed.original||preview
+    try{
+      sessionStorage.setItem('tufting_projector_image',image||'')
+      sessionStorage.setItem('tufting_projector_style',style)
+      sessionStorage.setItem('tufting_projector_palette',JSON.stringify(processed.palette||[]))
+    }catch(e){console.warn(e)}
+    nav('/projector')
+  }
 
- useEffect(()=>()=>{if(preview?.startsWith('blob:')) URL.revokeObjectURL(preview)},[preview])
+  useEffect(()=>()=>{
+    if(preview?.startsWith('blob:'))URL.revokeObjectURL(preview)
+  },[preview])
 
- if(isMobile){
-   return <MobileDesignStudio nav={nav} step={step} setStep={setStep} pick={pick} preview={preview} processed={processed} setProcessed={setProcessed} style={style} setStyle={setStyle} paletteCount={paletteCount} setPaletteCount={setPaletteCount} continueToProjector={continueToProjector} t={t} isProcessing={isProcessing}/>
- }
-
- return <DesktopDesignStudio
-   nav={nav}
-   step={step}
-   setStep={setStep}
-   pick={pick}
-   preview={preview}
-   processed={processed}
-   style={style}
-   setStyle={setStyle}
-   view={view}
-   setView={setView}
-   paletteCount={paletteCount}
-   regenerate={regenerate}
-   continueToProjector={continueToProjector}
-   t={t}
-   isProcessing={isProcessing}
- />
+  return <>
+    <DesignStyles/>
+    {isMobile
+      ? <MobileStudio {...{t,nav,step,setStep,preview,processed,view,selectView,style,setStyle,paletteCount,changePaletteCount,busy,pick,galleryRef,cameraRef,sendToProjector}}/>
+      : <DesktopStudio {...{t,nav,step,setStep,preview,processed,view,selectView,style,setStyle,paletteCount,changePaletteCount,busy,pick,galleryRef,cameraRef,sendToProjector}}/>
+    }
+  </>
 }
 
-function DesktopDesignStudio({nav,step,setStep,pick,preview,processed,style,setStyle,view,setView,paletteCount,regenerate,continueToProjector,t,isProcessing}){
- const galleryInputRef=useRef(null)
- const cameraInputRef=useRef(null)
- const current=processed[view]||processed.original||preview
- return <div className="desktop-design-page">
-   <div className="page-title desktop-design-header">
-     <div>
-       <h1>{t('newProject')}</h1>
-       <p>{t('uploadPhoto')} · {t('style')} · {t('preview')} · {t('save')}</p>
-     </div>
-     <button className="btn outline-btn" type="button" onClick={()=>nav(-1)}><ArrowLeft size={18}/>{t('back')}</button>
-   </div>
+function DesktopStudio({t,nav,step,setStep,preview,processed,view,selectView,style,setStyle,paletteCount,changePaletteCount,busy,pick,galleryRef,cameraRef,sendToProjector}){
+  if(step===0){
+    return <div className="ds-desktop ds-upload-screen">
+      <header className="ds-head">
+        <button className="ds-back" onClick={()=>nav(-1)}><ArrowLeft/></button>
+        <div><h1>{t('newProject')}</h1><p>{t('photoFormats')}</p></div>
+      </header>
+      <FlowSteps active={0} t={t}/>
+      <section className="ds-upload-card">
+        <div className="ds-upload-mark"><UploadCloud/></div>
+        <h2>{t('uploadPhoto')}</h2>
+        <p>{t('tipsBestResults')}</p>
+        <div className="ds-upload-buttons">
+          <button className="ds-btn ds-pink" onClick={()=>galleryRef.current?.click()}><ImageIcon/>{t('fromGallery')}</button>
+          <button className="ds-btn ds-teal" onClick={()=>cameraRef.current?.click()}><Camera/>{t('takePhoto')}</button>
+        </div>
+        <input ref={galleryRef} hidden type="file" accept="image/*" onChange={pick}/>
+        <input ref={cameraRef} hidden type="file" accept="image/*" capture="environment" onChange={pick}/>
+      </section>
+      <section className="ds-tip-grid">
+        <div><b>01</b><span>{t('tipClear')}</span></div>
+        <div><b>02</b><span>{t('tipCentered')}</span></div>
+        <div><b>03</b><span>{t('tipResolution')}</span></div>
+      </section>
+    </div>
+  }
 
-   <FlowSteps active={step===0?0:2} t={t}/>
+  const current=processed[view]||processed.original||preview
+  return <div className="ds-desktop ds-preview-screen">
+    <header className="ds-head">
+      <button className="ds-back" onClick={()=>setStep(0)}><ArrowLeft/></button>
+      <div><h1>{t('preview')}</h1><p>Tufting-ready image conversion</p></div>
+      <button className="ds-soft-btn" onClick={()=>setStep(0)}><RefreshCw/> {t('photo')}</button>
+    </header>
 
-   <div className="studio-layout desktop-studio-layout">
-     <aside className="card studio-tools desktop-studio-tools">
-       <div className="desktop-panel-title">
-         <UploadCloud/>
-         <div>
-           <h3>{t('uploadPhoto')}</h3>
-           <p>{t('photoFormats')}</p>
-         </div>
-       </div>
+    <FlowSteps active={2} t={t}/>
 
-       <div className={`desktop-upload-drop ${preview?'has-preview':''}`}>
-         <div className="desktop-upload-icon"><UploadCloud size={30}/></div>
-         <strong>{preview?t('photo'):t('uploadPhoto')}</strong>
-         <span>{preview?'Image ready for conversion':t('tipsBestResults')}</span>
-         <div className="desktop-upload-actions">
-           <button type="button" className="btn teal" onClick={()=>galleryInputRef.current?.click()}>{t('fromGallery')}</button>
-           <button type="button" className="btn purple" onClick={()=>cameraInputRef.current?.click()}><Camera size={18}/>{t('takePhoto')}</button>
-           <input ref={galleryInputRef} hidden type="file" accept="image/*" onChange={pick}/>
-           <input ref={cameraInputRef} hidden type="file" accept="image/*" capture="environment" onChange={pick}/>
-         </div>
-       </div>
+    <div className="ds-workspace">
+      <aside className="ds-toolbox">
+        <section className="ds-panel ds-style-panel">
+          <div className="ds-panel-title"><span className="ds-icon violet">✦</span><div><h3>{t('style')}</h3><p>Zgjidh rezultatin për tufting</p></div></div>
+          <div className="ds-style-buttons">
+            <button className={style==='Sketch'?'active sketch':''} onClick={()=>{setStyle('Sketch');selectView('sketch')}}>{t('sketch')}</button>
+            <button className={style==='Cartoon'?'active cartoon':''} onClick={()=>{setStyle('Cartoon');selectView('cartoon')}}>{t('cartoon')}</button>
+            <button className={style==='Pop Art'?'active original':''} onClick={()=>{setStyle('Pop Art');selectView('original')}}>{t('original')}</button>
+          </div>
+        </section>
 
-       <div className="desktop-style-card">
-         <div className="desktop-panel-title compact">
-           <SlidersHorizontal/>
-           <div>
-             <h3>{t('style')}</h3>
-             <p>Select the result you want to send to Projector.</p>
-           </div>
-         </div>
-         <div className="mode-buttons desktop-mode-buttons">
-           {[
-             ['Sketch','sketch',t('sketch')],
-             ['Cartoon','cartoon',t('cartoon')],
-             ['Pop Art','original',t('original')],
-           ].map(([styleValue,viewValue,label])=>
-             <button type="button" key={styleValue} className={style===styleValue?'active':''} onClick={()=>{setStyle(styleValue);setView(styleValue==='Pop Art'?'original':viewValue)}}>{label}</button>
-           )}
-         </div>
-       </div>
+        <section className="ds-panel">
+          <div className="ds-panel-title"><span className="ds-icon gold"><Palette/></span><div><h3>{t('colorPalette')}</h3><p>Ngjyrat merren nga fotoja origjinale</p></div></div>
+          <label className="ds-color-count"><span>{t('numberOfColors')}</span><select value={paletteCount} onChange={e=>changePaletteCount(+e.target.value)} disabled={busy}>{[6,8,10,12,16].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
+          <div className="ds-palette-list">
+            {processed.palette.map((c,i)=><div className="ds-color-row" key={`${c}-${i}`}><i style={{background:c}}/><b>{i+1}</b><span>{c.toUpperCase()}</span></div>)}
+          </div>
+        </section>
 
-       <label className="desktop-select-label">
-         <span>{t('numberOfColors')}</span>
-         <select value={paletteCount} onChange={e=>regenerate(+e.target.value)} disabled={!preview||isProcessing}>
-           {[6,8,10,12,16].map(n=><option key={n} value={n}>{n}</option>)}
-         </select>
-       </label>
+        <button className="ds-btn ds-purple ds-continue" onClick={sendToProjector} disabled={busy||!current}>{t('continueTools')}<ChevronRight/></button>
+      </aside>
 
-       <div className="card desktop-palette-card">
-         <div className="palette-headline"><Palette size={18}/><strong>{t('colorPalette')}</strong></div>
-         <div className="palette-row desktop-palette-row">
-           {processed.palette?.length ? processed.palette.map((c,i)=><div className="palette-chip" key={c+i}><i style={{background:c}}/><span>{i+1}</span><small>{c.toUpperCase()}</small></div>) : <div className="empty-preview">{isProcessing?'Processing…':'Upload a photo to generate colors.'}</div>}
-         </div>
-       </div>
+      <main className="ds-preview-area">
+        <div className="ds-tabs">
+          <button className={view==='original'?'active original':''} onClick={()=>selectView('original')}>{t('original')}</button>
+          <button className={view==='sketch'?'active sketch':''} onClick={()=>selectView('sketch')}>{t('sketch')}</button>
+          <button className={view==='cartoon'?'active cartoon':''} onClick={()=>selectView('cartoon')}>{t('cartoon')}</button>
+        </div>
 
-       <div className="card desktop-tips-card">
-         <h3>{t('tipsBestResults')}</h3>
-         <ul>
-           <li>{t('tipClear')}</li>
-           <li>{t('tipCentered')}</li>
-           <li>{t('tipResolution')}</li>
-         </ul>
-       </div>
+        <div className={`ds-main-image ${busy?'loading':''}`}>
+          {current?<img src={current} alt={view}/>:<div className="ds-empty"><ImageIcon/><span>{t('noImage')}</span></div>}
+          {busy&&<div className="ds-processing">Duke përpunuar foton…</div>}
+        </div>
 
-       <button type="button" className="btn primary-gradient desktop-continue-btn" disabled={!current||isProcessing} onClick={()=>continueToProjector(view==='original'?'popArt':view)}>
-         {t('continueTools')} <ChevronRight size={18}/>
-       </button>
-     </aside>
-
-     <section className="card studio-preview desktop-studio-preview">
-       <div className="desktop-preview-head">
-         <div>
-           <h3>{t('preview')}</h3>
-           <p>{isProcessing?'Processing image…':'Clean previews for tufting.'}</p>
-         </div>
-         <div className="desktop-preview-tabs">
-           {[
-             ['original',t('original')],
-             ['sketch',t('sketch')],
-             ['cartoon',t('cartoon')],
-           ].map(([k,label])=>
-             <button type="button" key={k} className={view===k?'active':''} onClick={()=>{setView(k); if(k==='sketch')setStyle('Sketch'); else if(k==='cartoon')setStyle('Cartoon'); else setStyle('Pop Art')}}>{label}</button>
-           )}
-         </div>
-       </div>
-
-       <div className="desktop-big-preview">
-         {current ? <img src={current} alt={view}/> : <div className="empty-preview"><ImageIcon size={34}/><p>{t('noImage')}</p></div>}
-       </div>
-
-       <div className="preview-grid desktop-preview-grid">
-         <button type="button" className={`preview-thumb ${view==='original'?'active':''}`} onClick={()=>{setView('original');setStyle('Pop Art')}}>
-           <div>{processed.original?<img src={processed.original} alt="original"/>:<span>{t('original')}</span>}</div>
-           <b>{t('original')}</b>
-         </button>
-         <button type="button" className={`preview-thumb ${view==='sketch'?'active':''}`} onClick={()=>{setView('sketch');setStyle('Sketch')}}>
-           <div>{processed.sketch?<img src={processed.sketch} alt="sketch"/>:<span>{t('sketch')}</span>}</div>
-           <b>{t('sketch')}</b>
-         </button>
-         <button type="button" className={`preview-thumb ${view==='cartoon'?'active':''}`} onClick={()=>{setView('cartoon');setStyle('Cartoon')}}>
-           <div>{processed.cartoon?<img src={processed.cartoon} alt="cartoon"/>:<span>{t('cartoon')}</span>}</div>
-           <b>{t('cartoon')}</b>
-         </button>
-       </div>
-     </section>
-   </div>
- </div>
+        <div className="ds-thumbs">
+          <PreviewThumb label={t('original')} src={processed.original} active={view==='original'} tone="original" onClick={()=>selectView('original')}/>
+          <PreviewThumb label={t('sketch')} src={processed.sketch} active={view==='sketch'} tone="sketch" onClick={()=>selectView('sketch')}/>
+          <PreviewThumb label={t('cartoon')} src={processed.cartoon} active={view==='cartoon'} tone="cartoon" onClick={()=>selectView('cartoon')}/>
+        </div>
+      </main>
+    </div>
+  </div>
 }
 
-function MobileDesignStudio({nav,step,setStep,pick,preview,processed,setProcessed,style,setStyle,paletteCount,setPaletteCount,continueToProjector,t,isProcessing}){
- const [view,setView]=useState('cartoon')
- if(step===0){
-   return <div className="m-design-page">
-     <div className="m-design-head"><button onClick={()=>nav(-1)}><ArrowLeft/></button><h1>{t('newProject')}</h1><span/></div>
-     <FlowSteps active={0} t={t}/>
-     <div className="m-upload-card">
-       <div className="m-upload-icon"><UploadCloud/></div>
-       <h2>{t('uploadPhoto')}</h2>
-       <p>{t('photoFormatsMobile')}</p>
-       <label className="m-upload-primary">{t('fromGallery')}<input type="file" accept="image/*" onChange={pick}/></label>
-       <label className="m-upload-secondary"><Camera/>{t('takePhoto')}<input type="file" accept="image/*" capture="environment" onChange={pick}/></label>
-     </div>
-     <div className="m-upload-tips">
-       <b>{t('tipsBestResults')}</b>
-       <span>• {t('tipClear')}</span>
-       <span>• {t('tipCentered')}</span>
-       <span>• {t('tipResolution')}</span>
-     </div>
-   </div>
- }
+function MobileStudio({t,nav,step,setStep,preview,processed,view,selectView,style,setStyle,paletteCount,changePaletteCount,busy,pick,galleryRef,cameraRef,sendToProjector}){
+  if(step===0){
+    return <div className="ds-mobile">
+      <header className="ds-mobile-head"><button onClick={()=>nav(-1)}><ArrowLeft/></button><h1>{t('newProject')}</h1><span/></header>
+      <FlowSteps active={0} t={t}/>
+      <section className="ds-mobile-upload">
+        <div className="ds-upload-mark"><UploadCloud/></div>
+        <h2>{t('uploadPhoto')}</h2>
+        <p>{t('photoFormatsMobile')}</p>
+        <button className="ds-btn ds-pink" onClick={()=>galleryRef.current?.click()}><ImageIcon/>{t('fromGallery')}</button>
+        <button className="ds-btn ds-teal" onClick={()=>cameraRef.current?.click()}><Camera/>{t('takePhoto')}</button>
+        <input ref={galleryRef} hidden type="file" accept="image/*" onChange={pick}/>
+        <input ref={cameraRef} hidden type="file" accept="image/*" capture="environment" onChange={pick}/>
+      </section>
+      <section className="ds-mobile-tips"><b>{t('tipsBestResults')}</b><span>• {t('tipClear')}</span><span>• {t('tipCentered')}</span><span>• {t('tipResolution')}</span></section>
+    </div>
+  }
 
- const current=processed[view]||processed.original
- return <div className="m-design-page m-preview-page">
-   <div className="m-design-head"><button onClick={()=>setStep(0)}><ArrowLeft/></button><h1>{t('preview')}</h1><button onClick={()=>nav(-1)}><X/></button></div>
-   <FlowSteps active={2} t={t}/>
+  const current=processed[view]||processed.original||preview
+  return <div className="ds-mobile ds-mobile-preview">
+    <header className="ds-mobile-head"><button onClick={()=>setStep(0)}><ArrowLeft/></button><h1>{t('preview')}</h1><span/></header>
+    <FlowSteps active={2} t={t}/>
 
-   <div className="m-preview-tabs">
-     {[['original',t('original')],['sketch',t('sketch')],['cartoon',t('cartoon')]].map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)}>{label}</button>)}
-   </div>
+    <div className="ds-tabs ds-tabs-mobile">
+      <button className={view==='original'?'active original':''} onClick={()=>selectView('original')}>{t('original')}</button>
+      <button className={view==='sketch'?'active sketch':''} onClick={()=>selectView('sketch')}>{t('sketch')}</button>
+      <button className={view==='cartoon'?'active cartoon':''} onClick={()=>selectView('cartoon')}>{t('cartoon')}</button>
+    </div>
 
-   <div className={`m-main-preview ${view}`}>
-     {current?<img src={current} alt={view}/>:<div className="m-preview-placeholder"><ImageIcon/><span>{t('noImage')}</span></div>}
-   </div>
+    <div className="ds-mobile-image">
+      {current?<img src={current} alt={view}/>:<div className="ds-empty"><ImageIcon/><span>{t('noImage')}</span></div>}
+      {busy&&<div className="ds-processing">Duke përpunuar…</div>}
+    </div>
 
-   <div className="m-mini-comparison">
-     <button className={view==='sketch'?'active':''} onClick={()=>setView('sketch')}>{processed.sketch&&<img src={processed.sketch}/>}<b>{t('sketch')}</b></button>
-     <button className={view==='cartoon'?'active':''} onClick={()=>setView('cartoon')}>{processed.cartoon&&<img src={processed.cartoon}/>}<b>{t('cartoon')}</b></button>
-   </div>
+    <h3 className="ds-mobile-section">{t('style')}</h3>
+    <div className="ds-mobile-style">
+      <button className={style==='Sketch'?'active sketch':''} onClick={()=>{setStyle('Sketch');selectView('sketch')}}>{t('sketch')}</button>
+      <button className={style==='Cartoon'?'active cartoon':''} onClick={()=>{setStyle('Cartoon');selectView('cartoon')}}>{t('cartoon')}</button>
+      <button className={style==='Pop Art'?'active original':''} onClick={()=>{setStyle('Pop Art');selectView('original')}}>{t('original')}</button>
+    </div>
 
-   <h3 className="m-section-title">{t('style')}</h3>
-   <div className="m-style-segment">
-     {['Sketch','Cartoon','Pop Art'].map(s=><button key={s} className={style===s?'active':''} onClick={()=>{setStyle(s);if(s==='Sketch')setView('sketch');else if(s==='Cartoon')setView('cartoon');else setView('original')}}>{styleLabel(s,t)}</button>)}
-   </div>
+    <div className="ds-mobile-palette-head"><h3>{t('colorPalette')}</h3><select value={paletteCount} onChange={e=>changePaletteCount(+e.target.value)} disabled={busy}>{[6,8,10,12,16].map(n=><option key={n} value={n}>{n}</option>)}</select></div>
+    <div className="ds-mobile-colors">{processed.palette.map((c,i)=><div key={`${c}-${i}`}><i style={{background:c}}/><b>{i+1}</b></div>)}</div>
 
-   <div className="m-palette-head"><h3>{t('colorPalette')}</h3><div className="palette-count-control" style={{display:'flex',alignItems:'center',gap:8,fontSize:10,fontWeight:800}}><span>{t('numberOfColors')}</span><select style={{height:32,border:'1px solid #e4d9c9',borderRadius:9,background:'#fff',padding:'0 8px',fontWeight:800}} value={paletteCount} onChange={async e=>{const n=+e.target.value;setPaletteCount(n);if(preview){setProcessed(await processImage(preview,n))}}} disabled={isProcessing}>{[6,8,10,12,16].map(n=><option key={n} value={n}>{n}</option>)}</select></div></div>
-   <div className="m-numbered-palette">
-     {processed.palette.map((c,i)=><div className="m-color-item" key={c}>
-       <span className="m-color-number">{i+1}</span><i style={{background:c}}></i>
-       <div><b>{t('color')} {i+1}</b><small>{c.toUpperCase()}</small></div>
-     </div>)}
-   </div>
+    <button className="ds-btn ds-purple ds-mobile-continue" onClick={sendToProjector} disabled={busy||!current}>{t('continueTools')}<ChevronRight/></button>
+  </div>
+}
 
-   <button className="m-continue-tools" onClick={()=>continueToProjector(view==='original'?'popArt':view)} disabled={isProcessing}>{t('continueTools')}</button>
- </div>
+function PreviewThumb({label,src,active,tone,onClick}){
+  return <button className={`ds-thumb ${active?'active':''} ${tone}`} onClick={onClick}><div>{src?<img src={src} alt={label}/>:<ImageIcon/>}</div><b>{label}</b></button>
 }
 
 function FlowSteps({active,t}){
- const labels=[t('photo'),t('style'),t('preview'),t('save')]
- return <div className="flow-steps">{labels.map((l,i)=><div key={i} className={i<=active?'done':''}><span>{i<active?<Check size={15}/>:i+1}</span><b>{l}</b></div>)}</div>
+  const labels=[t('photo'),t('style'),t('preview'),t('save')]
+  return <div className="ds-flow">{labels.map((label,i)=><div key={i} className={i<=active?'done':''}><span>{i<active?<Check/>:i+1}</span><b>{label}</b></div>)}</div>
 }
 
-function styleLabel(s,t){
- if(s==='Sketch')return t('sketch')
- if(s==='Cartoon')return t('cartoon')
- if(s==='Pop Art')return t('popArt')
- return s
+function DesignStyles(){
+ return <style>{`
+  .ds-desktop{max-width:1220px;margin:0 auto;padding:4px 0 28px;color:#172033}.ds-head{display:grid;grid-template-columns:50px 1fr auto;align-items:center;gap:14px;margin-bottom:12px}.ds-head h1{margin:0;font-size:30px}.ds-head p{margin:4px 0 0;color:#7b746c}.ds-back{width:46px;height:46px;border:1px solid #e8d9c7;border-radius:15px;background:#fffaf2;color:#172033;display:grid;place-items:center}.ds-soft-btn{border:1px solid #e6d6c2;background:#fffaf2;border-radius:13px;min-height:44px;padding:0 14px;display:flex;align-items:center;gap:8px;font-weight:800;color:#5a5047}
+  .ds-flow{position:relative;display:grid;grid-template-columns:repeat(4,1fr);max-width:720px;margin:12px auto 24px}.ds-flow:before{content:"";position:absolute;left:10%;right:10%;top:18px;height:3px;background:#eadfce;border-radius:99px}.ds-flow>div{position:relative;z-index:1;text-align:center}.ds-flow span{width:38px;height:38px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;background:#efe6da;color:#7e756b;font-weight:900;border:3px solid #fff8ea}.ds-flow span svg{width:18px}.ds-flow b{font-size:12px;color:#837970}.ds-flow .done span{background:#78bdb1;color:#fff}.ds-flow .done b{color:#317f76}
+  .ds-upload-screen{padding-top:8px}.ds-upload-card{width:min(760px,100%);margin:0 auto;border:2px dashed #e99aaa;border-radius:28px;background:linear-gradient(145deg,#fffdf8,#fff4ec);padding:48px 38px;text-align:center;box-shadow:0 18px 50px rgba(61,42,23,.07)}.ds-upload-mark{width:76px;height:76px;margin:0 auto 16px;border-radius:22px;background:#ffe3e8;color:#bd586c;display:grid;place-items:center}.ds-upload-mark svg{width:38px;height:38px}.ds-upload-card h2{font-size:30px;margin:0 0 7px}.ds-upload-card p{margin:0;color:#7b746c}.ds-upload-buttons{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:560px;margin:28px auto 0}.ds-btn{border:0;border-radius:15px;min-height:54px;padding:0 18px;display:flex;align-items:center;justify-content:center;gap:9px;font-weight:900;font-size:15px}.ds-btn svg{width:21px}.ds-pink{background:#eaa0ae;color:#6f3341}.ds-teal{background:#8cc8bd;color:#245c55}.ds-purple{background:#a68ad0;color:#fff}.ds-tip-grid{width:min(760px,100%);margin:16px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ds-tip-grid div{background:#fff9ee;border:1px solid #eadbc8;border-radius:18px;padding:15px;display:flex;align-items:center;gap:10px}.ds-tip-grid b{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#f4cf83;color:#694b11}.ds-tip-grid span{font-size:13px;color:#645d55}
+  .ds-workspace{display:grid;grid-template-columns:310px minmax(0,1fr);gap:18px;align-items:start}.ds-toolbox{display:grid;gap:14px}.ds-panel{border:1px solid #e9dac8;border-radius:20px;background:#fffaf2;padding:16px;box-shadow:0 10px 28px rgba(61,42,23,.05)}.ds-panel-title{display:flex;align-items:flex-start;gap:10px}.ds-panel-title h3{margin:0;font-size:17px}.ds-panel-title p{margin:3px 0 0;color:#7b746c;font-size:12px;line-height:1.4}.ds-icon{width:38px;height:38px;flex:0 0 38px;border-radius:12px;display:grid;place-items:center;font-size:19px}.ds-icon svg{width:20px}.ds-icon.violet{background:#eee3f7;color:#75578c}.ds-icon.gold{background:#fae8b9;color:#8a6519}.ds-style-buttons{display:grid;gap:8px;margin-top:14px}.ds-style-buttons button,.ds-mobile-style button{height:46px;border-radius:13px;border:1px solid #e5d7c4;background:#fffdf8;font-weight:900;color:#5c554d}.ds-style-buttons button.active.sketch,.ds-mobile-style button.active.sketch{background:#d9c8eb;border-color:#c6afe0;color:#553d70}.ds-style-buttons button.active.cartoon,.ds-mobile-style button.active.cartoon{background:#f3bf93;border-color:#e8ab76;color:#704015}.ds-style-buttons button.active.original,.ds-mobile-style button.active.original{background:#9bcfc5;border-color:#83bdb3;color:#245d56}.ds-color-count{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 10px;font-size:12px;font-weight:800}.ds-color-count select,.ds-mobile-palette-head select{height:36px;border-radius:10px;border:1px solid #e3d3bf;background:#fffdf8;padding:0 10px;font-weight:900}.ds-palette-list{display:grid;gap:7px;max-height:255px;overflow:auto}.ds-color-row{display:grid;grid-template-columns:30px 24px 1fr;align-items:center;gap:7px;border:1px solid #efe2d2;background:#fffdf8;border-radius:11px;padding:7px}.ds-color-row i{width:28px;height:28px;border-radius:9px;border:1px solid #0001}.ds-color-row b{font-size:12px;text-align:center}.ds-color-row span{font-size:10px;color:#6e665e}.ds-continue{width:100%;margin-top:2px}
+  .ds-preview-area{border:1px solid #e6d6c4;border-radius:24px;background:#fffaf2;padding:16px;box-shadow:0 14px 34px rgba(61,42,23,.06)}.ds-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.ds-tabs button{height:44px;border-radius:13px;border:1px solid #e4d4c0;background:#fffdf8;font-weight:900;color:#5a534b}.ds-tabs button.active.original{background:#9bcfc5;color:#245d56;border-color:#83bdb3}.ds-tabs button.active.sketch{background:#d9c8eb;color:#553d70;border-color:#c6afe0}.ds-tabs button.active.cartoon{background:#f3bf93;color:#704015;border-color:#e8ab76}.ds-main-image{height:500px;border-radius:20px;border:1px solid #e6d5c2;background:#f4ede3;display:grid;place-items:center;overflow:hidden;position:relative}.ds-main-image img{width:100%;height:100%;object-fit:contain;display:block}.ds-empty{display:flex;flex-direction:column;align-items:center;gap:8px;color:#8a837c}.ds-processing{position:absolute;inset:auto 16px 16px;z-index:4;border-radius:999px;padding:8px 14px;background:rgba(23,32,51,.82);color:#fff;font-size:12px;text-align:center}.ds-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.ds-thumb{border:1px solid #e6d7c4;background:#fffdf8;border-radius:14px;padding:8px;text-align:left}.ds-thumb.active{box-shadow:0 0 0 2px #a68ad0}.ds-thumb>div{height:110px;border-radius:10px;background:#f2eadf;display:grid;place-items:center;overflow:hidden}.ds-thumb img{width:100%;height:100%;object-fit:contain}.ds-thumb b{display:block;padding:8px 2px 1px;font-size:12px}
+  .ds-mobile{min-height:100dvh;background:#fff8ea;padding:14px 14px 100px;color:#172033}.ds-mobile-head{height:52px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center}.ds-mobile-head button{width:42px;height:42px;border:1px solid #eadac6;border-radius:13px;background:#fffdf8;display:grid;place-items:center}.ds-mobile-head h1{font-size:21px;margin:0;text-align:center}.ds-mobile .ds-flow{margin:8px 0 18px}.ds-mobile .ds-flow:before{top:14px}.ds-mobile .ds-flow span{width:30px;height:30px;border-width:2px;font-size:11px}.ds-mobile .ds-flow b{font-size:9px}.ds-mobile-upload{border:2px dashed #e99aaa;border-radius:22px;background:#fffaf2;padding:28px 20px;text-align:center}.ds-mobile-upload .ds-upload-mark{width:64px;height:64px}.ds-mobile-upload h2{margin:0 0 5px;font-size:24px}.ds-mobile-upload p{margin:0 0 18px;color:#7b746c;font-size:12px}.ds-mobile-upload .ds-btn{width:100%;margin-top:10px}.ds-mobile-tips{margin-top:14px;border:1px solid #e7d6bf;border-radius:17px;background:#fff3cf;padding:14px 16px;display:grid;gap:7px}.ds-mobile-tips b{color:#795510}.ds-mobile-tips span{font-size:12px;color:#62584b}.ds-tabs-mobile{margin-top:2px}.ds-tabs-mobile button{height:40px;font-size:12px}.ds-mobile-image{height:42dvh;min-height:300px;max-height:430px;border:1px solid #e5d4bf;border-radius:18px;background:#f3eadf;overflow:hidden;display:grid;place-items:center;position:relative}.ds-mobile-image img{width:100%;height:100%;object-fit:contain}.ds-mobile-section{font-size:18px;margin:16px 0 8px}.ds-mobile-style{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.ds-mobile-style button{height:44px;font-size:12px}.ds-mobile-palette-head{display:flex;align-items:center;justify-content:space-between;margin-top:16px}.ds-mobile-palette-head h3{font-size:18px;margin:0}.ds-mobile-colors{display:flex;gap:9px;overflow:auto;padding:11px 1px 3px}.ds-mobile-colors div{position:relative;min-width:42px;text-align:center}.ds-mobile-colors i{width:40px;height:40px;border-radius:12px;display:block;border:2px solid #fff;box-shadow:0 0 0 1px #ddcdb9}.ds-mobile-colors b{position:absolute;right:-2px;top:-5px;background:#172033;color:#fff;width:18px;height:18px;border-radius:50%;font-size:9px;display:grid;place-items:center}.ds-mobile-continue{width:100%;margin-top:18px}
+  @media(max-width:1050px) and (min-width:761px){.ds-workspace{grid-template-columns:280px minmax(0,1fr)}.ds-main-image{height:430px}.ds-thumb>div{height:90px}}
+ `}</style>
 }
 
 function useMedia(query){
- const [matches,setMatches]=useState(()=>typeof window!=='undefined'&&window.matchMedia(query).matches)
- useEffect(()=>{
-   const m=window.matchMedia(query),f=()=>setMatches(m.matches)
-   f();m.addEventListener?.('change',f)
-   return()=>m.removeEventListener?.('change',f)
- },[query])
- return matches
+  const [matches,setMatches]=useState(()=>typeof window!=='undefined'&&window.matchMedia(query).matches)
+  useEffect(()=>{
+    const m=window.matchMedia(query)
+    const f=()=>setMatches(m.matches)
+    f()
+    m.addEventListener?.('change',f)
+    return()=>m.removeEventListener?.('change',f)
+  },[query])
+  return matches
 }
 
 async function processImage(url,paletteCount=8){
- const img=await loadImage(url)
- const max=1280
- const scale=Math.min(1,max/Math.max(img.width,img.height))
- const w=Math.max(1,Math.round(img.width*scale))
- const h=Math.max(1,Math.round(img.height*scale))
-
- const base=document.createElement('canvas')
- base.width=w
- base.height=h
- const bctx=base.getContext('2d',{willReadFrequently:true})
- bctx.drawImage(img,0,0,w,h)
- const src=bctx.getImageData(0,0,w,h)
- const source=new Uint8ClampedArray(src.data)
-
- const original=base.toDataURL('image/jpeg',0.96)
-
- const smooth=boxBlurRGBA(source,w,h,2,2)
- const palette=extractPaletteKMeans(smooth,paletteCount)
- const paletteRgb=palette.map(hexToRgb)
-
- const cartoonData=makeCartoon(source,smooth,w,h,paletteRgb)
- const cartoonCanvas=document.createElement('canvas')
- cartoonCanvas.width=w
- cartoonCanvas.height=h
- cartoonCanvas.getContext('2d').putImageData(new ImageData(cartoonData,w,h),0,0)
- const cartoon=cartoonCanvas.toDataURL('image/png')
-
- const sketchData=makeProfessionalSketch(source,w,h)
- const sketchCanvas=document.createElement('canvas')
- sketchCanvas.width=w
- sketchCanvas.height=h
- sketchCanvas.getContext('2d').putImageData(new ImageData(sketchData,w,h),0,0)
- const sketch=sketchCanvas.toDataURL('image/png')
-
- return {original,sketch,cartoon,popArt:original,palette}
+  const img=await loadImage(url)
+  const max=1280
+  const scale=Math.min(1,max/Math.max(img.width,img.height))
+  const w=Math.max(1,Math.round(img.width*scale))
+  const h=Math.max(1,Math.round(img.height*scale))
+  const base=document.createElement('canvas')
+  base.width=w;base.height=h
+  const ctx=base.getContext('2d',{willReadFrequently:true})
+  ctx.drawImage(img,0,0,w,h)
+  const imageData=ctx.getImageData(0,0,w,h)
+  const source=new Uint8ClampedArray(imageData.data)
+  const original=base.toDataURL('image/jpeg',.96)
+  const smooth=boxBlurRGBA(source,w,h,2)
+  const palette=extractPaletteKMeans(source,paletteCount)
+  const paletteRgb=palette.map(hexToRgb)
+  const cartoonData=makeCartoon(source,smooth,w,h,paletteRgb)
+  const cartoonCanvas=document.createElement('canvas');cartoonCanvas.width=w;cartoonCanvas.height=h
+  cartoonCanvas.getContext('2d').putImageData(new ImageData(cartoonData,w,h),0,0)
+  const cartoon=cartoonCanvas.toDataURL('image/png')
+  const sketchData=makeSketch(source,w,h)
+  const sketchCanvas=document.createElement('canvas');sketchCanvas.width=w;sketchCanvas.height=h
+  sketchCanvas.getContext('2d').putImageData(new ImageData(sketchData,w,h),0,0)
+  const sketch=sketchCanvas.toDataURL('image/png')
+  return {original,sketch,cartoon,popArt:original,palette}
 }
 
-function loadImage(url){
- return new Promise((resolve,reject)=>{
-   const i=new Image()
-   i.decoding='async'
-   i.onload=()=>resolve(i)
-   i.onerror=reject
-   i.src=url
- })
-}
+function loadImage(url){return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=url})}
 
 function makeCartoon(source,smooth,w,h,palette){
- const edges=makeEdgeMap(smooth,w,h)
- const out=new Uint8ClampedArray(source.length)
-
- for(let i=0,p=0;i<source.length;i+=4,p++){
-   const enhanced=enhanceForCartoon(source[i],source[i+1],source[i+2])
-   const nearest=nearestColor(enhanced,palette)
-
-   let r=mix(nearest[0],enhanced[0],0.22)
-   let g=mix(nearest[1],enhanced[1],0.22)
-   let b=mix(nearest[2],enhanced[2],0.22)
-
-   const e=edges[p]
-   if(e>0.14){
-     const edgeStrength=Math.min(0.78,Math.pow((e-0.14)/0.86,0.92))
-     const darken=1-edgeStrength*0.92
-     r*=darken
-     g*=darken
-     b*=darken
-   }
-
-   out[i]=clamp255(r)
-   out[i+1]=clamp255(g)
-   out[i+2]=clamp255(b)
-   out[i+3]=255
- }
-
- return out
+  const edges=edgeMap(smooth,w,h)
+  const out=new Uint8ClampedArray(source.length)
+  for(let i=0,p=0;i<source.length;i+=4,p++){
+    const original=[source[i],source[i+1],source[i+2]]
+    const nearest=nearestColor(original,palette)
+    let r=nearest[0]*.82+original[0]*.18
+    let g=nearest[1]*.82+original[1]*.18
+    let b=nearest[2]*.82+original[2]*.18
+    const e=edges[p]
+    if(e>48){const k=e>105?.48:.7;r*=k;g*=k;b*=k}
+    out[i]=clamp(r);out[i+1]=clamp(g);out[i+2]=clamp(b);out[i+3]=255
+  }
+  return out
 }
 
-function makeProfessionalSketch(source,w,h){
- const gray=toGray(source)
- const softGray=boxBlurGray(gray,w,h,1,1)
- const inverted=new Float32Array(gray.length)
- for(let i=0;i<gray.length;i++) inverted[i]=255-softGray[i]
- const blurredInv=boxBlurGray(inverted,w,h,8,1)
- const edges=makeEdgeMapFromGray(softGray,w,h)
-
- const out=new Uint8ClampedArray(source.length)
- for(let p=0,i=0;p<gray.length;p++,i+=4){
-   const dodge=Math.min(255,(softGray[p]*255)/Math.max(18,255-blurredInv[p]))
-   const edge=Math.max(0,(edges[p]-0.10)/0.68)
-   const line=Math.pow(clamp01(edge),0.75)
-   const shadow=Math.max(0,(145-softGray[p])/145)
-   let value=Math.min(dodge,255-line*235-shadow*18)
-
-   if(value>245) value=255
-   else if(value>232) value=242+(value-232)*0.55
-   else if(value<32) value=24
-
-   out[i]=value
-   out[i+1]=value
-   out[i+2]=value
-   out[i+3]=255
- }
-
- return out
+function makeSketch(source,w,h){
+  const gray=new Float32Array(w*h)
+  for(let p=0,i=0;p<gray.length;p++,i+=4)gray[p]=.299*source[i]+.587*source[i+1]+.114*source[i+2]
+  const soft=blurGray(gray,w,h,1)
+  const edges=edgeMapFromGray(soft,w,h)
+  const out=new Uint8ClampedArray(source.length)
+  for(let p=0,i=0;p<gray.length;p++,i+=4){
+    const e=edges[p]
+    const shade=Math.max(0,(150-soft[p])*.12)
+    let v=255-e*1.12-shade
+    if(e>80)v=Math.min(v,70)
+    if(e>120)v=20
+    if(v>238)v=255
+    out[i]=clamp(v);out[i+1]=clamp(v);out[i+2]=clamp(v);out[i+3]=255
+  }
+  return out
 }
 
-function toGray(data){
- const gray=new Float32Array(data.length/4)
- for(let p=0,i=0;p<gray.length;p++,i+=4){
-   gray[p]=0.299*data[i]+0.587*data[i+1]+0.114*data[i+2]
- }
- return gray
+function boxBlurRGBA(data,w,h,radius=1){
+  const out=new Uint8ClampedArray(data.length)
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    let r=0,g=0,b=0,a=0,n=0
+    for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+      const xx=Math.max(0,Math.min(w-1,x+dx)),yy=Math.max(0,Math.min(h-1,y+dy)),i=(yy*w+xx)*4
+      r+=data[i];g+=data[i+1];b+=data[i+2];a+=data[i+3];n++
+    }
+    const o=(y*w+x)*4;out[o]=r/n;out[o+1]=g/n;out[o+2]=b/n;out[o+3]=a/n
+  }
+  return out
 }
-
-function boxBlurRGBA(data,w,h,radius=1,passes=1){
- let src=new Uint8ClampedArray(data)
- for(let pass=0;pass<passes;pass++){
-   src=boxBlurRGBAOnce(src,w,h,radius)
- }
- return src
+function blurGray(data,w,h,radius=1){
+  const out=new Float32Array(data.length)
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    let s=0,n=0
+    for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+      const xx=Math.max(0,Math.min(w-1,x+dx)),yy=Math.max(0,Math.min(h-1,y+dy));s+=data[yy*w+xx];n++
+    }
+    out[y*w+x]=s/n
+  }
+  return out
 }
-
-function boxBlurRGBAOnce(data,w,h,radius){
- const tmp=new Float32Array(data.length)
- const out=new Uint8ClampedArray(data.length)
- const span=radius*2+1
-
- for(let y=0;y<h;y++){
-   let r=0,g=0,b=0,a=0
-   for(let dx=-radius;dx<=radius;dx++){
-     const xx=Math.max(0,Math.min(w-1,dx))
-     const idx=(y*w+xx)*4
-     r+=data[idx]; g+=data[idx+1]; b+=data[idx+2]; a+=data[idx+3]
-   }
-   for(let x=0;x<w;x++){
-     const o=(y*w+x)*4
-     tmp[o]=r/span; tmp[o+1]=g/span; tmp[o+2]=b/span; tmp[o+3]=a/span
-     const removeX=Math.max(0,Math.min(w-1,x-radius))
-     const addX=Math.max(0,Math.min(w-1,x+radius+1))
-     const ri=(y*w+removeX)*4
-     const ai=(y*w+addX)*4
-     r+=data[ai]-data[ri]
-     g+=data[ai+1]-data[ri+1]
-     b+=data[ai+2]-data[ri+2]
-     a+=data[ai+3]-data[ri+3]
-   }
- }
-
- for(let x=0;x<w;x++){
-   let r=0,g=0,b=0,a=0
-   for(let dy=-radius;dy<=radius;dy++){
-     const yy=Math.max(0,Math.min(h-1,dy))
-     const idx=(yy*w+x)*4
-     r+=tmp[idx]; g+=tmp[idx+1]; b+=tmp[idx+2]; a+=tmp[idx+3]
-   }
-   for(let y=0;y<h;y++){
-     const o=(y*w+x)*4
-     out[o]=clamp255(r/span); out[o+1]=clamp255(g/span); out[o+2]=clamp255(b/span); out[o+3]=clamp255(a/span)
-     const removeY=Math.max(0,Math.min(h-1,y-radius))
-     const addY=Math.max(0,Math.min(h-1,y+radius+1))
-     const ri=(removeY*w+x)*4
-     const ai=(addY*w+x)*4
-     r+=tmp[ai]-tmp[ri]
-     g+=tmp[ai+1]-tmp[ri+1]
-     b+=tmp[ai+2]-tmp[ri+2]
-     a+=tmp[ai+3]-tmp[ri+3]
-   }
- }
-
- return out
+function edgeMap(data,w,h){
+  const gray=new Float32Array(w*h)
+  for(let p=0,i=0;p<gray.length;p++,i+=4)gray[p]=.299*data[i]+.587*data[i+1]+.114*data[i+2]
+  return edgeMapFromGray(gray,w,h)
 }
-
-function boxBlurGray(data,w,h,radius=1,passes=1){
- let src=data instanceof Float32Array ? new Float32Array(data) : Float32Array.from(data)
- for(let pass=0;pass<passes;pass++) src=boxBlurGrayOnce(src,w,h,radius)
- return src
+function edgeMapFromGray(gray,w,h){
+  const edges=new Float32Array(w*h)
+  for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+    const p=y*w+x
+    const gx=-gray[p-w-1]-2*gray[p-1]-gray[p+w-1]+gray[p-w+1]+2*gray[p+1]+gray[p+w+1]
+    const gy=-gray[p-w-1]-2*gray[p-w]-gray[p-w+1]+gray[p+w-1]+2*gray[p+w]+gray[p+w+1]
+    edges[p]=Math.min(255,Math.hypot(gx,gy))
+  }
+  return edges
 }
-
-function boxBlurGrayOnce(data,w,h,radius){
- const tmp=new Float32Array(w*h)
- const out=new Float32Array(w*h)
- const span=radius*2+1
-
- for(let y=0;y<h;y++){
-   let sum=0
-   for(let dx=-radius;dx<=radius;dx++){
-     const xx=Math.max(0,Math.min(w-1,dx))
-     sum+=data[y*w+xx]
-   }
-   for(let x=0;x<w;x++){
-     tmp[y*w+x]=sum/span
-     const removeX=Math.max(0,Math.min(w-1,x-radius))
-     const addX=Math.max(0,Math.min(w-1,x+radius+1))
-     sum+=data[y*w+addX]-data[y*w+removeX]
-   }
- }
-
- for(let x=0;x<w;x++){
-   let sum=0
-   for(let dy=-radius;dy<=radius;dy++){
-     const yy=Math.max(0,Math.min(h-1,dy))
-     sum+=tmp[yy*w+x]
-   }
-   for(let y=0;y<h;y++){
-     out[y*w+x]=sum/span
-     const removeY=Math.max(0,Math.min(h-1,y-radius))
-     const addY=Math.max(0,Math.min(h-1,y+radius+1))
-     sum+=tmp[addY*w+x]-tmp[removeY*w+x]
-   }
- }
-
- return out
-}
-
-function makeEdgeMap(data,w,h){
- return makeEdgeMapFromGray(toGray(data),w,h)
-}
-
-function makeEdgeMapFromGray(gray,w,h){
- const edges=new Float32Array(w*h)
- for(let y=1;y<h-1;y++){
-   for(let x=1;x<w-1;x++){
-     const p=y*w+x
-     const gx=-gray[p-w-1]-2*gray[p-1]-gray[p+w-1]+gray[p-w+1]+2*gray[p+1]+gray[p+w+1]
-     const gy=-gray[p-w-1]-2*gray[p-w]-gray[p-w+1]+gray[p+w-1]+2*gray[p+w]+gray[p+w+1]
-     edges[p]=Math.min(1,Math.hypot(gx,gy)/255)
-   }
- }
- return edges
-}
-
-function enhanceForCartoon(r,g,b){
- let [h,s,l]=rgbToHsl(r,g,b)
- s=Math.min(1,s*1.08+0.02)
- l=clamp01((l-0.5)*1.04+0.5)
- const [rr,gg,bb]=hslToRgb(h,s,l)
- return [rr,gg,bb]
-}
-
 function extractPaletteKMeans(data,count){
- const samples=[]
- const total=data.length/4
- const step=Math.max(1,Math.floor(total/7000))
- for(let p=0;p<total;p+=step){
-   const i=p*4
-   if(data[i+3]<220) continue
-   const r=data[i],g=data[i+1],b=data[i+2]
-   const max=Math.max(r,g,b),min=Math.min(r,g,b)
-   const light=(max+min)/510
-   if(light<0.02||light>0.98) continue
-   samples.push([r,g,b])
- }
-
- if(!samples.length) return ['#111111','#ffffff'].slice(0,count)
-
- const centroids=[]
- centroids.push(samples[Math.floor(samples.length*0.15)]?.slice()||samples[0].slice())
- while(centroids.length<count){
-   let bestSample=samples[0]
-   let bestDistance=-1
-   for(const s of samples){
-     const nearest=nearestColor(s,centroids)
-     const d=colorDistance(s,nearest)
-     if(d>bestDistance){bestDistance=d;bestSample=s}
-   }
-   centroids.push(bestSample.slice())
- }
-
- for(let iter=0;iter<12;iter++){
-   const sums=Array.from({length:count},()=>[0,0,0,0])
-   for(const s of samples){
-     let best=0,bestD=Infinity
-     for(let i=0;i<count;i++){
-       const c=centroids[i]
-       const d=(s[0]-c[0])**2+(s[1]-c[1])**2+(s[2]-c[2])**2
-       if(d<bestD){bestD=d;best=i}
-     }
-     sums[best][0]+=s[0]
-     sums[best][1]+=s[1]
-     sums[best][2]+=s[2]
-     sums[best][3]++
-   }
-   for(let i=0;i<count;i++){
-     if(sums[i][3]) centroids[i]=[
-       Math.round(sums[i][0]/sums[i][3]),
-       Math.round(sums[i][1]/sums[i][3]),
-       Math.round(sums[i][2]/sums[i][3])
-     ]
-   }
- }
-
- const uniq=[]
- for(const c of centroids.sort((a,b)=>luminance(b)-luminance(a))){
-   if(uniq.every(u=>colorDistance(u,c)>26)) uniq.push(c)
- }
- while(uniq.length<count){
-   uniq.push(uniq[uniq.length-1]||samples[0])
- }
- return uniq.slice(0,count).map(([r,g,b])=>rgbToHex(r,g,b))
+  const samples=[]
+  const total=data.length/4
+  const step=Math.max(1,Math.floor(total/6000))
+  for(let p=0;p<total;p+=step){
+    const i=p*4;if(data[i+3]<220)continue
+    const r=data[i],g=data[i+1],b=data[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),light=(mx+mn)/510
+    if(light<.025||light>.975)continue
+    samples.push([r,g,b])
+  }
+  if(!samples.length)return ['#222222','#eeeeee'].slice(0,count)
+  const centers=[]
+  for(let i=0;i<count;i++)centers.push(samples[Math.floor((i+.5)*samples.length/count)]?.slice()||samples[0].slice())
+  for(let it=0;it<10;it++){
+    const sums=Array.from({length:count},()=>[0,0,0,0])
+    for(const s of samples){let bi=0,bd=Infinity;for(let i=0;i<count;i++){const c=centers[i],d=(s[0]-c[0])**2+(s[1]-c[1])**2+(s[2]-c[2])**2;if(d<bd){bd=d;bi=i}}sums[bi][0]+=s[0];sums[bi][1]+=s[1];sums[bi][2]+=s[2];sums[bi][3]++}
+    for(let i=0;i<count;i++)if(sums[i][3])centers[i]=[Math.round(sums[i][0]/sums[i][3]),Math.round(sums[i][1]/sums[i][3]),Math.round(sums[i][2]/sums[i][3])]
+  }
+  return centers.map(c=>rgbToHex(...c))
 }
-
-function nearestColor(rgb,palette){
- let best=palette[0]||rgb
- let dist=Infinity
- for(const c of palette){
-  const d=(rgb[0]-c[0])**2+(rgb[1]-c[1])**2+(rgb[2]-c[2])**2
-  if(d<dist){dist=d;best=c}
- }
- return best
-}
-
-function luminance(rgb){
- return 0.2126*rgb[0]+0.7152*rgb[1]+0.0722*rgb[2]
-}
-function colorDistance(a,b){
- return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2)
-}
-function mix(a,b,t){return a*(1-t)+b*t}
-function clamp01(v){return Math.max(0,Math.min(1,v))}
-function clamp255(v){return Math.max(0,Math.min(255,Math.round(v)))}
-function hexToRgb(h){
- h=h.replace('#','')
- return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]
-}
-function rgbToHex(r,g,b){
- return '#'+[r,g,b].map(v=>clamp255(v).toString(16).padStart(2,'0')).join('')
-}
-
-function rgbToHsl(r,g,b){
- r/=255; g/=255; b/=255
- const max=Math.max(r,g,b), min=Math.min(r,g,b)
- let h, s
- const l=(max+min)/2
- if(max===min){
-   h=s=0
- }else{
-   const d=max-min
-   s=l>0.5 ? d/(2-max-min) : d/(max+min)
-   switch(max){
-     case r: h=(g-b)/d + (g<b?6:0); break
-     case g: h=(b-r)/d + 2; break
-     default: h=(r-g)/d + 4; break
-   }
-   h/=6
- }
- return [h,s||0,l]
-}
-
-function hslToRgb(h,s,l){
- if(s===0){
-   const v=clamp255(l*255)
-   return [v,v,v]
- }
- const hue2rgb=(p,q,t)=>{
-   if(t<0) t+=1
-   if(t>1) t-=1
-   if(t<1/6) return p+(q-p)*6*t
-   if(t<1/2) return q
-   if(t<2/3) return p+(q-p)*(2/3-t)*6
-   return p
- }
- const q=l<0.5 ? l*(1+s) : l+s-l*s
- const p=2*l-q
- return [
-   clamp255(hue2rgb(p,q,h+1/3)*255),
-   clamp255(hue2rgb(p,q,h)*255),
-   clamp255(hue2rgb(p,q,h-1/3)*255),
- ]
-}
+function nearestColor(rgb,palette){let best=palette[0]||rgb,dist=Infinity;for(const c of palette){const d=(rgb[0]-c[0])**2+(rgb[1]-c[1])**2+(rgb[2]-c[2])**2;if(d<dist){dist=d;best=c}}return best}
+function hexToRgb(h){h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+function rgbToHex(r,g,b){return '#'+[r,g,b].map(v=>clamp(v).toString(16).padStart(2,'0')).join('')}
+function clamp(v){return Math.max(0,Math.min(255,Math.round(v)))}
