@@ -54,6 +54,11 @@ export default function Login(){
     <div className="login-clean-ready">
       <div className="login-clean-ready-bg" aria-hidden="true"></div>
 
+      <div className="login-desktop-copy" aria-hidden="true">
+        <h1><span>Tufting</span> <em>Studio</em></h1>
+        <p>Design it. Tuft it. Love it.</p>
+      </div>
+
       <form className="login-clean-ready-form" onSubmit={submit}>
         <label className="login-clean-ready-field">
           <Mail/>
