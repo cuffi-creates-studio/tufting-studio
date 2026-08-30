@@ -1,0 +1,73 @@
+/* Tufting Studio — desktop/tablet only. Mobile <=760px untouched. */
+@media (min-width:761px){
+  .desktop-design-page,.desktop-settings-page,.desktop-gallery-page{display:block}
+  .desktop-design-header{margin-bottom:14px}
+  .desktop-studio-layout{align-items:start;grid-template-columns:minmax(330px,380px) 1fr}
+  .desktop-studio-tools{display:grid;gap:14px;position:sticky;top:90px}
+  .desktop-panel-title{display:flex;align-items:flex-start;gap:12px}
+  .desktop-panel-title svg{width:20px;height:20px;color:#744be3;margin-top:3px}
+  .desktop-panel-title h3{margin:0 0 3px}
+  .desktop-panel-title p{margin:0;color:var(--muted);font-size:13px}
+  .desktop-panel-title.compact h3{font-size:18px}
+  .desktop-upload-drop{border:2px dashed #e6d3be;border-radius:18px;background:linear-gradient(180deg,#fffaf2,#fff7ec);padding:20px;text-align:center}
+  .desktop-upload-drop.has-preview{border-color:#0ca892}
+  .desktop-upload-icon{width:60px;height:60px;margin:0 auto 12px;border-radius:18px;background:#fff3f7;display:grid;place-items:center;color:#ff4f82}
+  .desktop-upload-drop strong{display:block;font-size:18px}
+  .desktop-upload-drop span{display:block;margin-top:4px;color:var(--muted);font-size:13px}
+  .desktop-upload-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:15px}
+  .desktop-style-card{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fffdf8}
+  .desktop-mode-buttons{margin-top:12px}
+  .desktop-mode-buttons button{justify-content:center;font-weight:800}
+  .desktop-select-label{display:grid;gap:7px;font-weight:800}
+  .desktop-select-label select{height:46px;border-radius:12px;border:1px solid var(--line);padding:0 12px;background:#fff}
+  .desktop-palette-card,.desktop-tips-card{padding:16px}
+  .palette-headline{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .desktop-palette-row{row-gap:10px}
+  .desktop-tips-card h3{margin:0 0 10px}
+  .desktop-tips-card ul{margin:0;padding-left:18px;color:#5c615f;display:grid;gap:8px}
+  .desktop-continue-btn{width:100%;min-height:54px;font-size:16px}
+  .desktop-studio-preview{display:grid;gap:16px;min-height:760px}
+  .desktop-preview-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+  .desktop-preview-head h3{margin:0 0 4px}
+  .desktop-preview-head p{margin:0;color:var(--muted)}
+  .desktop-preview-tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .desktop-preview-tabs button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-weight:800}
+  .desktop-preview-tabs button.active{background:#744be3;color:#fff;border-color:#744be3}
+  .desktop-big-preview{min-height:520px;border-radius:20px;border:1px solid #eadfce;background:#f7f2e9;display:grid;place-items:center;overflow:hidden;padding:16px}
+  .desktop-big-preview img{width:100%;height:100%;max-height:650px;object-fit:contain;display:block}
+  .desktop-preview-grid{grid-template-columns:repeat(3,1fr)}
+  .preview-thumb{border:1px solid var(--line);background:#fff;border-radius:16px;padding:10px;text-align:left}
+  .preview-thumb.active{border-color:#744be3;box-shadow:0 0 0 3px rgba(116,75,227,.08)}
+  .preview-thumb>div{height:160px;background:#f7f2e9;border-radius:12px;display:grid;place-items:center;overflow:hidden}
+  .preview-thumb img{width:100%;height:100%;object-fit:contain;display:block}
+  .preview-thumb b{display:block;padding-top:10px}
+
+  .desktop-settings-page .language-segment{display:flex;gap:10px;flex-wrap:wrap}
+  .desktop-settings-page .language-segment button{min-height:42px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:#fffdf8;font-weight:800}
+  .desktop-settings-page .language-segment button.active{background:#744be3;color:#fff;border-color:#744be3}
+  .desktop-language-segment{margin-top:6px}
+  .desktop-notification-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .desktop-notification-row strong{font-size:18px}
+  .desktop-notification-row p{margin:5px 0 0;color:var(--muted)}
+  .desktop-settings-page .settings-switch{width:64px;height:36px;border-radius:999px;border:1px solid var(--line);background:#ece6de;display:flex;align-items:center;padding:3px;transition:.2s}
+  .desktop-settings-page .settings-switch i{width:28px;height:28px;border-radius:50%;background:#fff;display:block;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+  .desktop-settings-page .settings-switch.on{background:#0ca892}
+  .desktop-settings-page .settings-switch.on i{transform:translateX(28px)}
+
+  .desktop-gallery-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+  .desktop-gallery-card{padding:0;background:#fffdf8;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+  .desktop-gallery-image-button{display:block;width:100%;border:0;padding:0;background:#f6efe4;cursor:pointer}
+  .desktop-gallery-image{display:block;width:100%;height:250px;object-fit:contain;background:#f6efe4}
+  .desktop-gallery-placeholder{height:250px;display:grid;place-items:center;font-size:56px;background:#f6efe4}
+  .desktop-gallery-copy{padding:14px 16px 16px}
+  .desktop-gallery-copy h3{margin:0 0 6px;font-size:17px;line-height:1.25}
+  .desktop-gallery-copy small{font-weight:800}
+  .desktop-gallery-copy small.done{color:#00995E}
+  .desktop-gallery-copy small.progress{color:#FD5A46}
+}
+
+@media (min-width:761px) and (max-width:1150px){
+  .desktop-studio-layout{grid-template-columns:1fr}
+  .desktop-studio-tools{position:static}
+  .desktop-preview-head{flex-direction:column}
+}
