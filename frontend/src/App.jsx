@@ -10,6 +10,7 @@ import Projector from './pages/Projector'
 import Calculator from './pages/Calculator'
 import Materials from './pages/Materials'
 import Settings from './pages/Settings'
+import WorkHours from './pages/WorkHours'
 
 function Guard({children}) {
   const isLoggedIn = localStorage.getItem('tufting_auth') === '1'
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="projector" element={<Projector />} />
         <Route path="calculator" element={<Calculator />} />
         <Route path="materials" element={<Materials />} />
+        <Route path="work-hours" element={<WorkHours />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
