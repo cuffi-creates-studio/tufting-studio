@@ -106,7 +106,7 @@ export default function Dashboard(){
 
    <section className="m-carousel-card" onTouchStart={e=>touchX.current=e.touches[0].clientX} onTouchEnd={e=>swipeEnd(e.changedTouches[0].clientX)}>
     <div className="m-carousel-track" style={{transform:`translateX(-${page*100}%)`}}>
-     <div className="m-slide"><div className="m-title-row"><b>{t('calendar')}</b><CalendarDays/></div><Calendar appointments={appointments} projects={projects}/></div>
+     <div className="m-slide"><div className="m-title-row"><b>{t('calendar')}</b><CalendarDays/></div><Calendar appointments={appointments} projects={projects} lang={lang}/></div>
      <div className="m-slide"><div className="m-title-row"><b>{t('statistics')}</b><TrendingUp/></div>{stats.hasData?<><div className="m-stat-summary" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'5px 8px',margin:'4px 0 6px',fontSize:9,color:'#555d68'}}><span><i className="dot project" style={{display:'inline-block',width:7,height:7,borderRadius:'50%',marginRight:5,background:'#5d3fe4'}}/>{t('projectsThisWeek')}: <b>{stats.projectTotal}</b></span><span><i className="dot calc" style={{display:'inline-block',width:7,height:7,borderRadius:'50%',marginRight:5,background:'#0b9d83'}}/>{t('calculationsThisWeek')}: <b>{stats.calcTotal}</b></span><span>{t('weeklyCost')}: <b>€{stats.weekCost.toFixed(2)}</b></span></div><canvas ref={chart} width="700" height="230"/><div className="m-days">{stats.labels.map(d=><span key={d}>{d}</span>)}</div></>:<div className="m-empty-state"><TrendingUp/><b>{t('noStats')}</b></div>}</div>
      <div className="m-slide"><div className="m-title-row"><b>{t('appointments')}</b><button className="m-add-app" onClick={addAppointment}>+ {t('addAppointment')}</button></div><Appointments items={appointments} onDelete={deleteAppointment} t={t}/></div>
     </div>
@@ -170,7 +170,7 @@ function DesktopDashboard({t,lang,nav,projects,completed,progress,cost,stats,app
          <button className={desktopPage===2?'active':''} onClick={()=>setDesktopPage(2)}><CalendarDays/>{t('appointments')}</button>
        </div>
        <div className="dd-carousel-body">
-         {desktopPage===0&&<div className="dd-panel"><Calendar appointments={appointments} projects={projects}/></div>}
+         {desktopPage===0&&<div className="dd-panel"><Calendar appointments={appointments} projects={projects} lang={lang}/></div>}
          {desktopPage===1&&<div className="dd-panel"><DesktopStats stats={stats} t={t}/></div>}
          {desktopPage===2&&<div className="dd-panel dd-appointments"><div className="dd-appt-head"><b>{t('appointments')}</b><button onClick={addAppointment}>+ {t('addAppointment')}</button></div><Appointments items={appointments} onDelete={deleteAppointment} t={t}/></div>}
        </div>
@@ -224,10 +224,21 @@ function DesktopStats({stats,t}){
  </div>
 }
 
-function Calendar({appointments,projects}){
+function Calendar({appointments,projects,lang='en'}){
  const d=new Date(),y=d.getFullYear(),m=d.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),offset=(first.getDay()+6)%7,cells=[]
  for(let i=0;i<offset;i++)cells.push(null);for(let i=1;i<=last.getDate();i++)cells.push(i);while(cells.length%7)cells.push(null)
- return <div className="mini-calendar"><div className="cal-week">{['M','T','W','T','F','S','S'].map((x,i)=><b key={i}>{x}</b>)}</div><div className="cal-grid">{cells.map((n,i)=><div key={i} className={`cal-day ${n===d.getDate()?'today':''}`}>{n||''}</div>)}</div></div>
+ const calendarCopy={
+   sq:{days:['E hënë','E martë','E mërkurë','E enjte','E premte','E shtunë','E diel'],locale:'sq-AL'},
+   de:{days:['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'],locale:'de-DE'},
+   en:{days:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],locale:'en-GB'}
+ }
+ const copy=calendarCopy[lang]||calendarCopy.en
+ const monthTitle=new Intl.DateTimeFormat(copy.locale,{month:'long',year:'numeric'}).format(d)
+ return <div className="mini-calendar">
+   <div style={{textAlign:'center',fontWeight:900,fontSize:13,margin:'0 0 8px',textTransform:'capitalize'}}>{monthTitle}</div>
+   <div className="cal-week">{copy.days.map((x,i)=><b key={i} style={{fontSize:'clamp(8px,0.72vw,11px)',lineHeight:1.05,whiteSpace:'normal',textAlign:'center'}}>{x}</b>)}</div>
+   <div className="cal-grid">{cells.map((n,i)=><div key={i} className={`cal-day ${n===d.getDate()?'today':''}`}>{n||''}</div>)}</div>
+ </div>
 }
 function Appointments({items,onDelete,t}){return <div className="appt-list">{items.length?items.map(a=><div className="appt-row" key={a.id}><div><b>{a.title}</b><span><Clock/> {a.date} · {a.time}</span></div><button onClick={()=>onDelete(a.id)}>×</button></div>):<div className="m-empty-state"><CalendarDays/><b>{t('noAppointments')}</b></div>}</div>}
 function readProfile(){return{name:localStorage.getItem('tufting_profile_name')||localStorage.getItem('tufting_name')||'Studio Owner',photo:localStorage.getItem('tufting_profile_photo')||''}}
