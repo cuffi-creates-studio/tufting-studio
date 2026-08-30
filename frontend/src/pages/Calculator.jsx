@@ -1,8 +1,8 @@
 import React,{useEffect,useMemo,useState} from 'react'
-import {Calculator as CalculatorIcon,Coins,Scale,PackageOpen,Save,RotateCcw,CheckCircle2} from 'lucide-react'
+import {Calculator as CalculatorIcon,Coins,Scale,PackageOpen,Save,RotateCcw,CheckCircle2,Trash2} from 'lucide-react'
 import MobilePageHeader from '../components/MobilePageHeader'
 import {useI18n} from '../i18n/I18n'
-import {getCalculations,saveCalculation} from '../lib/calculationsStore'
+import {deleteCalculation,getCalculations,saveCalculation} from '../lib/calculationsStore'
 import '../styles/calculator-retro.css'
 
 const num=v=>{
@@ -78,6 +78,17 @@ export default function Calculator(){
      await load()
      setTimeout(()=>setSaved(false),1600)
    }catch(err){console.error('CALC SAVE ERROR',err)}
+ }
+
+
+ async function removeSavedCalculation(id){
+   if(!id)return
+   const ok=window.confirm('Ta fshij këtë llogaritje?')
+   if(!ok)return
+   try{
+     await deleteCalculation(id)
+     setHistory(v=>v.filter(x=>x.id!==id))
+   }catch(err){console.error('CALC DELETE ERROR',err)}
  }
 
  function reset(){
@@ -212,15 +223,26 @@ export default function Calculator(){
    {history.length>0&&<section className="card real-history-card">
      <div className="real-section-head compact"><div className="real-icon retro-pink"><Save/></div><div><h2>Llogaritjet e ruajtura</h2><p>Historiku i konsumit dhe kostos reale.</p></div></div>
      <div className="real-history-list">
-       {history.slice(0,8).map(c=><div className="real-history-row" key={c.id}>
+       {history.slice(0,12).map(c=><div className="real-history-row expanded" key={c.id}>
          <div className="real-history-main">
            <span className="history-color-dot" style={{background:validHex(c.yarn_color_code||'#D8CBB8')}}/>
-           <div>
+           <div className="history-copy">
              <b>{c.yarn_type==='Wool'?'Wool / Lesh':'Acrylic'}{c.yarn_color_name?` · ${c.yarn_color_name}`:''}</b>
-             <small>{c.yarn_color_code?`${normalizeHex(c.yarn_color_code)} · `:''}{new Date(c.created_at).toLocaleDateString()} · {grams(c.total_g)}</small>
+             <small>{c.yarn_color_code?`${normalizeHex(c.yarn_color_code)} · `:''}{new Date(c.created_at).toLocaleDateString()}</small>
+             <div className="history-details">
+               <span><em>Topi</em><strong>{grams(c.ball_weight_g||0)}</strong></span>
+               <span><em>Çmimi/top</em><strong>{money(c.ball_price||0)}</strong></span>
+               <span><em>Para</em><strong>{grams(c.start_weight_g||0)}</strong></span>
+               <span><em>Mbetur</em><strong>{grams(c.remaining_weight_g||0)}</strong></span>
+               <span><em>Harxhuar</em><strong>{grams(c.total_g||0)}</strong></span>
+               <span><em>Topa plot</em><strong>{Number(c.full_balls_used||0)}</strong></span>
+             </div>
            </div>
          </div>
-         <strong>{money(c.cost)}</strong>
+         <div className="history-actions">
+           <strong className="history-cost">{money(c.cost)}</strong>
+           <button type="button" className="history-delete" onClick={()=>removeSavedCalculation(c.id)} aria-label="Fshi llogaritjen"><Trash2 size={18}/></button>
+         </div>
        </div>)}
      </div>
    </section>}
