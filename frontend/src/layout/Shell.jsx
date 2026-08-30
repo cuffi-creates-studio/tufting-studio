@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react'
 import {NavLink,Outlet,useNavigate} from 'react-router-dom'
-import {Home,FolderKanban,Images,WandSparkles,Projector,Calculator,Boxes,Settings,Menu,Search,LogOut,X} from 'lucide-react'
+import {Home,FolderKanban,Images,WandSparkles,Projector,Calculator,Boxes,Settings,Menu,Search,LogOut,X,Globe2} from 'lucide-react'
 import {useI18n} from '../i18n/I18n'
 import {signOut} from 'firebase/auth'
 import {auth} from '../lib/firebase'
@@ -17,11 +17,7 @@ export default function Shell(){
  const nav=useNavigate()
 
  async function logout(){
-  try{
-   await signOut(auth)
-  }catch(err){
-   console.error('FIREBASE LOGOUT ERROR:',err)
-  }finally{
+  try{await signOut(auth)}catch(err){console.error('FIREBASE LOGOUT ERROR:',err)}finally{
    localStorage.removeItem('tufting_auth')
    localStorage.removeItem('tufting_name')
    nav('/login',{replace:true})
@@ -48,9 +44,7 @@ export default function Shell(){
     <div className={`brand-logo ${p.logo?'has-image':''}`}>{p.logo?<img src={p.logo} alt="logo"/>:'🌼'}</div>
     <div className="brand-copy"><b>Tufting</b><strong>Studio</strong></div>
    </div>
-   <nav>{items.map(([to,I,label])=><NavLink key={to} to={to} end={to==='/'} onClick={()=>setDrawer(false)}>
-    <span className="nav-icon"><I/></span><span>{label}</span>
-   </NavLink>)}</nav>
+   <nav>{items.map(([to,I,label])=><NavLink key={to} to={to} end={to==='/'} onClick={()=>setDrawer(false)}><span className="nav-icon"><I/></span><span>{label}</span></NavLink>)}</nav>
    <div className="sidebar-bottom">
     <div className="profile-avatar">{avatar}</div>
     <div className="profile-text"><b>{p.name}</b><small>Professional</small></div>
@@ -65,35 +59,17 @@ export default function Shell(){
     <button className="icon-button mobile-menu" onClick={()=>setDrawer(true)}><Menu/></button>
     <div className="search-box"><Search/><input placeholder="Search projects, materials..."/></div>
     <div className="topbar-spacer"/>
-    <label className="desktop-language-select" aria-label={t('language')}>
-      <span>🌐</span>
-      <select value={lang} onChange={e=>setLang(e.target.value)}>
-        <option value="sq">Shqip</option>
-        <option value="de">Deutsch</option>
-        <option value="en">English</option>
-      </select>
-    </label>
-    <div className="top-profile">
-      <div className="top-profile-avatar">{avatar}</div>
-      <button className="logout-button" onClick={logout}><LogOut/></button>
-    </div>
+    <label className="desktop-shell-language"><Globe2/><select value={lang} onChange={e=>setLang(e.target.value)}><option value="sq">Shqip</option><option value="de">Deutsch</option><option value="en">English</option></select></label>
+    <div className="top-profile"><div className="top-profile-avatar">{avatar}</div><button className="logout-button" onClick={logout}><LogOut/></button></div>
    </header>
    <div className="page-wrap"><Outlet/></div>
   </main>
 
   <nav className="retro-homebar">
-    <NavLink to="/" end className={({isActive})=>`hb-item hb-home ${isActive?'active':''}`}>
-      <span className="hb-circle"><Home/></span><small>{t('home')}</small>
-    </NavLink>
-    <NavLink to="/projects" className={({isActive})=>`hb-item hb-projects ${isActive?'active':''}`}>
-      <span className="hb-circle"><FolderKanban/></span><small>{t('projects')}</small>
-    </NavLink>
-    <NavLink to="/gallery" className={({isActive})=>`hb-item hb-gallery ${isActive?'active':''}`}>
-      <span className="hb-circle"><Images/></span><small>{t('gallery')}</small>
-    </NavLink>
-    <button className={`hb-item hb-menu ${drawer?'active':''}`} onClick={()=>setDrawer(v=>!v)}>
-      <span className="hb-circle">{drawer?<X/>:<Menu/>}</span><small>{t('menu')}</small>
-    </button>
+    <NavLink to="/" end className={({isActive})=>`hb-item hb-home ${isActive?'active':''}`}><span className="hb-circle"><Home/></span><small>{t('home')}</small></NavLink>
+    <NavLink to="/projects" className={({isActive})=>`hb-item hb-projects ${isActive?'active':''}`}><span className="hb-circle"><FolderKanban/></span><small>{t('projects')}</small></NavLink>
+    <NavLink to="/gallery" className={({isActive})=>`hb-item hb-gallery ${isActive?'active':''}`}><span className="hb-circle"><Images/></span><small>{t('gallery')}</small></NavLink>
+    <button className={`hb-item hb-menu ${drawer?'active':''}`} onClick={()=>setDrawer(v=>!v)}><span className="hb-circle">{drawer?<X/>:<Menu/>}</span><small>{t('menu')}</small></button>
   </nav>
  </div>
 }
