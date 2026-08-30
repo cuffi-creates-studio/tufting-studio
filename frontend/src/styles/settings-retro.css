@@ -51,3 +51,19 @@
   .retro-save-bar{margin-top:14px;padding:14px 18px;border-radius:17px}
   .retro-save-btn{min-width:160px;min-height:46px;border-radius:13px;font-size:14px}
 }
+
+/* FINAL VISUAL FIX: stronger retro icon blocks + white symbols, Settings only */
+@media (min-width:761px){
+  .settings-retro-page .retro-card-icon{
+    color:#fff !important;
+    box-shadow:0 7px 16px rgba(23,32,51,.10);
+  }
+  .settings-retro-page .retro-card-icon svg{
+    color:#fff !important;
+    stroke:#fff !important;
+  }
+  .settings-retro-page .retro-card-icon.purple{background:#552CB7 !important;color:#fff !important}
+  .settings-retro-page .retro-card-icon.green{background:#00995E !important;color:#fff !important}
+  .settings-retro-page .retro-card-icon.orange{background:#FD5A46 !important;color:#fff !important}
+  .settings-retro-page .retro-card-icon.pink{background:#FB7DA8 !important;color:#fff !important}
+}
