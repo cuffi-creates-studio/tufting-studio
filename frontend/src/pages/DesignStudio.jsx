@@ -1,5 +1,5 @@
-import React,{useEffect,useState} from 'react'
-import {ArrowLeft,X,UploadCloud,Camera,Check,Palette,Image as ImageIcon} from 'lucide-react'
+import React,{useEffect,useMemo,useRef,useState} from 'react'
+import {ArrowLeft,X,UploadCloud,Camera,Check,Palette,Image as ImageIcon,SlidersHorizontal,ChevronRight} from 'lucide-react'
 import {useNavigate} from 'react-router-dom'
 import {useI18n} from '../i18n/I18n'
 
@@ -10,22 +10,50 @@ export default function DesignStudio(){
  const [step,setStep]=useState(0)
  const [preview,setPreview]=useState('')
  const [style,setStyle]=useState('Cartoon')
- const [processed,setProcessed]=useState({original:'',sketch:'',cartoon:'',palette:[]})
+ const [view,setView]=useState('cartoon')
+ const [processed,setProcessed]=useState({original:'',sketch:'',cartoon:'',popArt:'',palette:[]})
  const [paletteCount,setPaletteCount]=useState(8)
+ const [isProcessing,setIsProcessing]=useState(false)
 
  async function pick(e){
   const f=e.target.files?.[0]
   if(!f)return
   const url=URL.createObjectURL(f)
   setPreview(url)
-  const result=await processImage(url,paletteCount)
-  setProcessed(result)
-  setStep(1)
+  setIsProcessing(true)
+  try{
+    const result=await processImage(url,paletteCount)
+    setProcessed(result)
+    setStep(1)
+    setView('cartoon')
+    setStyle('Cartoon')
+  }finally{
+    setIsProcessing(false)
+  }
  }
 
- function continueToProjector(view='cartoon'){
-   const key=style==='Sketch'?'sketch':style==='Cartoon'?'cartoon':view
-   const image=processed[key]||processed.cartoon||processed.original||preview
+ async function regenerate(nextCount){
+  setPaletteCount(nextCount)
+  if(!preview)return
+  setIsProcessing(true)
+  try{
+    const result=await processImage(preview,nextCount)
+    setProcessed(result)
+  }finally{
+    setIsProcessing(false)
+  }
+ }
+
+ const selectedKey=useMemo(()=>{
+   if(style==='Sketch')return 'sketch'
+   if(style==='Cartoon')return 'cartoon'
+   if(style==='Pop Art')return 'popArt'
+   return 'original'
+ },[style])
+
+ function continueToProjector(explicitView){
+   const key=explicitView||selectedKey
+   const image=processed[key]||processed.original||preview
    try{
      sessionStorage.setItem('tufting_projector_image',image||'')
      sessionStorage.setItem('tufting_projector_style',style)
@@ -34,38 +62,156 @@ export default function DesignStudio(){
    nav('/projector')
  }
 
- if(!isMobile){
-   if(step===0)return <div className="mobile-flow-page exact-upload desktop-design-preserved">
-     <div className="flow-top"><button onClick={()=>nav(-1)}><X/></button><h1>{t('newProject')}</h1><button onClick={()=>nav(-1)}><X/></button></div>
-     <FlowSteps active={0} t={t}/>
-     <div className="upload-panel">
-       <UploadCloud size={62}/>
-       <h2>{t('uploadPhoto')}</h2><p>{t('photoFormats')}</p>
-       <label className="big-action teal">{t('fromGallery')}<input type="file" accept="image/*" onChange={pick}/></label>
-       <label className="big-action purple"><Camera/>{t('takePhoto')}<input type="file" accept="image/*" capture="environment" onChange={pick}/></label>
-     </div>
-     <div className="tips-panel"><h3>{t('tipsBestResults')}</h3><p>✧ {t('tipClear')}</p><p>☼ {t('tipCentered')}</p><p>▣ {t('tipResolution')}</p></div>
-   </div>
+ useEffect(()=>()=>{if(preview?.startsWith('blob:')) URL.revokeObjectURL(preview)},[preview])
 
-   return <div className="mobile-flow-page exact-preview desktop-design-preserved">
-     <div className="flow-top"><button onClick={()=>setStep(0)}><ArrowLeft/></button><h1>{t('preview')}</h1><button onClick={()=>nav(-1)}><X/></button></div>
-     <FlowSteps active={2} t={t}/>
-     <div className="preview-pair">
-       <div><div className="img-stage sketch-stage">{processed.sketch?<img src={processed.sketch}/>:preview?<img src={preview}/>:<span>{t('sketch')}</span>}</div><b>{t('sketch')}</b></div>
-       <div><div className="img-stage cartoon-stage">{processed.cartoon?<img src={processed.cartoon}/>:preview?<img src={preview}/>:<span>{t('cartoon')}</span>}</div><b>{t('cartoon')}</b></div>
-     </div>
-     <h3 className="style-title">{t('style')}</h3>
-     <div className="style-segment">{['Sketch','Cartoon','Pop Art'].map(s=><button className={style===s?'active':''} onClick={()=>setStyle(s)} key={s}>{styleLabel(s,t)}</button>)}</div>
-     <div className="palette-head"><h3>{t('colorPalette')}</h3><button><Palette/></button></div>
-     <div className="palette-dots">{processed.palette.map(c=><span key={c} style={{background:c}}></span>)}</div>
-     <button className="continue-tools" onClick={()=>continueToProjector()}>{t('continueTools')}</button>
-   </div>
+ if(isMobile){
+   return <MobileDesignStudio nav={nav} step={step} setStep={setStep} pick={pick} preview={preview} processed={processed} setProcessed={setProcessed} style={style} setStyle={setStyle} paletteCount={paletteCount} setPaletteCount={setPaletteCount} continueToProjector={continueToProjector} t={t} isProcessing={isProcessing}/>
  }
 
- return <MobileDesignStudio nav={nav} step={step} setStep={setStep} pick={pick} preview={preview} processed={processed} setProcessed={setProcessed} style={style} setStyle={setStyle} paletteCount={paletteCount} setPaletteCount={setPaletteCount} continueToProjector={continueToProjector} t={t}/>
+ return <DesktopDesignStudio
+   nav={nav}
+   step={step}
+   setStep={setStep}
+   pick={pick}
+   preview={preview}
+   processed={processed}
+   style={style}
+   setStyle={setStyle}
+   view={view}
+   setView={setView}
+   paletteCount={paletteCount}
+   regenerate={regenerate}
+   continueToProjector={continueToProjector}
+   t={t}
+   isProcessing={isProcessing}
+ />
 }
 
-function MobileDesignStudio({nav,step,setStep,pick,preview,processed,setProcessed,style,setStyle,paletteCount,setPaletteCount,continueToProjector,t}){
+function DesktopDesignStudio({nav,step,setStep,pick,preview,processed,style,setStyle,view,setView,paletteCount,regenerate,continueToProjector,t,isProcessing}){
+ const galleryInputRef=useRef(null)
+ const cameraInputRef=useRef(null)
+ const current=processed[view]||processed.original||preview
+ return <div className="desktop-design-page">
+   <div className="page-title desktop-design-header">
+     <div>
+       <h1>{t('newProject')}</h1>
+       <p>{t('uploadPhoto')} · {t('style')} · {t('preview')} · {t('save')}</p>
+     </div>
+     <button className="btn outline-btn" type="button" onClick={()=>nav(-1)}><ArrowLeft size={18}/>{t('back')}</button>
+   </div>
+
+   <FlowSteps active={step===0?0:2} t={t}/>
+
+   <div className="studio-layout desktop-studio-layout">
+     <aside className="card studio-tools desktop-studio-tools">
+       <div className="desktop-panel-title">
+         <UploadCloud/>
+         <div>
+           <h3>{t('uploadPhoto')}</h3>
+           <p>{t('photoFormats')}</p>
+         </div>
+       </div>
+
+       <div className={`desktop-upload-drop ${preview?'has-preview':''}`}>
+         <div className="desktop-upload-icon"><UploadCloud size={30}/></div>
+         <strong>{preview?t('photo'):t('uploadPhoto')}</strong>
+         <span>{preview?'Image ready for conversion':t('tipsBestResults')}</span>
+         <div className="desktop-upload-actions">
+           <button type="button" className="btn teal" onClick={()=>galleryInputRef.current?.click()}>{t('fromGallery')}</button>
+           <button type="button" className="btn purple" onClick={()=>cameraInputRef.current?.click()}><Camera size={18}/>{t('takePhoto')}</button>
+           <input ref={galleryInputRef} hidden type="file" accept="image/*" onChange={pick}/>
+           <input ref={cameraInputRef} hidden type="file" accept="image/*" capture="environment" onChange={pick}/>
+         </div>
+       </div>
+
+       <div className="desktop-style-card">
+         <div className="desktop-panel-title compact">
+           <SlidersHorizontal/>
+           <div>
+             <h3>{t('style')}</h3>
+             <p>Select the result you want to send to Projector.</p>
+           </div>
+         </div>
+         <div className="mode-buttons desktop-mode-buttons">
+           {[
+             ['Sketch','sketch',t('sketch')],
+             ['Cartoon','cartoon',t('cartoon')],
+             ['Pop Art','original',t('original')],
+           ].map(([styleValue,viewValue,label])=>
+             <button type="button" key={styleValue} className={style===styleValue?'active':''} onClick={()=>{setStyle(styleValue);setView(styleValue==='Pop Art'?'original':viewValue)}}>{label}</button>
+           )}
+         </div>
+       </div>
+
+       <label className="desktop-select-label">
+         <span>{t('numberOfColors')}</span>
+         <select value={paletteCount} onChange={e=>regenerate(+e.target.value)} disabled={!preview||isProcessing}>
+           {[6,8,10,12,16].map(n=><option key={n} value={n}>{n}</option>)}
+         </select>
+       </label>
+
+       <div className="card desktop-palette-card">
+         <div className="palette-headline"><Palette size={18}/><strong>{t('colorPalette')}</strong></div>
+         <div className="palette-row desktop-palette-row">
+           {processed.palette?.length ? processed.palette.map((c,i)=><div className="palette-chip" key={c+i}><i style={{background:c}}/><span>{i+1}</span><small>{c.toUpperCase()}</small></div>) : <div className="empty-preview">{isProcessing?'Processing…':'Upload a photo to generate colors.'}</div>}
+         </div>
+       </div>
+
+       <div className="card desktop-tips-card">
+         <h3>{t('tipsBestResults')}</h3>
+         <ul>
+           <li>{t('tipClear')}</li>
+           <li>{t('tipCentered')}</li>
+           <li>{t('tipResolution')}</li>
+         </ul>
+       </div>
+
+       <button type="button" className="btn primary-gradient desktop-continue-btn" disabled={!current||isProcessing} onClick={()=>continueToProjector(view==='original'?'popArt':view)}>
+         {t('continueTools')} <ChevronRight size={18}/>
+       </button>
+     </aside>
+
+     <section className="card studio-preview desktop-studio-preview">
+       <div className="desktop-preview-head">
+         <div>
+           <h3>{t('preview')}</h3>
+           <p>{isProcessing?'Processing image…':'Clean previews for tufting.'}</p>
+         </div>
+         <div className="desktop-preview-tabs">
+           {[
+             ['original',t('original')],
+             ['sketch',t('sketch')],
+             ['cartoon',t('cartoon')],
+           ].map(([k,label])=>
+             <button type="button" key={k} className={view===k?'active':''} onClick={()=>{setView(k); if(k==='sketch')setStyle('Sketch'); else if(k==='cartoon')setStyle('Cartoon'); else setStyle('Pop Art')}}>{label}</button>
+           )}
+         </div>
+       </div>
+
+       <div className="desktop-big-preview">
+         {current ? <img src={current} alt={view}/> : <div className="empty-preview"><ImageIcon size={34}/><p>{t('noImage')}</p></div>}
+       </div>
+
+       <div className="preview-grid desktop-preview-grid">
+         <button type="button" className={`preview-thumb ${view==='original'?'active':''}`} onClick={()=>{setView('original');setStyle('Pop Art')}}>
+           <div>{processed.original?<img src={processed.original} alt="original"/>:<span>{t('original')}</span>}</div>
+           <b>{t('original')}</b>
+         </button>
+         <button type="button" className={`preview-thumb ${view==='sketch'?'active':''}`} onClick={()=>{setView('sketch');setStyle('Sketch')}}>
+           <div>{processed.sketch?<img src={processed.sketch} alt="sketch"/>:<span>{t('sketch')}</span>}</div>
+           <b>{t('sketch')}</b>
+         </button>
+         <button type="button" className={`preview-thumb ${view==='cartoon'?'active':''}`} onClick={()=>{setView('cartoon');setStyle('Cartoon')}}>
+           <div>{processed.cartoon?<img src={processed.cartoon} alt="cartoon"/>:<span>{t('cartoon')}</span>}</div>
+           <b>{t('cartoon')}</b>
+         </button>
+       </div>
+     </section>
+   </div>
+ </div>
+}
+
+function MobileDesignStudio({nav,step,setStep,pick,preview,processed,setProcessed,style,setStyle,paletteCount,setPaletteCount,continueToProjector,t,isProcessing}){
  const [view,setView]=useState('cartoon')
  if(step===0){
    return <div className="m-design-page">
@@ -107,10 +253,10 @@ function MobileDesignStudio({nav,step,setStep,pick,preview,processed,setProcesse
 
    <h3 className="m-section-title">{t('style')}</h3>
    <div className="m-style-segment">
-     {['Sketch','Cartoon','Pop Art'].map(s=><button key={s} className={style===s?'active':''} onClick={()=>{setStyle(s);if(s==='Sketch')setView('sketch');else if(s==='Cartoon')setView('cartoon')}}>{styleLabel(s,t)}</button>)}
+     {['Sketch','Cartoon','Pop Art'].map(s=><button key={s} className={style===s?'active':''} onClick={()=>{setStyle(s);if(s==='Sketch')setView('sketch');else if(s==='Cartoon')setView('cartoon');else setView('original')}}>{styleLabel(s,t)}</button>)}
    </div>
 
-   <div className="m-palette-head"><h3>{t('colorPalette')}</h3><div className="palette-count-control" style={{display:'flex',alignItems:'center',gap:8,fontSize:10,fontWeight:800}}><span>{t('numberOfColors')}</span><select style={{height:32,border:'1px solid #e4d9c9',borderRadius:9,background:'#fff',padding:'0 8px',fontWeight:800}} value={paletteCount} onChange={async e=>{const n=+e.target.value;setPaletteCount(n);if(preview)setProcessed(await processImage(preview,n))}}>{[6,8,10,12,16].map(n=><option key={n} value={n}>{n}</option>)}</select></div></div>
+   <div className="m-palette-head"><h3>{t('colorPalette')}</h3><div className="palette-count-control" style={{display:'flex',alignItems:'center',gap:8,fontSize:10,fontWeight:800}}><span>{t('numberOfColors')}</span><select style={{height:32,border:'1px solid #e4d9c9',borderRadius:9,background:'#fff',padding:'0 8px',fontWeight:800}} value={paletteCount} onChange={async e=>{const n=+e.target.value;setPaletteCount(n);if(preview){setProcessed(await processImage(preview,n))}}} disabled={isProcessing}>{[6,8,10,12,16].map(n=><option key={n} value={n}>{n}</option>)}</select></div></div>
    <div className="m-numbered-palette">
      {processed.palette.map((c,i)=><div className="m-color-item" key={c}>
        <span className="m-color-number">{i+1}</span><i style={{background:c}}></i>
@@ -118,7 +264,7 @@ function MobileDesignStudio({nav,step,setStep,pick,preview,processed,setProcesse
      </div>)}
    </div>
 
-   <button className="m-continue-tools" onClick={()=>continueToProjector(view)}>{t('continueTools')}</button>
+   <button className="m-continue-tools" onClick={()=>continueToProjector(view==='original'?'popArt':view)} disabled={isProcessing}>{t('continueTools')}</button>
  </div>
 }
 
@@ -146,85 +292,177 @@ function useMedia(query){
 
 async function processImage(url,paletteCount=8){
  const img=await loadImage(url)
- const max=900
+ const max=1400
  const scale=Math.min(1,max/Math.max(img.width,img.height))
  const w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale))
- const base=document.createElement('canvas'); base.width=w;base.height=h
+
+ const base=document.createElement('canvas')
+ base.width=w;base.height=h
  const bctx=base.getContext('2d',{willReadFrequently:true})
  bctx.drawImage(img,0,0,w,h)
- const original=base.toDataURL('image/jpeg',.92)
+ const src=bctx.getImageData(0,0,w,h)
+ const original=base.toDataURL('image/jpeg',.94)
 
- const source=bctx.getImageData(0,0,w,h)
- const palette=extractPalette(source.data,paletteCount)
+ const smoothData=boxBlur(new Uint8ClampedArray(src.data),w,h,1)
+ const palette=extractPaletteKMeans(smoothData,paletteCount)
+ const paletteRgb=palette.map(hexToRgb)
 
- const cartoonCanvas=document.createElement('canvas');cartoonCanvas.width=w;cartoonCanvas.height=h
- const cctx=cartoonCanvas.getContext('2d')
- const cartoon=new ImageData(new Uint8ClampedArray(source.data),w,h)
- for(let i=0;i<cartoon.data.length;i+=4){
-   const r=cartoon.data[i],g=cartoon.data[i+1],b=cartoon.data[i+2]
-   const nearest=boostColor(nearestColor([r,g,b],palette.map(hexToRgb)))
-   cartoon.data[i]=nearest[0];cartoon.data[i+1]=nearest[1];cartoon.data[i+2]=nearest[2]
- }
- cctx.putImageData(cartoon,0,0)
- cctx.globalAlpha=.16;cctx.drawImage(base,0,0);cctx.globalAlpha=1
- const cartoonUrl=cartoonCanvas.toDataURL('image/png')
+ const cartoonData=new Uint8ClampedArray(smoothData)
+ quantizeToPalette(cartoonData,paletteRgb)
+ const edges=makeEdgeMap(smoothData,w,h)
+ overlayEdges(cartoonData,edges,w,h)
+ const cartoonCanvas=document.createElement('canvas'); cartoonCanvas.width=w; cartoonCanvas.height=h
+ cartoonCanvas.getContext('2d').putImageData(new ImageData(cartoonData,w,h),0,0)
+ const cartoon=cartoonCanvas.toDataURL('image/png')
 
- const sketchCanvas=document.createElement('canvas');sketchCanvas.width=w;sketchCanvas.height=h
- const sctx=sketchCanvas.getContext('2d')
- const sketch=new ImageData(w,h)
- const gray=new Float32Array(w*h)
- for(let p=0,i=0;p<gray.length;p++,i+=4) gray[p]=.299*source.data[i]+.587*source.data[i+1]+.114*source.data[i+2]
- for(let y=1;y<h-1;y++){
-  for(let x=1;x<w-1;x++){
-   const p=y*w+x
-   const gx=-gray[p-w-1]-2*gray[p-1]-gray[p+w-1]+gray[p-w+1]+2*gray[p+1]+gray[p+w+1]
-   const gy=-gray[p-w-1]-2*gray[p-w]-gray[p-w+1]+gray[p+w-1]+2*gray[p+w]+gray[p+w+1]
-   const edge=Math.min(255,Math.hypot(gx,gy)*1.15)
-   const v=edge>42?20:Math.max(224,255-edge*.35)
-   const i=p*4; sketch.data[i]=v;sketch.data[i+1]=v;sketch.data[i+2]=v;sketch.data[i+3]=255
-  }
- }
- sctx.fillStyle='#fff';sctx.fillRect(0,0,w,h);sctx.putImageData(sketch,0,0)
- const sketchUrl=sketchCanvas.toDataURL('image/png')
+ const sketchData=makeSketch(smoothData,w,h)
+ const sketchCanvas=document.createElement('canvas'); sketchCanvas.width=w; sketchCanvas.height=h
+ sketchCanvas.getContext('2d').putImageData(new ImageData(sketchData,w,h),0,0)
+ const sketch=sketchCanvas.toDataURL('image/png')
 
- return {original,sketch:sketchUrl,cartoon:cartoonUrl,palette}
+ return {original,sketch,cartoon,popArt:original,palette}
 }
 
-function loadImage(url){return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=url})}
-function extractPalette(data,count){
- const buckets=new Map()
- const step=Math.max(2,Math.floor(data.length/(4*26000)))
- for(let p=0;p<data.length;p+=4*step){
-  if(data[p+3]<220)continue
-  const r=data[p],g=data[p+1],b=data[p+2]
-  const max=Math.max(r,g,b),min=Math.min(r,g,b),light=(max+min)/510
-  const sat=max===min?0:(max-min)/(255-Math.abs(max+min-255))
-  if(light<.055||light>.965)continue
-  const q=24
-  const rr=Math.min(255,Math.round(r/q)*q),gg=Math.min(255,Math.round(g/q)*q),bb=Math.min(255,Math.round(b/q)*q)
-  const key=`${rr},${gg},${bb}`
-  const weight=.55+sat*1.7+(light>.2&&light<.82?.35:0)
-  buckets.set(key,(buckets.get(key)||0)+weight)
- }
- const ranked=[...buckets.entries()].sort((a,b)=>b[1]-a[1]).map(([k,score])=>({rgb:k.split(',').map(Number),score}))
- const chosen=[]
- for(const item of ranked){
-   if(chosen.every(c=>colorDistance(c.rgb,item.rgb)>52))chosen.push(item)
-   if(chosen.length>=count)break
- }
- if(chosen.length<count){
-   for(const item of ranked){
-     if(!chosen.includes(item))chosen.push(item)
-     if(chosen.length>=count)break
+function loadImage(url){
+ return new Promise((resolve,reject)=>{
+   const i=new Image()
+   i.onload=()=>resolve(i)
+   i.onerror=reject
+   i.src=url
+ })
+}
+
+function boxBlur(data,w,h,radius=1){
+ const out=new Uint8ClampedArray(data.length)
+ for(let y=0;y<h;y++){
+   for(let x=0;x<w;x++){
+     let rs=0,gs=0,bs=0,as=0,c=0
+     for(let dy=-radius;dy<=radius;dy++){
+       const yy=Math.max(0,Math.min(h-1,y+dy))
+       for(let dx=-radius;dx<=radius;dx++){
+         const xx=Math.max(0,Math.min(w-1,x+dx))
+         const i=(yy*w+xx)*4
+         rs+=data[i];gs+=data[i+1];bs+=data[i+2];as+=data[i+3];c++
+       }
+     }
+     const o=(y*w+x)*4
+     out[o]=rs/c; out[o+1]=gs/c; out[o+2]=bs/c; out[o+3]=as/c
    }
  }
- return chosen.slice(0,count).map(x=>rgbToHex(...x.rgb))
+ return out
 }
-function colorDistance(a,b){return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2)}
-function boostColor(rgb){
- const avg=(rgb[0]+rgb[1]+rgb[2])/3
- return rgb.map(v=>Math.max(0,Math.min(255,Math.round((avg+(v-avg)*1.12)*1.04+3))))
+
+function extractPaletteKMeans(data,count){
+ const samples=[]
+ const total=data.length/4
+ const step=Math.max(1,Math.floor(total/5000))
+ for(let p=0;p<total;p+=step){
+   const i=p*4
+   if(data[i+3] < 220) continue
+   const r=data[i],g=data[i+1],b=data[i+2]
+   const max=Math.max(r,g,b),min=Math.min(r,g,b),light=(max+min)/510
+   if(light<0.03||light>0.97) continue
+   samples.push([r,g,b])
+ }
+ if(!samples.length) return ['#000000','#ffffff'].slice(0,count)
+ const centroids=[]
+ for(let i=0;i<count;i++) centroids.push(samples[Math.floor(i*samples.length/count)]?.slice() || samples[0].slice())
+ for(let iter=0;iter<10;iter++){
+   const sums=Array.from({length:count},()=>[0,0,0,0])
+   for(const s of samples){
+     let best=0,bestD=Infinity
+     for(let i=0;i<count;i++){
+       const c=centroids[i]
+       const d=(s[0]-c[0])**2+(s[1]-c[1])**2+(s[2]-c[2])**2
+       if(d<bestD){bestD=d;best=i}
+     }
+     sums[best][0]+=s[0];sums[best][1]+=s[1];sums[best][2]+=s[2];sums[best][3]++
+   }
+   for(let i=0;i<count;i++){
+     if(sums[i][3]) centroids[i]=[Math.round(sums[i][0]/sums[i][3]),Math.round(sums[i][1]/sums[i][3]),Math.round(sums[i][2]/sums[i][3])]
+   }
+ }
+ const uniq=[]
+ for(const c of centroids){
+   if(uniq.every(u=>colorDistance(u,c)>36)) uniq.push(c)
+ }
+ while(uniq.length<count && samples.length){
+   const candidate=samples[Math.floor(Math.random()*samples.length)]
+   if(uniq.every(u=>colorDistance(u,candidate)>28)) uniq.push(candidate)
+   else break
+ }
+ return uniq.slice(0,count).map(([r,g,b])=>rgbToHex(r,g,b))
 }
+
+function quantizeToPalette(data,palette){
+ for(let i=0;i<data.length;i+=4){
+   const best=nearestColor([data[i],data[i+1],data[i+2]],palette)
+   data[i]=best[0]
+   data[i+1]=best[1]
+   data[i+2]=best[2]
+ }
+}
+
+function makeEdgeMap(data,w,h){
+ const gray=new Float32Array(w*h)
+ for(let p=0,i=0;p<gray.length;p++,i+=4) gray[p]=0.299*data[i]+0.587*data[i+1]+0.114*data[i+2]
+ const edges=new Float32Array(w*h)
+ for(let y=1;y<h-1;y++){
+   for(let x=1;x<w-1;x++){
+     const p=y*w+x
+     const gx=-gray[p-w-1]-2*gray[p-1]-gray[p+w-1]+gray[p-w+1]+2*gray[p+1]+gray[p+w+1]
+     const gy=-gray[p-w-1]-2*gray[p-w]-gray[p-w+1]+gray[p+w-1]+2*gray[p+w]+gray[p+w+1]
+     edges[p]=Math.hypot(gx,gy)
+   }
+ }
+ return edges
+}
+
+function overlayEdges(data,edges,w,h){
+ for(let p=0;p<edges.length;p++){
+   const e=edges[p]
+   if(e<38) continue
+   const strength=Math.min(0.82,(e-38)/145)
+   const i=p*4
+   data[i]=Math.round(data[i]*(1-strength))
+   data[i+1]=Math.round(data[i+1]*(1-strength))
+   data[i+2]=Math.round(data[i+2]*(1-strength))
+ }
+}
+
+function makeSketch(data,w,h){
+ const gray=new Float32Array(w*h)
+ for(let p=0,i=0;p<gray.length;p++,i+=4) gray[p]=0.299*data[i]+0.587*data[i+1]+0.114*data[i+2]
+ const out=new Uint8ClampedArray(data.length)
+ for(let y=1;y<h-1;y++){
+   for(let x=1;x<w-1;x++){
+     const p=y*w+x
+     const gx=-gray[p-w-1]-2*gray[p-1]-gray[p+w-1]+gray[p-w+1]+2*gray[p+1]+gray[p+w+1]
+     const gy=-gray[p-w-1]-2*gray[p-w]-gray[p-w+1]+gray[p+w-1]+2*gray[p+w]+gray[p+w+1]
+     const edge=Math.hypot(gx,gy)
+     const intensity=edge>65?16:edge>38?90:245
+     const i=p*4
+     out[i]=intensity
+     out[i+1]=intensity
+     out[i+2]=intensity
+     out[i+3]=255
+   }
+ }
+ for(let x=0;x<w;x++){
+   for(const y of [0,h-1]){
+     const i=(y*w+x)*4
+     out[i]=255;out[i+1]=255;out[i+2]=255;out[i+3]=255
+   }
+ }
+ for(let y=0;y<h;y++){
+   for(const x of [0,w-1]){
+     const i=(y*w+x)*4
+     out[i]=255;out[i+1]=255;out[i+2]=255;out[i+3]=255
+   }
+ }
+ return out
+}
+
 function nearestColor(rgb,palette){
  let best=palette[0]||rgb,dist=Infinity
  for(const c of palette){
@@ -233,5 +471,6 @@ function nearestColor(rgb,palette){
  }
  return best
 }
+function colorDistance(a,b){return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2)}
 function hexToRgb(h){h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
-function rgbToHex(r,g,b){return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('')}
+function rgbToHex(r,g,b){return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('')}
