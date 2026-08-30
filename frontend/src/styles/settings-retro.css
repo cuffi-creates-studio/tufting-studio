@@ -15,3 +15,39 @@
   .retro-save-bar{margin-top:18px;padding:18px 22px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(90deg,#fffdf8,#fff2df);display:flex;align-items:center;justify-content:space-between;gap:18px;box-shadow:0 10px 24px rgba(61,41,19,.06)}.retro-save-bar h3{margin:0 0 4px}.retro-save-bar p{margin:0;color:var(--muted)}.retro-save-btn{min-width:180px;min-height:52px;border:0;border-radius:15px;background:linear-gradient(90deg,#744be3,#a66cf1);color:#fff;font-weight:900;font-size:16px;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 22px rgba(116,75,227,.22)}
   @media(max-width:1180px){.settings-retro-grid{grid-template-columns:1fr}.settings-retro-card{min-height:auto}}
 }
+
+/* Compact desktop Settings cards only */
+@media (min-width:761px){
+  .settings-retro-title{margin-bottom:13px}
+  .settings-retro-title h1{font-size:31px;margin-bottom:5px}
+  .settings-retro-grid{grid-template-columns:1.15fr .85fr;gap:14px}
+  .settings-retro-card{border-radius:20px;padding:18px;min-height:190px}
+  .retro-card-head{gap:10px;margin-bottom:14px}
+  .retro-card-head h3{font-size:18px;margin-bottom:2px}
+  .retro-card-head p{font-size:12px}
+  .retro-card-icon{width:40px;height:40px;border-radius:13px}
+  .retro-card-icon svg{width:20px;height:20px}
+  .retro-profile-row{grid-template-columns:104px 1fr;gap:16px}
+  .retro-avatar{width:96px;height:96px;font-size:25px;border-width:4px}
+  .retro-profile-fields input{height:43px;border-radius:11px}
+  .retro-actions{margin-top:9px;gap:8px}
+  .retro-btn{min-height:41px;padding:0 13px;border-radius:12px;font-size:13px}
+  .retro-logo-row{gap:16px}
+  .retro-logo-box{width:145px;height:96px;border-radius:16px}
+  .retro-logo-box span{font-size:44px}
+  .retro-globe-panel{gap:12px;padding:11px 13px;border-radius:15px;margin-bottom:11px}
+  .retro-globe{width:54px;height:54px}
+  .retro-globe svg{width:28px;height:28px}
+  .retro-globe-panel b{font-size:16px}
+  .retro-globe-panel span{font-size:12px;margin-top:3px}
+  .retro-language-buttons{gap:8px}
+  .retro-lang{min-height:52px;border-radius:14px;padding:0 11px;font-size:13px;gap:7px}
+  .retro-lang .retro-flag{font-size:21px}
+  .retro-notification-row{padding:13px 14px;border-radius:15px}
+  .retro-notification-row b{font-size:17px}
+  .retro-switch{width:64px;height:36px;padding:4px}
+  .retro-switch i{width:28px;height:28px}
+  .retro-switch.on i{transform:translateX(28px)}
+  .retro-save-bar{margin-top:14px;padding:14px 18px;border-radius:17px}
+  .retro-save-btn{min-width:160px;min-height:46px;border-radius:13px;font-size:14px}
+}
