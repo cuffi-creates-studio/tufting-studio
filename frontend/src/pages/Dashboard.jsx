@@ -236,7 +236,19 @@ function Calendar({appointments,projects,lang='en'}){
  const monthTitle=new Intl.DateTimeFormat(copy.locale,{month:'long',year:'numeric'}).format(d)
  return <div className="mini-calendar">
    <div style={{textAlign:'center',fontWeight:900,fontSize:13,margin:'0 0 8px',textTransform:'capitalize'}}>{monthTitle}</div>
-   <div className="cal-week">{copy.days.map((x,i)=><b key={i} style={{fontSize:'clamp(8px,0.72vw,11px)',lineHeight:1.05,whiteSpace:'normal',textAlign:'center'}}>{x}</b>)}</div>
+   <div className="cal-week">{copy.days.map((x,i)=>{
+     const retroDays=[
+       {bg:'#FFC567',fg:'#172033'},
+       {bg:'#FB7DA8',fg:'#172033'},
+       {bg:'#FD5A46',fg:'#FFFFFF'},
+       {bg:'#552CB7',fg:'#FFFFFF'},
+       {bg:'#00995E',fg:'#FFFFFF'},
+       {bg:'#058CD7',fg:'#FFFFFF'},
+       {bg:'#FB7DA8',fg:'#172033'}
+     ]
+     const c=retroDays[i]
+     return <b key={i} style={{fontSize:'clamp(7px,0.68vw,10px)',lineHeight:1.05,whiteSpace:'normal',textAlign:'center',background:c.bg,color:c.fg,borderRadius:8,padding:'5px 2px',boxShadow:'inset 0 -1px 0 rgba(0,0,0,.08)'}}>{x}</b>
+   })}</div>
    <div className="cal-grid">{cells.map((n,i)=><div key={i} className={`cal-day ${n===d.getDate()?'today':''}`}>{n||''}</div>)}</div>
  </div>
 }
