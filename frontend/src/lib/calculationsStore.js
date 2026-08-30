@@ -17,6 +17,8 @@ export async function saveCalculation(data){
     width_cm:Number(data.width_cm)||0,
     height_cm:Number(data.height_cm)||0,
     yarn_type:data.yarn_type||'Acrylic',
+    yarn_color_name:String(data.yarn_color_name||'').trim(),
+    yarn_color_code:String(data.yarn_color_code||'').trim().toUpperCase(),
     density:Number(data.density)||0,
     price_per_100g:Number(data.price_per_100g)||0,
     waste_percent:Number(data.waste_percent)||0,
