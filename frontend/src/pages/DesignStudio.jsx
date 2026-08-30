@@ -35,30 +35,72 @@ export default function DesignStudio(){
  }
 
  if(!isMobile){
-   if(step===0)return <div className="mobile-flow-page exact-upload desktop-design-preserved">
-     <div className="flow-top"><button onClick={()=>nav(-1)}><X/></button><h1>{t('newProject')}</h1><button onClick={()=>nav(-1)}><X/></button></div>
-     <FlowSteps active={0} t={t}/>
-     <div className="upload-panel">
-       <UploadCloud size={62}/>
-       <h2>{t('uploadPhoto')}</h2><p>{t('photoFormats')}</p>
-       <label className="big-action teal">{t('fromGallery')}<input type="file" accept="image/*" onChange={pick}/></label>
-       <label className="big-action purple"><Camera/>{t('takePhoto')}<input type="file" accept="image/*" capture="environment" onChange={pick}/></label>
+   if(step===0)return <div className="ds-desktop-page">
+     <div className="ds-desktop-head">
+       <button className="ds-back" onClick={()=>nav(-1)}><ArrowLeft/></button>
+       <div><h1>{t('newProject')}</h1><p>Foto → Stili → Paraqitja → Ruaj</p></div>
+       <span/>
      </div>
-     <div className="tips-panel"><h3>{t('tipsBestResults')}</h3><p>✧ {t('tipClear')}</p><p>☼ {t('tipCentered')}</p><p>▣ {t('tipResolution')}</p></div>
+
+     <FlowSteps active={0} t={t}/>
+
+     <section className="ds-upload-card">
+       <div className="ds-upload-icon"><UploadCloud/></div>
+       <h2>{t('uploadPhoto')}</h2>
+       <p>{t('photoFormats')}</p>
+       <div className="ds-upload-actions">
+         <label className="ds-file-btn teal">
+           <ImageIcon/><span>{t('fromGallery')}</span>
+           <input type="file" accept="image/*" onChange={pick}/>
+         </label>
+         <label className="ds-file-btn lavender">
+           <Camera/><span>{t('takePhoto')}</span>
+           <input type="file" accept="image/*" capture="environment" onChange={pick}/>
+         </label>
+       </div>
+     </section>
+
+     <section className="ds-tips-card">
+       <h3>{t('tipsBestResults')}</h3>
+       <div className="ds-tips-grid">
+         <span>✧ {t('tipClear')}</span>
+         <span>☼ {t('tipCentered')}</span>
+         <span>▣ {t('tipResolution')}</span>
+       </div>
+     </section>
    </div>
 
-   return <div className="mobile-flow-page exact-preview desktop-design-preserved">
-     <div className="flow-top"><button onClick={()=>setStep(0)}><ArrowLeft/></button><h1>{t('preview')}</h1><button onClick={()=>nav(-1)}><X/></button></div>
-     <FlowSteps active={2} t={t}/>
-     <div className="preview-pair">
-       <div><div className="img-stage sketch-stage">{processed.sketch?<img src={processed.sketch}/>:preview?<img src={preview}/>:<span>{t('sketch')}</span>}</div><b>{t('sketch')}</b></div>
-       <div><div className="img-stage cartoon-stage">{processed.cartoon?<img src={processed.cartoon}/>:preview?<img src={preview}/>:<span>{t('cartoon')}</span>}</div><b>{t('cartoon')}</b></div>
+   return <div className="ds-desktop-page ds-preview-desktop">
+     <div className="ds-desktop-head">
+       <button className="ds-back" onClick={()=>setStep(0)}><ArrowLeft/></button>
+       <div><h1>{t('preview')}</h1><p>{t('style')} & {t('colorPalette')}</p></div>
+       <button className="ds-close" onClick={()=>nav(-1)}><X/></button>
      </div>
-     <h3 className="style-title">{t('style')}</h3>
-     <div className="style-segment">{['Sketch','Cartoon','Pop Art'].map(s=><button className={style===s?'active':''} onClick={()=>setStyle(s)} key={s}>{styleLabel(s,t)}</button>)}</div>
-     <div className="palette-head"><h3>{t('colorPalette')}</h3><button><Palette/></button></div>
-     <div className="palette-dots">{processed.palette.map(c=><span key={c} style={{background:c}}></span>)}</div>
-     <button className="continue-tools" onClick={()=>continueToProjector()}>{t('continueTools')}</button>
+     <FlowSteps active={2} t={t}/>
+
+     <div className="ds-preview-grid">
+       <article className="ds-preview-card">
+         <div className="ds-image-stage sketch">{processed.sketch?<img src={processed.sketch} alt={t('sketch')}/>:preview?<img src={preview} alt={t('original')}/>:<span>{t('sketch')}</span>}</div>
+         <b>{t('sketch')}</b>
+       </article>
+       <article className="ds-preview-card">
+         <div className="ds-image-stage cartoon">{processed.cartoon?<img src={processed.cartoon} alt={t('cartoon')}/>:preview?<img src={preview} alt={t('original')}/>:<span>{t('cartoon')}</span>}</div>
+         <b>{t('cartoon')}</b>
+       </article>
+     </div>
+
+     <section className="ds-controls-card">
+       <div className="ds-control-title"><h3>{t('style')}</h3></div>
+       <div className="ds-style-tabs">{['Sketch','Cartoon','Pop Art'].map(s=><button className={style===s?'active':''} onClick={()=>setStyle(s)} key={s}>{styleLabel(s,t)}</button>)}</div>
+
+       <div className="ds-palette-row">
+         <div><h3>{t('colorPalette')}</h3><small>{t('numberOfColors')}</small></div>
+         <select value={paletteCount} onChange={async e=>{const n=+e.target.value;setPaletteCount(n);if(preview)setProcessed(await processImage(preview,n))}}>{[6,8,10,12,16].map(n=><option key={n} value={n}>{n}</option>)}</select>
+       </div>
+       <div className="ds-numbered-palette">{processed.palette.map((c,i)=><div className="ds-color" key={`${c}-${i}`}><i style={{background:c}}/><span>{i+1}</span><small>{c.toUpperCase()}</small></div>)}</div>
+     </section>
+
+     <button className="ds-continue" onClick={()=>continueToProjector()}>{t('continueTools')}</button>
    </div>
  }
 
