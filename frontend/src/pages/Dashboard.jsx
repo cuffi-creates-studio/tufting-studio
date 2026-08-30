@@ -1,16 +1,19 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react'
-import {Folder,CheckCircle2,RotateCw,Euro,Plus,Images,Projector,Calculator as CalcIcon,ChevronRight,CalendarDays,Clock,TrendingUp,LogOut,X,Bell} from 'lucide-react'
+import {Folder,CheckCircle2,RotateCw,Euro,Plus,Images,Projector,Calculator as CalcIcon,ChevronRight,CalendarDays,Clock,TrendingUp,LogOut,X,Bell,Play,Square,History} from 'lucide-react'
 import {getProjects} from '../lib/projectsStore'
 import {getCalculations} from '../lib/calculationsStore'
 import {signOut} from 'firebase/auth'
 import {auth} from '../lib/firebase'
 import {useNavigate} from 'react-router-dom'
 import {useI18n} from '../i18n/I18n'
+import {getRunningWorkSession,getWorkSessions,secondsForToday,startWorkSession,stopWorkSession} from '../lib/workHoursStore'
+import '../styles/dashboard-retro-work.css'
 
 export default function Dashboard(){
  const {t,lang}=useI18n(),nav=useNavigate()
  const [projects,setProjects]=useState([]),[calculations,setCalculations]=useState([]),[page,setPage]=useState(0),[desktopPage,setDesktopPage]=useState(0),[appointments,setAppointments]=useState(loadAppointments()),[notificationsOpen,setNotificationsOpen]=useState(false)
  const [profile,setProfile]=useState(readProfile()),[now,setNow]=useState(new Date())
+ const [workRunning,setWorkRunning]=useState(getRunningWorkSession()),[workSessions,setWorkSessions]=useState([]),[workBusy,setWorkBusy]=useState(false)
  const chart=useRef(null),touchX=useRef(null)
 
  useEffect(()=>{
@@ -40,24 +43,43 @@ export default function Dashboard(){
    }
  },[])
 
- useEffect(()=>{const id=setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(id)},[])
+ useEffect(()=>{const id=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(id)},[])
+ useEffect(()=>{
+   const load=async()=>{try{setWorkSessions(await getWorkSessions())}catch(e){console.error(e)}setWorkRunning(getRunningWorkSession())}
+   load()
+   window.addEventListener('tufting-work-hours-updated',load)
+   return()=>window.removeEventListener('tufting-work-hours-updated',load)
+ },[])
 
  const completed=projects.filter(p=>p.status==='Completed').length,progress=projects.length-completed
  const projectCost=projects.reduce((s,p)=>s+(Number(p.material_cost)||0),0)
  const calculationCost=calculations.reduce((s,c)=>s+(Number(c.cost)||0),0)
  const cost=projectCost+calculationCost
  const stats=useMemo(()=>weekly(projects,calculations),[projects,calculations])
+ const workSeconds=workRunning?Math.max(0,Math.floor((now-new Date(workRunning.started_at))/1000)):0
+ const workToday=secondsForToday(workSessions,now)+runningSecondsForPeriod(workRunning,now,'day')
  useEffect(()=>{if(page===1)drawChart(chart.current,stats)},[page,stats])
 
  function swipeEnd(x){if(touchX.current==null)return;const dx=x-touchX.current;touchX.current=null;if(Math.abs(dx)>45)setPage(p=>Math.max(0,Math.min(2,p+(dx<0?1:-1))))}
  function addAppointment(){const a=createAppointment();if(a){const n=[...appointments,a];setAppointments(n);saveAppointments(n)}}
  function deleteAppointment(id){const n=appointments.filter(x=>x.id!==id);setAppointments(n);saveAppointments(n)}
+ async function toggleWork(){
+   if(workBusy)return
+   setWorkBusy(true)
+   try{
+     if(workRunning)await stopWorkSession()
+     else startWorkSession()
+     setWorkRunning(getRunningWorkSession())
+     try{setWorkSessions(await getWorkSessions())}catch(e){console.error(e)}
+   }catch(e){console.error(e);alert(lang==='sq'?'Nuk u ruajt sesioni. Provo përsëri.':lang==='de'?'Sitzung konnte nicht gespeichert werden.':'Could not save work session.')}finally{setWorkBusy(false)}
+ }
 
  return <>
   <DesktopDashboard
    t={t} lang={lang} nav={nav} projects={projects} completed={completed} progress={progress} cost={cost}
    stats={stats} appointments={appointments} desktopPage={desktopPage} setDesktopPage={setDesktopPage}
    addAppointment={addAppointment} deleteAppointment={deleteAppointment} profile={profile} now={now}
+   workRunning={workRunning} workSeconds={workSeconds} workToday={workToday} toggleWork={toggleWork} workBusy={workBusy}
   />
 
   <div className="mobile-dashboard-exact">
@@ -103,7 +125,7 @@ export default function Dashboard(){
  </>
 }
 
-function DesktopDashboard({t,lang,nav,projects,completed,progress,cost,stats,appointments,desktopPage,setDesktopPage,addAppointment,deleteAppointment,profile,now}){
+function DesktopDashboard({t,lang,nav,projects,completed,progress,cost,stats,appointments,desktopPage,setDesktopPage,addAppointment,deleteAppointment,profile,now,workRunning,workSeconds,workToday,toggleWork,workBusy}){
  const locale=lang==='sq'?'sq-AL':lang==='de'?'de-DE':'en-GB'
  const time=now.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'})
  const date=now.toLocaleDateString(locale,{weekday:'long',day:'numeric',month:'long',year:'numeric'})
@@ -122,12 +144,22 @@ function DesktopDashboard({t,lang,nav,projects,completed,progress,cost,stats,app
    </div>
 
    <div className="dd-main-grid">
-     <section className="dd-time-card">
-       <small>{date.split(',')[0]}</small>
-       <strong>{time}</strong>
-       <span>{date}</span>
-       <div className="dd-clock-art"><Clock/></div>
-       <div className="dd-time-ribbon"><i></i><i></i><i></i></div>
+     <section className="dd-time-card retro-work-clock-card">
+       <div className="retro-clock-top"><small>{date.split(',')[0]}</small><span>{date}</span></div>
+       <div className="retro-analog-clock" aria-label={time}>
+         {Array.from({length:12},(_,i)=><i key={i} className="retro-clock-mark" style={{transform:`rotate(${i*30}deg) translateY(-68px)`}}/>)}
+         <b className="retro-hour-hand" style={{transform:`translateX(-50%) rotate(${((now.getHours()%12)+now.getMinutes()/60)*30}deg)`}}/>
+         <b className="retro-minute-hand" style={{transform:`translateX(-50%) rotate(${(now.getMinutes()+now.getSeconds()/60)*6}deg)`}}/>
+         <b className="retro-second-hand" style={{transform:`translateX(-50%) rotate(${now.getSeconds()*6}deg)`}}/>
+         <em></em>
+       </div>
+       <div className="retro-digital-time">{time}<small>:{String(now.getSeconds()).padStart(2,'0')}</small></div>
+       <div className="retro-work-summary"><span>{workLabel(lang,'today')}</span><b>{formatDuration(workToday)}</b></div>
+       <div className="retro-work-actions">
+         <button className={workRunning?'stop':'start'} onClick={toggleWork} disabled={workBusy}>{workRunning?<><Square/> {workLabel(lang,'stop')}</>:<><Play/> {workLabel(lang,'start')}</>}</button>
+         <button className="history" onClick={()=>nav('/work-hours')}><History/> {workLabel(lang,'history')}</button>
+       </div>
+       <div className="retro-work-live"><span>{workLabel(lang,'session')}</span><b>{formatDuration(workSeconds)}</b></div>
      </section>
 
      <section className="dd-carousel-card">
@@ -195,4 +227,28 @@ function drawChart(canvas,stats){
  const max=Math.max(1,...stats.projectCounts,...stats.calcCounts),L=30,R=w-18,T=20,B=h-28
  c.strokeStyle='#e7ded1';c.setLineDash([4,4]);for(let i=0;i<5;i++){let y=T+(B-T)*i/4;c.beginPath();c.moveTo(L,y);c.lineTo(R,y);c.stroke()}c.setLineDash([])
  ;[['#5d3fe4',stats.projectCounts],['#0b9d83',stats.calcCounts]].forEach(([color,a])=>{c.strokeStyle=color;c.lineWidth=5;c.beginPath();a.forEach((v,i)=>{let x=L+(R-L)*i/6,y=B-(v/max)*(B-T);i?c.lineTo(x,y):c.moveTo(x,y)});c.stroke()})
+}
+
+function formatDuration(sec){
+ sec=Math.max(0,Math.floor(Number(sec)||0));const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60
+ return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+}
+function workLabel(lang,key){
+ const all={
+  sq:{today:'Punuar sot',start:'Start',stop:'Stop',history:'Historiku',session:'Sesioni aktual'},
+  de:{today:'Heute gearbeitet',start:'Start',stop:'Stop',history:'Verlauf',session:'Aktuelle Sitzung'},
+  en:{today:'Worked today',start:'Start',stop:'Stop',history:'History',session:'Current session'}
+ }
+ return (all[lang]||all.en)[key]
+}
+
+function runningSecondsForPeriod(running,now,period){
+ if(!running?.started_at)return 0
+ const start=new Date(running.started_at)
+ let boundary=new Date(now)
+ if(period==='day'){boundary.setHours(0,0,0,0)}
+ else if(period==='week'){const d=(boundary.getDay()+6)%7;boundary.setHours(0,0,0,0);boundary.setDate(boundary.getDate()-d)}
+ else if(period==='month'){boundary=new Date(now.getFullYear(),now.getMonth(),1)}
+ const effective=start>boundary?start:boundary
+ return Math.max(0,Math.floor((now-effective)/1000))
 }
