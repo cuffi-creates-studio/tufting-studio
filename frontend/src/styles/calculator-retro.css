@@ -1,0 +1,45 @@
+/* Scoped only to Calculator. Desktop/tablet visual changes start at 761px. */
+.real-calc-page{width:100%}
+
+@media (min-width:761px){
+ .real-calc-title{align-items:flex-start;margin-bottom:20px}
+ .real-calc-title h1{font-size:34px;letter-spacing:-.7px;margin-bottom:5px}
+ .real-calc-title p{max-width:720px}
+ .real-calc-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid #e2d3bf;border-radius:999px;padding:10px 14px;background:#fffaf1;font-size:12px;font-weight:900;letter-spacing:.7px;color:#6944c8;box-shadow:0 6px 16px rgba(62,44,20,.06)}
+
+ .real-calc-layout{display:grid;grid-template-columns:minmax(420px,.9fr) minmax(560px,1.45fr);gap:18px;align-items:start}
+ .real-calc-form-card,.real-results-card{padding:22px;border-radius:22px}
+ .real-section-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}.real-section-head.compact{margin-bottom:14px}.real-section-head h2{font-size:20px;margin:0 0 3px}.real-section-head p{margin:0;color:#727477;font-size:13px}
+ .real-icon{width:46px;height:46px;min-width:46px;border-radius:15px;display:grid;place-items:center;border:1px solid rgba(23,32,51,.08)}.real-icon svg{width:23px;height:23px}.retro-purple{background:#eee7ff;color:#7043da}.retro-orange{background:#fff0dc;color:#ed761f}.retro-teal{background:#e6faf5;color:#089a82}.retro-pink{background:#ffebf2;color:#e84777}
+
+ .real-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}.real-field{display:grid;gap:7px}.real-field.full{grid-column:1/-1}.real-field>span{font-size:13px;font-weight:850}.real-field small{font-size:11px;line-height:1.35;color:#777a7d}
+ .input-with-unit{height:50px;display:flex;align-items:center;border:1px solid #ddcfbb;border-radius:13px;background:#fffdfa;overflow:hidden;transition:.18s}.input-with-unit:focus-within{border-color:#8b63e7;box-shadow:0 0 0 3px rgba(116,75,227,.08)}.input-with-unit input{width:100%;height:100%;border:0;outline:0;background:transparent;padding:0 13px;font-size:16px;font-weight:750;color:#172033}.input-with-unit b{height:100%;min-width:48px;display:grid;place-items:center;padding:0 12px;background:#f6eee2;border-left:1px solid #e3d7c6;font-size:13px}.input-with-unit.money>b{border-left:0;border-right:1px solid #e3d7c6}.input-with-unit.compact{max-width:230px}
+
+ .retro-choice-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.retro-choice{min-height:50px;border-radius:13px;border:1px solid #dccfbd;background:#fffdf8;font-weight:900;color:#172033}.retro-choice.acrylic.active{background:#dff7f1;border-color:#0ca892;color:#087c6c;box-shadow:0 0 0 3px rgba(12,168,146,.08)}.retro-choice.wool.active{background:#f0e9ff;border-color:#744be3;color:#6035c6;box-shadow:0 0 0 3px rgba(116,75,227,.08)}
+ .real-error{margin-top:14px;border-radius:12px;padding:10px 12px;background:#fff0ef;border:1px solid #f3c1bb;color:#b44338;font-size:12px;font-weight:800}
+ .real-form-actions{display:grid;grid-template-columns:140px 1fr;gap:10px;margin-top:18px}.real-form-actions button{height:50px;border-radius:13px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px}.real-reset{border:1px solid #ddcfbb;background:#fffaf1;color:#172033}.real-save{border:0;background:linear-gradient(90deg,#744be3,#9567eb);color:#fff;box-shadow:0 9px 20px rgba(116,75,227,.18)}.real-save:disabled{opacity:.5;cursor:not-allowed}
+
+ .real-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.real-result{min-height:142px;border-radius:18px;padding:20px;border:1px solid rgba(23,32,51,.06);display:flex;flex-direction:column;justify-content:center}.real-result span{font-size:12px;font-weight:800;color:#666b70}.real-result strong{font-size:34px;line-height:1.1;margin:6px 0;color:#172033}.real-result small{font-size:11px;color:#676c70}.real-result.used{background:#fff0dc}.real-result.cost{background:#e4faf4}.real-result.cost strong{color:#078d72}.real-result.remaining{background:#ffedf3}.real-result.ball{background:#eee9ff}.real-result.ball strong{color:#6840cc}
+ .real-example-line{display:grid;grid-template-columns:46px 1fr;gap:12px;align-items:start;margin-top:16px;padding:15px;border:1px dashed #ddceb8;border-radius:16px;background:#fffaf1}.real-example-line b{display:block;margin-bottom:4px}.real-example-line span{font-size:13px;line-height:1.5;color:#555b60}.real-example-line strong{color:#172033}
+
+ .real-history-card{margin-top:18px;padding:20px;border-radius:22px}.real-history-list{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}.real-history-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid #eee3d4}.real-history-row b{display:block}.real-history-row small{display:block;color:#75787b;margin-top:3px}.real-history-row>strong{font-size:18px;color:#087f69}
+}
+
+@media (min-width:761px) and (max-width:1100px){
+ .real-calc-layout{grid-template-columns:1fr}
+}
+
+
+/* Color fields - scoped only to Calculator */
+.real-text-input{width:100%;height:50px;border:1px solid #ddcfbb;border-radius:13px;background:#fffdfa;padding:0 13px;font-size:15px;font-weight:750;color:#172033;outline:0;transition:.18s}
+.real-text-input:focus{border-color:#8b63e7;box-shadow:0 0 0 3px rgba(116,75,227,.08)}
+.real-color-input-wrap{display:grid;grid-template-columns:54px 1fr 42px;gap:8px;align-items:center}
+.real-color-picker{width:54px;height:50px;padding:4px;border:1px solid #ddcfbb;border-radius:13px;background:#fffdfa;cursor:pointer}
+.real-color-picker::-webkit-color-swatch-wrapper{padding:0}.real-color-picker::-webkit-color-swatch{border:0;border-radius:9px}
+.real-color-preview{width:42px;height:42px;border-radius:12px;border:2px solid #fff;box-shadow:0 0 0 1px #d8cbb8,0 4px 10px rgba(23,32,51,.10)}
+.real-history-main{display:flex;align-items:center;gap:10px;min-width:0}
+.history-color-dot{width:32px;height:32px;min-width:32px;border-radius:10px;border:2px solid #fff;box-shadow:0 0 0 1px #d8cbb8}
+@media(max-width:760px){
+ .real-color-input-wrap{grid-template-columns:48px 1fr 38px}
+ .real-color-picker{width:48px;height:46px}.real-color-preview{width:38px;height:38px}
+}
