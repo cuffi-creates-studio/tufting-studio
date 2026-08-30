@@ -6,13 +6,13 @@ import {signOut} from 'firebase/auth'
 import {auth} from '../lib/firebase'
 import {useNavigate} from 'react-router-dom'
 import {useI18n} from '../i18n/I18n'
-import '../styles/desktop-restore.css'
 
 export default function Dashboard(){
  const {t}=useI18n(),nav=useNavigate()
  const [projects,setProjects]=useState([]),[calculations,setCalculations]=useState([]),[page,setPage]=useState(0),[appointments,setAppointments]=useState(loadAppointments()),[notificationsOpen,setNotificationsOpen]=useState(false)
  const [profile,setProfile]=useState(readProfile())
- const chart=useRef(null),touchX=useRef(null)
+ const chart=useRef(null),desktopChart=useRef(null),touchX=useRef(null)
+ const [now,setNow]=useState(new Date())
  useEffect(()=>{
    const load=async()=>{
      try{const [p,c]=await Promise.all([getProjects(),getCalculations()]);setProjects(p);setCalculations(c)}catch(e){console.error(e);setProjects([]);setCalculations([])}
@@ -46,12 +46,13 @@ export default function Dashboard(){
  const calculationCost=calculations.reduce((s,c)=>s+(Number(c.cost)||0),0)
  const cost=projectCost+calculationCost
  const stats=useMemo(()=>weekly(projects,calculations),[projects,calculations])
- useEffect(()=>{if(page===1)drawChart(chart.current,stats)},[page,stats])
+ useEffect(()=>{if(page===1){drawChart(chart.current,stats);drawChart(desktopChart.current,stats)}},[page,stats])
+ useEffect(()=>{const id=setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(id)},[])
 
  function swipeEnd(x){if(touchX.current==null)return;const dx=x-touchX.current;touchX.current=null;if(Math.abs(dx)>45)setPage(p=>Math.max(0,Math.min(2,p+(dx<0?1:-1))))}
 
  return <>
-  <DesktopDashboardRestore
+  <DesktopDashboard
     t={t}
     nav={nav}
     projects={projects}
@@ -59,8 +60,12 @@ export default function Dashboard(){
     progress={progress}
     cost={cost}
     stats={stats}
+    page={page}
+    setPage={setPage}
     appointments={appointments}
-    profile={profile}
+    setAppointments={setAppointments}
+    desktopChart={desktopChart}
+    now={now}
   />
   <div className="mobile-dashboard-exact">
   <div className="m-header-profile">
@@ -112,91 +117,63 @@ export default function Dashboard(){
 }
 
 
-function DesktopDashboardRestore({t,nav,projects,completed,progress,cost,stats,appointments,profile}){
- const recent=projects.slice(0,5)
- const today=new Date()
- const weekLabel=t('thisWeek')
- return <div className="desktop-dashboard-only desktop-restore-dashboard">
-   <div className="page-title desktop-restore-title">
-     <div>
-       <p className="desktop-hello">{t('hello')},</p>
-       <h1>{profile.name}</h1>
-       <p>{t('dashboard')}</p>
-     </div>
-     <button className="btn pink" onClick={()=>nav('/design')}><Plus/> {t('newProject')}</button>
+function DesktopDashboard({t,nav,projects,completed,progress,cost,stats,page,setPage,appointments,setAppointments,desktopChart,now}){
+ const recent=projects.slice(0,4)
+ const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+ const time=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
+ const date=now.toLocaleDateString([], {day:'2-digit',month:'short',year:'numeric'})
+ return <div className="desktop-dashboard-final">
+   <div className="dtf-heading">
+     <div><small>{t('hello')},</small><h1>{localStorage.getItem('tufting_profile_name')||localStorage.getItem('tufting_name')||'Studio Owner'}</h1><p>Welcome back to your studio</p></div>
+     <button className="dtf-new" onClick={()=>nav('/design')}><Plus/> {t('newProject')}</button>
    </div>
 
-   <div className="metrics-grid desktop-restore-metrics">
-     <div className="card clock-card desktop-clock-card">
-       <div><small>{today.toLocaleDateString(undefined,{weekday:'long'})}</small><b>{today.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</b><em>{weekLabel}</em></div>
-       <span><CalendarDays/></span>
-     </div>
-     <button className="card metric-card desktop-metric-button" onClick={()=>nav('/projects')}>
-       <div className="metric-copy"><small>{t('projects')}</small><b>{projects.length}</b><em>{weekLabel}</em></div>
-       <div className="premium-icon blue"><div className="premium-icon-inner"><Folder/></div></div>
-     </button>
-     <button className="card metric-card desktop-metric-button" onClick={()=>nav('/projects')}>
-       <div className="metric-copy"><small>{t('completed')}</small><b>{completed}</b><em>{weekLabel}</em></div>
-       <div className="premium-icon green"><div className="premium-icon-inner"><CheckCircle2/></div></div>
-     </button>
-     <button className="card metric-card desktop-metric-button" onClick={()=>nav('/projects')}>
-       <div className="metric-copy"><small>{t('inProgress')}</small><b>{progress}</b><em>{weekLabel}</em></div>
-       <div className="premium-icon orange"><div className="premium-icon-inner"><RotateCw/></div></div>
-     </button>
-     <button className="card metric-card desktop-metric-button" onClick={()=>nav('/calculator')}>
-       <div className="metric-copy"><small>{t('materialCost')}</small><b>€{cost.toFixed(2)}</b><em>{weekLabel}</em></div>
-       <div className="premium-icon purple"><div className="premium-icon-inner"><Euro/></div></div>
-     </button>
+   <div className="dtf-metrics">
+     <button className="dtf-metric lavender" onClick={()=>nav('/projects')}><span className="dtf-icon"><Folder/></span><div><small>{t('projects')}</small><b>{projects.length}</b><em>{t('thisWeek')}</em></div></button>
+     <button className="dtf-metric mint" onClick={()=>nav('/projects')}><span className="dtf-icon"><CheckCircle2/></span><div><small>{t('completed')}</small><b>{completed}</b><em>{t('thisWeek')}</em></div></button>
+     <button className="dtf-metric peach" onClick={()=>nav('/projects')}><span className="dtf-icon"><RotateCw/></span><div><small>{t('inProgress')}</small><b>{progress}</b><em>{t('thisWeek')}</em></div></button>
+     <button className="dtf-metric rose" onClick={()=>nav('/calculator')}><span className="dtf-icon"><Euro/></span><div><small>{t('materialCost')}</small><b>€{cost.toFixed(2)}</b><em>{t('thisWeek')}</em></div></button>
    </div>
 
-   <div className="dashboard-body desktop-restore-body">
-     <section className="card weather-card desktop-calendar-card">
-       <div className="section-head"><div><small>{weekLabel}</small><h3>{t('calendar')}</h3></div><CalendarDays/></div>
-       <Calendar appointments={appointments} projects={projects}/>
+   <div className="dtf-body">
+     <section className="dtf-time-card">
+       <small>{days[now.getDay()]}</small>
+       <strong>{time}</strong>
+       <b>{date}</b>
+       <img src={`${import.meta.env.BASE_URL}green-gun-one-cable.png`} alt="Tufting gun"/>
+       <div className="dtf-time-waves"/>
      </section>
 
-     <section className="card stats-card desktop-stats-card">
-       <div className="section-head"><div><small>{weekLabel}</small><h3>{t('statistics')}</h3></div><TrendingUp/></div>
-       {stats.hasData?<>
-         <div className="desktop-stat-summary">
-           <span><i className="d-dot project"/>{t('projectsThisWeek')}: <b>{stats.projectTotal}</b></span>
-           <span><i className="d-dot calc"/>{t('calculationsThisWeek')}: <b>{stats.calcTotal}</b></span>
-           <span>{t('weeklyCost')}: <b>€{stats.weekCost.toFixed(2)}</b></span>
+     <section className="dtf-carousel-card">
+       <div className="dtf-tabs">
+         <button className={page===0?'active':''} onClick={()=>setPage(0)}><CalendarDays/>{t('calendar')}</button>
+         <button className={page===1?'active':''} onClick={()=>setPage(1)}><TrendingUp/>{t('statistics')}</button>
+         <button className={page===2?'active':''} onClick={()=>setPage(2)}><Clock/>{t('appointments')}</button>
+       </div>
+       <div className="dtf-carousel-window">
+         <div className="dtf-carousel-track" style={{transform:`translateX(-${page*100}%)`}}>
+           <div className="dtf-slide dtf-calendar-slide"><Calendar appointments={appointments} projects={projects}/><div className="dtf-rainbow-art">⌒</div></div>
+           <div className="dtf-slide dtf-stat-slide">
+             {stats.hasData?<><div className="dtf-stat-summary"><span><i className="p"/> {t('projects')}: <b>{stats.projectTotal}</b></span><span><i className="c"/> {t('calculator')}: <b>{stats.calcTotal}</b></span><span>{t('weeklyCost')}: <b>€{stats.weekCost.toFixed(2)}</b></span></div><canvas ref={desktopChart} width="900" height="300"/><div className="dtf-days">{stats.labels.map(d=><span key={d}>{d}</span>)}</div></>:<div className="dtf-empty"><TrendingUp/><b>{t('noStats')}</b></div>}
+           </div>
+           <div className="dtf-slide dtf-appt-slide"><Appointments items={appointments} onDelete={id=>{const n=appointments.filter(x=>x.id!==id);setAppointments(n);saveAppointments(n)}} t={t}/><button className="dtf-add-appt" onClick={()=>{const a=createAppointment();if(a){const n=[...appointments,a];setAppointments(n);saveAppointments(n)}}}>+ {t('addAppointment')}</button></div>
          </div>
-         <DesktopWeeklyBars stats={stats}/>
-       </>:<div className="desktop-empty-state"><TrendingUp/><b>{t('noStats')}</b></div>}
+       </div>
+       <div className="dtf-dots">{[0,1,2].map(i=><button key={i} aria-label={`slide ${i+1}`} className={page===i?'active':''} onClick={()=>setPage(i)}/>)}</div>
      </section>
 
-     <section className="card recent-card desktop-recent-card">
-       <div className="section-head"><div><small>{t('projects')}</small><h3>{t('recentProjects')}</h3></div><button className="text-button" onClick={()=>nav('/projects')}>{t('projects')} <ChevronRight/></button></div>
-       {recent.length?recent.map(p=><button className="recent-row desktop-recent-row" key={p.id} onClick={()=>nav('/projects')}>
-         <div className="recent-art">{p.image_data?<img src={p.image_data} alt={p.name}/>:<span>🧶</span>}</div>
-         <div><b>{p.name}</b><small>{p.status==='Completed'?t('completed'):t('inProgress')}</small></div>
-         <ChevronRight/>
-       </button>):<div className="desktop-empty-state compact"><Folder/><b>{t('noProjects')}</b></div>}
+     <section className="dtf-recent-card">
+       <div className="dtf-section-head"><div><small>{t('projects')}</small><h2>{t('recentProjects')}</h2></div><button onClick={()=>nav('/projects')}>View all <ChevronRight/></button></div>
+       {recent.length?<div className="dtf-recent-list">{recent.map(p=><button className="dtf-recent-row" key={p.id} onClick={()=>nav('/projects')}><span className="dtf-thumb">{p.image_data?<img src={p.image_data} alt={p.name}/>:<>🧶</>}</span><span><b>{p.name}</b><small className={p.status==='Completed'?'done':'progress'}>{p.status==='Completed'?t('completed'):t('inProgress')}</small></span><ChevronRight/></button>)}</div>:<div className="dtf-empty small"><Folder/><b>{t('noProjects')}</b></div>}
      </section>
    </div>
 
-   <h3 className="quick-title">{t('quickActions')}</h3>
-   <div className="quick-grid desktop-restore-quick">
-     <button className="quick pink" onClick={()=>nav('/design')}><Plus/> {t('newProject')}</button>
-     <button className="quick teal" onClick={()=>nav('/gallery')}><Images/> {t('gallery')}</button>
-     <button className="quick orange" onClick={()=>nav('/projector')}><Projector/> {t('projector')}</button>
-     <button className="quick purple" onClick={()=>nav('/calculator')}><CalcIcon/> {t('calculator')}</button>
-   </div>
- </div>
-}
-
-function DesktopWeeklyBars({stats}){
- const max=Math.max(1,...stats.projectCounts,...stats.calcCounts)
- return <div className="desktop-week-bars">
-   {stats.labels.map((label,i)=><div className="desktop-week-col" key={label}>
-     <div className="desktop-week-track">
-       <i className="project" style={{height:`${Math.max(3,(stats.projectCounts[i]/max)*100)}%`}}/>
-       <i className="calc" style={{height:`${Math.max(3,(stats.calcCounts[i]/max)*100)}%`}}/>
-     </div>
-     <small>{label}</small>
-   </div>)}
+   <section className="dtf-quick-wrap"><h2>{t('quickActions')}</h2><div className="dtf-quick">
+     <button className="pink" onClick={()=>nav('/design')}><Plus/><b>{t('newProject')}</b></button>
+     <button className="teal" onClick={()=>nav('/gallery')}><Images/><b>{t('gallery')}</b></button>
+     <button className="orange" onClick={()=>nav('/projector')}><Projector/><b>{t('projector')}</b></button>
+     <button className="purple" onClick={()=>nav('/calculator')}><CalcIcon/><b>{t('calculator')}</b></button>
+   </div></section>
  </div>
 }
 

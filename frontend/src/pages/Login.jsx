@@ -4,7 +4,6 @@ import React,{useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {Eye,EyeOff,Mail,Lock,Globe2} from 'lucide-react'
 import {useI18n} from '../i18n/I18n'
-import '../styles/desktop-restore.css'
 
 export default function Login(){
   const [username,setUsername]=useState('')
@@ -53,46 +52,39 @@ export default function Login(){
     }
   }
 
+  const copy={
+    en:{welcome:'Welcome back!',sub:'Sign in to continue creating amazing tufted art.',email:'Username or Email',password:'Password',remember:'Remember me',forgot:'Forgot password?',signin:'Sign In'},
+    de:{welcome:'Willkommen zurück!',sub:'Melde dich an und gestalte weiter großartige Tufting-Kunst.',email:'E-Mail',password:'Passwort',remember:'Angemeldet bleiben',forgot:'Passwort vergessen?',signin:'Anmelden'},
+    sq:{welcome:'Mirë se u ktheve!',sub:'Hyr për të vazhduar krijimin e artit tufting.',email:'Email',password:'Fjalëkalimi',remember:'Më mbaj mend',forgot:'Harrove fjalëkalimin?',signin:'Hyr'}
+  }[lang]||{}
+
   return (
     <>
-      <div className="desktop-login-restore">
-        <div className="desktop-login-brand"><span>🌼</span><div><b>Tufting</b><strong>Studio</strong></div></div>
-        <label className="desktop-login-language"><Globe2/><select value={lang} onChange={e=>setLang(e.target.value)}><option value="en">English</option><option value="de">Deutsch</option><option value="sq">Shqip</option></select></label>
-
+      <div className="desktop-login-final">
+        <div className="desktop-login-brand"><span>🌼</span><b>Tufting<br/>Studio</b></div>
+        <label className="desktop-login-lang"><Globe2/><select value={lang} onChange={e=>setLang(e.target.value)}><option value="sq">Shqip</option><option value="de">Deutsch</option><option value="en">English</option></select></label>
         <form className="desktop-login-card" onSubmit={submit}>
-          <div className="desktop-login-wordmark"><span>Tufting</span><strong>Studio</strong><i>✦</i></div>
-          <h1>Welcome back!</h1>
-          <p>Sign in to continue creating amazing tufted art.</p>
-
-          <label className="desktop-login-field"><Mail/><input value={username} onChange={e=>setUsername(e.target.value)} placeholder="Username or Email" autoComplete="username"/></label>
-          <label className="desktop-login-field"><Lock/><input type={show?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" autoComplete="current-password"/><button type="button" onClick={()=>setShow(!show)}>{show?<EyeOff/>:<Eye/>}</button></label>
-
-          <div className="desktop-login-meta"><label><input type="checkbox" defaultChecked/> Remember me</label><button type="button">Forgot password?</button></div>
+          <div className="desktop-login-logo"><span>Tufting</span><strong>Studio</strong><i>✦</i></div>
+          <h1>{copy.welcome}</h1>
+          <p>{copy.sub}</p>
+          <label className="desktop-login-field"><Mail/><input value={username} onChange={e=>setUsername(e.target.value)} placeholder={copy.email} autoComplete="username"/></label>
+          <label className="desktop-login-field"><Lock/><input type={show?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder={copy.password} autoComplete="current-password"/><button type="button" onClick={()=>setShow(!show)}>{show?<EyeOff/>:<Eye/>}</button></label>
+          <div className="desktop-login-meta"><label><input type="checkbox" defaultChecked/> {copy.remember}</label><button type="button">{copy.forgot}</button></div>
           {error&&<div className="desktop-login-error">{error}</div>}
-          <button className="desktop-login-signin" disabled={busy}><span>✦</span>{busy?'Signing in...':'Sign In'}<span>✦</span></button>
+          <button className="desktop-login-signin" disabled={busy}><span>✦</span>{busy?'...':copy.signin}<span>✦</span></button>
         </form>
-
-        <div className="desktop-login-features">
-          <div><b>🎨</b><span><strong>Design with joy</strong><small>Color your ideas to life</small></span></div>
-          <div><b>▣</b><span><strong>Track with ease</strong><small>All your projects, in one place</small></span></div>
-          <div><b>✦</b><span><strong>Create anywhere</strong><small>Your studio, always with you</small></span></div>
-          <div><b>♙</b><span><strong>Secure & private</strong><small>Your creativity is safe with us</small></span></div>
-        </div>
       </div>
 
-      <div className="login-mobile-current">
-        <div className="login-clean-ready">
-          <div className="login-clean-ready-bg" aria-hidden="true"></div>
-          <form className="login-clean-ready-form" onSubmit={submit}>
-            <label className="login-clean-ready-field"><Mail/><input value={username} onChange={e=>setUsername(e.target.value)} placeholder="Email address" autoComplete="username"/></label>
-            <label className="login-clean-ready-field"><Lock/><input type={show?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" autoComplete="current-password"/><button type="button" onClick={()=>setShow(!show)}>{show?<EyeOff/>:<Eye/>}</button></label>
-            <button type="button" className="login-clean-ready-forgot">Forgot password?</button>
-            {error&&<div className="login-clean-ready-error">{error}</div>}
-            <button className="login-clean-ready-signin" disabled={busy}><span>✦</span>{busy?'Signing in...':'Sign In'}<span>✦</span></button>
-          </form>
-        </div>
+      <div className="login-clean-ready">
+        <div className="login-clean-ready-bg" aria-hidden="true"></div>
+        <form className="login-clean-ready-form" onSubmit={submit}>
+          <label className="login-clean-ready-field"><Mail/><input value={username} onChange={e=>setUsername(e.target.value)} placeholder="Email address" autoComplete="username"/></label>
+          <label className="login-clean-ready-field"><Lock/><input type={show?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" autoComplete="current-password"/><button type="button" onClick={()=>setShow(!show)}>{show?<EyeOff/>:<Eye/>}</button></label>
+          <button type="button" className="login-clean-ready-forgot">Forgot password?</button>
+          {error&&<div className="login-clean-ready-error">{error}</div>}
+          <button className="login-clean-ready-signin" disabled={busy}><span>✦</span>{busy?'Signing in...':'Sign In'}<span>✦</span></button>
+        </form>
       </div>
     </>
   )
-
 }
