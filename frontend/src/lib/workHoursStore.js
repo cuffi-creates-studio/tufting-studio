@@ -1,9 +1,10 @@
-import {collection,doc,getDocs,query,setDoc,where} from 'firebase/firestore'
+import {collection,deleteDoc,doc,getDocs,query,setDoc,where} from 'firebase/firestore'
 import {onAuthStateChanged} from 'firebase/auth'
 import {auth,db} from './firebase'
 
 const RUNNING_KEY='tufting_work_running'
 const LOCAL_KEY='tufting_work_sessions_local'
+const DELETE_KEY='tufting_work_sessions_deleted'
 
 async function user(){
   if(auth.currentUser)return auth.currentUser
@@ -14,6 +15,8 @@ async function user(){
 function changed(){if(typeof window!=='undefined')window.dispatchEvent(new Event('tufting-work-hours-updated'))}
 function readLocal(){try{return JSON.parse(localStorage.getItem(LOCAL_KEY)||'[]')}catch{return[]}}
 function writeLocal(rows){localStorage.setItem(LOCAL_KEY,JSON.stringify(rows.slice(0,500)))}
+function readDeleted(){try{return JSON.parse(localStorage.getItem(DELETE_KEY)||'[]')}catch{return[]}}
+function writeDeleted(ids){localStorage.setItem(DELETE_KEY,JSON.stringify([...new Set(ids)].slice(0,500)))}
 function makeId(){return `wh_${Date.now()}_${Math.random().toString(36).slice(2,8)}`}
 
 export function getRunningWorkSession(){
@@ -46,6 +49,34 @@ async function syncOne(row){
   writeLocal(readLocal().map(x=>x.id===row.id?{...x,pending:false}:x))
 }
 
+
+async function syncPendingDeletes(){
+  const ids=readDeleted()
+  if(!ids.length)return
+  const u=await user()
+  const remaining=[]
+  for(const id of ids){
+    try{await deleteDoc(doc(db,'work_hours',id))}
+    catch{remaining.push(id)}
+  }
+  writeDeleted(remaining)
+}
+
+export async function deleteWorkSession(id){
+  if(!id)return
+  writeLocal(readLocal().filter(x=>x.id!==id))
+  writeDeleted([...readDeleted(),id])
+  changed()
+  try{
+    await user()
+    await deleteDoc(doc(db,'work_hours',id))
+    writeDeleted(readDeleted().filter(x=>x!==id))
+  }catch(e){
+    console.warn('Work-hours delete pending:',e)
+  }
+  changed()
+}
+
 async function syncPending(){
   const pending=readLocal().filter(x=>x.pending)
   for(const row of pending){try{await syncOne(row)}catch{break}}
@@ -55,12 +86,14 @@ export async function getWorkSessions(){
   const local=readLocal()
   try{
     await syncPending()
+    await syncPendingDeletes()
     const u=await user()
     const q=query(collection(db,'work_hours'),where('user_id','==',u.uid))
     const snap=await getDocs(q)
-    const cloud=snap.docs.map(d=>({id:d.id,...d.data(),pending:false}))
+    const deleted=new Set(readDeleted())
+    const cloud=snap.docs.map(d=>({id:d.id,...d.data(),pending:false})).filter(r=>!deleted.has(r.id))
     const map=new Map()
-    ;[...local,...cloud].forEach(r=>map.set(r.id,r))
+    ;[...local.filter(r=>!deleted.has(r.id)),...cloud].forEach(r=>map.set(r.id,r))
     const merged=[...map.values()].sort((a,b)=>String(b.started_at||'').localeCompare(String(a.started_at||'')))
     writeLocal(merged)
     return merged
