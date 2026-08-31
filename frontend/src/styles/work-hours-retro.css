@@ -296,3 +296,14 @@
  .wh-stats{gap:7px!important}.wh-stats article{min-height:64px!important;padding:8px 11px!important;grid-template-columns:38px minmax(0,1fr) 15px!important;column-gap:9px!important;border-radius:14px!important}.wh-stats svg{width:36px!important;height:36px!important;padding:8px!important}.wh-stats span{font-size:12px!important}.wh-stats b{font-size:20px!important}.wh-stats article::after{font-size:23px!important}
  .wh-section-title{margin:0 0 6px!important}.wh-section-title>svg{width:32px!important;height:32px!important;padding:7px!important}.wh-section-title h2{font-size:16px!important}.wh-section-title p{font-size:8px!important}.wh-history-toggle{min-height:42px!important;font-size:11px!important}
 }
+
+/* PC/TABLET ONLY: history is always visible; no extra toggle button */
+@media (min-width:761px){
+  .work-hours-page .wh-history-toggle{
+    display:none!important;
+  }
+  .work-hours-page .wh-history-content{
+    display:block!important;
+    margin-top:0!important;
+  }
+}
