@@ -133,3 +133,106 @@
   /* No yarn drawing/image anywhere in Inventory. */
   .yarn-ball{display:none!important}
 }
+
+
+/* ===== EXPENSES COLOR POLISH — desktop/tablet only ===== */
+@media (min-width:761px){
+  /* Keep the current layout; only improve the retro color hierarchy. */
+  .business-page.expenses .business-shell-card{border-color:#FB7DA8}
+  .business-page.expenses .business-title-icon{
+    background:color-mix(in srgb,#FB7DA8 20%,#fffdf8);
+    color:#D92F67;
+    border:1px solid color-mix(in srgb,#FB7DA8 45%,#fffdf8)
+  }
+
+  /* Table header: retro pink, dark readable text. */
+  .business-page.expenses .business-table thead th{
+    background:#FB7DA8!important;
+    color:#172033!important;
+  }
+  .business-page.expenses .business-table tbody tr:nth-child(6n+1){background:color-mix(in srgb,#FFC567 10%,#fffdf8)}
+  .business-page.expenses .business-table tbody tr:nth-child(6n+2){background:color-mix(in srgb,#FB7DA8 8%,#fffdf8)}
+  .business-page.expenses .business-table tbody tr:nth-child(6n+3){background:color-mix(in srgb,#FD5A46 7%,#fffdf8)}
+  .business-page.expenses .business-table tbody tr:nth-child(6n+4){background:color-mix(in srgb,#552CB7 6%,#fffdf8)}
+  .business-page.expenses .business-table tbody tr:nth-child(6n+5){background:color-mix(in srgb,#00995E 7%,#fffdf8)}
+  .business-page.expenses .business-table tbody tr:nth-child(6n){background:color-mix(in srgb,#058CD7 7%,#fffdf8)}
+
+  /* Main actions. */
+  .business-page.expenses .biz-btn.retro-purple{
+    background:#552CB7;
+    border-color:#552CB7;
+    color:#fff;
+    box-shadow:0 5px 12px rgba(85,44,183,.16)
+  }
+  .business-page.expenses .biz-btn.primary{
+    background:#FB7DA8;
+    border-color:#FB7DA8;
+    color:#172033;
+    box-shadow:0 5px 12px rgba(251,125,168,.18)
+  }
+  .business-page.expenses .biz-btn.primary svg{stroke:#172033}
+
+  /* Summary panel. */
+  .business-page.expenses .colorful-summary{
+    background:#fffdf8;
+  }
+  .business-page.expenses .biz-month-card{
+    background:color-mix(in srgb,#FFC567 12%,#fffdf8);
+    border-color:color-mix(in srgb,#FFC567 55%,#eadbc8)
+  }
+  .business-page.expenses .biz-month-card label{color:#655b51;font-weight:750}
+  .business-page.expenses .biz-month-card strong{color:#FD5A46!important;font-weight:950}
+
+  /* Bottom cards marked in the screenshot: clean contrast, no pink-on-pink. */
+  .business-page.expenses .biz-bottom-stats{gap:12px}
+  .business-page.expenses .biz-mini-stat{
+    min-height:70px;
+    border-width:1.5px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    box-shadow:none;
+  }
+  .business-page.expenses .biz-mini-stat.pink{
+    background:color-mix(in srgb,#FB7DA8 16%,#fffdf8)!important;
+    border-color:#FB7DA8!important;
+  }
+  .business-page.expenses .biz-mini-stat.pink span{
+    color:#7C2C4C!important;
+    font-weight:800;
+  }
+  .business-page.expenses .biz-mini-stat.pink strong{
+    color:#552CB7!important;
+    font-weight:950;
+  }
+  .business-page.expenses .biz-mini-stat.good{
+    background:color-mix(in srgb,#00995E 10%,#fffdf8)!important;
+    border-color:#00995E!important;
+  }
+  .business-page.expenses .biz-mini-stat.good span{
+    color:#17674F!important;
+    font-weight:800;
+  }
+  .business-page.expenses .biz-mini-stat.good strong{
+    color:#00995E!important;
+    font-weight:950;
+  }
+
+  /* Payment/status chips remain strong and readable. */
+  .business-page.expenses .payment-pill{
+    background:#552CB7;
+    color:#fff;
+    border:0;
+    font-weight:900
+  }
+
+  /* Saved PDF row follows the same palette. */
+  .business-page.expenses + .saved-docs{
+    border-color:color-mix(in srgb,#FB7DA8 34%,#ead9c7)
+  }
+  .business-page.expenses + .saved-docs .saved-doc{
+    background:color-mix(in srgb,#FFC567 8%,#fffdf8)
+  }
+  .business-page.expenses + .saved-docs .saved-doc button{background:#552CB7;color:#fff}
+  .business-page.expenses + .saved-docs .saved-doc .danger-mini{background:#FD5A46;color:#fff}
+}
