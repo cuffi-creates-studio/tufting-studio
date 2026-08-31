@@ -43,7 +43,6 @@ export default function Shell(){
 
  return <div className="app-shell">
   <aside className={`sidebar ${drawer?'mobile-open':''}`}>
-   <button className="drawer-close" onClick={()=>setDrawer(false)} aria-label="Close menu"><X/></button>
    <div className="brand">
     <div className={`brand-logo ${p.logo?'has-image':''}`}>{p.logo?<img src={p.logo} alt="logo"/>:'🌼'}</div>
     <div className="brand-copy"><b>Tufting</b><strong>Studio</strong></div>
