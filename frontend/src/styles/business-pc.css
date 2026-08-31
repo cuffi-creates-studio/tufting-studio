@@ -66,3 +66,145 @@
 
   .biz-dialog{width:100vw!important;max-width:100vw!important;height:100dvh!important;max-height:100dvh!important;margin:0!important;border-radius:0!important;overflow:hidden!important}.biz-dialog-head{height:70px!important;padding:12px 14px!important}.biz-dialog-head .business-title-icon{display:none!important}.biz-dialog-head h2{font-size:21px!important}.biz-dialog-head p{font-size:9px!important}.biz-form{height:calc(100dvh - 70px)!important;overflow:auto!important;padding:12px 14px 106px!important;display:grid!important;grid-template-columns:1fr!important;gap:9px!important}.retro-field-card{padding:10px!important;border-radius:13px!important;background:#fffdf9!important;border-color:#e6d7c3!important}.retro-field-title{font-size:11px!important;margin-bottom:6px!important}.retro-field-card input,.retro-field-card select,.retro-field-card textarea{min-height:42px!important;font-size:12px!important;padding:8px 10px!important}.retro-field-card textarea{min-height:86px!important}.biz-form-actions{position:sticky!important;bottom:-106px!important;background:#fffaf2!important;padding:12px 0 calc(14px + env(safe-area-inset-bottom))!important;margin-top:4px!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}.biz-form-actions .biz-btn{height:44px!important;font-size:11px!important}.biz-form-actions .danger{grid-column:1/-1!important}
 }
+
+/* ==========================================================
+   MOBILE BUSINESS POLISH FINAL
+   Only Orders / Inventory / Expenses on phones.
+   Clean, professional, light forms; no purple UI blocks.
+   ========================================================== */
+@media(max-width:760px){
+  .biz-mobile-app{
+    background:#fffaf2!important;
+    color:#10213d!important;
+    padding-top:8px!important;
+  }
+
+  .bma-head{
+    display:grid!important;
+    grid-template-columns:42px minmax(0,1fr) auto!important;
+    align-items:start!important;
+    gap:10px!important;
+    padding:14px 16px 12px!important;
+  }
+  .bma-back{
+    width:40px!important;
+    height:40px!important;
+    border:1px solid #e3d3bd!important;
+    border-radius:13px!important;
+    background:#fffdf9!important;
+    color:#10213d!important;
+    display:grid!important;
+    place-items:center!important;
+    box-shadow:0 5px 14px rgba(33,24,14,.05)!important;
+  }
+  .bma-back svg{width:19px!important;height:19px!important}
+  .bma-head h1{font-size:27px!important;line-height:1.05!important}
+  .bma-head p{font-size:11px!important;margin-top:5px!important;color:#746d65!important}
+  .bma-head-btn{
+    width:40px!important;height:40px!important;
+    background:#fffdf9!important;
+    border:1px solid #e3d3bd!important;
+    color:#087d5d!important;
+    box-shadow:0 5px 14px rgba(33,24,14,.05)!important;
+  }
+  .bma-head-btn.secondary{color:#10213d!important}
+
+  /* Keep the business pages calm: white/cream surfaces, color only for data states. */
+  .bma-stats>div{
+    background:#fffdf9!important;
+    border-color:#e4d5c1!important;
+    box-shadow:none!important;
+  }
+  .bma-stats .warning{background:#fff8ee!important;border-color:#ecd8be!important}
+  .bma-search,.bma-row,.bma-summary,.bma-expense-summary,.bma-detail-card,.bma-inventory-detail,.bma-stock-level,.bma-notes{
+    background:#fffdf9!important;
+    border-color:#e4d5c1!important;
+    box-shadow:none!important;
+  }
+  .bma-chips button{background:#f8f2e9!important;color:#5e5952!important;border-color:#e5d6c2!important}
+  .bma-chips button.active{background:#e9f5ef!important;color:#126c53!important;border-color:#9ccfba!important}
+
+  /* One consistent primary action color. No purple on mobile business pages. */
+  .bma-primary.order,.bma-primary.inventory,.bma-primary.expense{
+    background:#167b5b!important;
+    color:#fff!important;
+  }
+  .bma-detail-actions button.dark,
+  .bma-detail-actions button.purple{
+    background:#167b5b!important;
+    border-color:#167b5b!important;
+    color:#fff!important;
+  }
+
+  /* Registration dialogs: light retro tints + black text, consistent everywhere. */
+  .retro-dialog{
+    background:#fffaf2!important;
+    color:#111827!important;
+  }
+  .retro-dialog-head{
+    background:#fffdf9!important;
+    border-bottom:1px solid #e5d6c2!important;
+  }
+  .retro-dialog-head h2,.retro-dialog-head p,.retro-field-title{
+    color:#111827!important;
+  }
+  .retro-form .retro-field-card{
+    border:1px solid #e2d1ba!important;
+    color:#111827!important;
+    box-shadow:none!important;
+  }
+  .retro-form .retro-field-card.green{background:#eaf6ef!important}
+  .retro-form .retro-field-card.purple{background:#eef6fb!important}
+  .retro-form .retro-field-card.orange{background:#fff2e3!important}
+  .retro-form .retro-field-card.blue{background:#eef6fb!important}
+  .retro-form .retro-field-card.pink{background:#fff0f4!important}
+  .retro-form .retro-field-card.coral{background:#fff1ed!important}
+  .retro-form .retro-field-card.yellow{background:#fff8df!important}
+  .retro-form .retro-field-card.color-card{background:#fff7ef!important}
+  .retro-form .retro-field-card input,
+  .retro-form .retro-field-card select,
+  .retro-form .retro-field-card textarea{
+    background:#fffdf9!important;
+    border:1px solid #d7c4aa!important;
+    color:#111827!important;
+    box-shadow:none!important;
+  }
+  .retro-form .retro-field-card input::placeholder,
+  .retro-form .retro-field-card textarea::placeholder{color:#8b847b!important}
+  .retro-form .retro-field-title svg{color:#111827!important}
+
+  .retro-form .choice-row button{
+    background:#fffdf9!important;
+    border:1px solid #d7c4aa!important;
+    color:#111827!important;
+  }
+  .retro-form .choice-row button.active,
+  .retro-form .choice-row button.active.acrylic,
+  .retro-form .choice-row button.active.wool,
+  .retro-form .choice-row button.active.gram{
+    background:#dff2e8!important;
+    border-color:#85c5ab!important;
+    color:#111827!important;
+  }
+
+  .retro-actions .biz-btn.retro-save,
+  .retro-actions .biz-btn.primary{
+    background:#167b5b!important;
+    border-color:#167b5b!important;
+    color:#fff!important;
+  }
+  .retro-actions .biz-btn:not(.retro-save):not(.danger){
+    background:#fffdf9!important;
+    color:#111827!important;
+    border-color:#d8c7af!important;
+  }
+  .retro-actions .biz-btn.danger{
+    background:#fff0ee!important;
+    border-color:#f1b8ae!important;
+    color:#b52b20!important;
+  }
+
+  /* Saved PDF controls: calm colors, clear contrast. */
+  .business-page .saved-doc button:not(.danger-mini){background:#167b5b!important;color:#fff!important;border-color:#167b5b!important}
+  .business-page .saved-doc .danger-mini{background:#fff0ee!important;color:#b52b20!important;border-color:#f1b8ae!important}
+}
