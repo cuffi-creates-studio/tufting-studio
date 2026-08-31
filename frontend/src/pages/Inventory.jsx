@@ -113,7 +113,51 @@ export default function Inventory(){
  </div>
 }
 
-function YarnBall({hex:color,size='md'}){return <span className={`yarn-ball-v3 ${size}`} style={{'--yarn':hex(color)}} aria-hidden="true"><i/></span>}
+function YarnBall({hex:color,size='md'}){
+ const c=hex(color)
+ return <svg className={`yarn-ball-v3 ${size}`} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+  <defs>
+   <clipPath id="yarnClip"><circle cx="50" cy="50" r="46"/></clipPath>
+   <radialGradient id="yarnShade" cx="36%" cy="30%" r="75%">
+    <stop offset="0" stopColor="#fff" stopOpacity=".18"/>
+    <stop offset=".58" stopColor="#fff" stopOpacity="0"/>
+    <stop offset="1" stopColor="#000" stopOpacity=".13"/>
+   </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="46" fill={c}/>
+  <g clipPath="url(#yarnClip)" fill="none" strokeLinecap="round" strokeLinejoin="round">
+   <g stroke="#fff" strokeOpacity=".34" strokeWidth="2.3">
+    <path d="M5 28 C24 10 53 8 95 27"/>
+    <path d="M1 39 C28 22 62 21 101 43"/>
+    <path d="M0 51 C30 34 67 35 101 56"/>
+    <path d="M3 65 C31 50 67 50 97 70"/>
+    <path d="M12 80 C37 66 67 66 91 84"/>
+    <path d="M18 8 C36 28 35 62 20 94"/>
+    <path d="M34 4 C49 29 49 69 33 98"/>
+    <path d="M52 1 C63 30 62 70 48 99"/>
+    <path d="M70 5 C78 35 75 70 63 96"/>
+    <path d="M86 14 C91 40 87 69 76 91"/>
+   </g>
+   <g stroke="#172033" strokeOpacity=".24" strokeWidth="2.1">
+    <path d="M-3 31 C24 45 53 75 91 101"/>
+    <path d="M4 18 C32 36 60 65 101 91"/>
+    <path d="M15 5 C39 26 67 53 102 74"/>
+    <path d="M-2 77 C27 61 52 33 78 -2"/>
+    <path d="M9 92 C35 73 60 43 91 7"/>
+    <path d="M30 102 C50 80 72 52 101 25"/>
+   </g>
+   <g stroke="#fff" strokeOpacity=".18" strokeWidth="1.2">
+    <path d="M0 46 C30 56 63 58 100 49"/>
+    <path d="M2 58 C32 68 65 69 99 61"/>
+    <path d="M25 0 C28 35 26 70 16 100"/>
+    <path d="M61 0 C69 35 67 70 57 100"/>
+   </g>
+  </g>
+  <circle cx="50" cy="50" r="46" fill="url(#yarnShade)"/>
+  <circle cx="50" cy="50" r="46" fill="none" stroke="#fffaf2" strokeWidth="4"/>
+  <circle cx="50" cy="50" r="46" fill="none" stroke="#172033" strokeOpacity=".14" strokeWidth="1.4"/>
+ </svg>
+}
 function makeDonut(rows,total){if(!rows.length||!total)return 'conic-gradient(#efe8dc 0 100%)';let cursor=0;const stops=[];rows.slice(0,10).forEach(r=>{const share=num(r.stock_g)/total*100;const start=cursor;cursor+=share;stops.push(`${hex(r.hex)} ${start}% ${cursor}%`)});if(cursor<100)stops.push(`#efe8dc ${cursor}% 100%`);return `conic-gradient(${stops.join(',')})`}
 function SavedReports({title,reports,openReport,onDelete}){return <section className="saved-docs"><h3>{title}</h3>{reports.length?<div className="saved-doc-grid">{reports.slice(0,8).map(r=><div className="saved-doc" key={r.id}><div><b>{r.title}</b><small>{new Date(r.created_at||Date.now()).toLocaleString()}</small></div><button onClick={()=>openReport(r)}>PDF</button><button className="danger-mini" onClick={()=>onDelete(r.id)}>×</button></div>)}</div>:<p>—</p>}</section>}
 function empty(){return{yarn_type:'Acrylic',name:'',hex:'#FB7DA8',brand:'',stock_g:0,ball_g:100,price_per_ball:'',min_stock_g:0}}
