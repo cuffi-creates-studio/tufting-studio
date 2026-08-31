@@ -1495,13 +1495,60 @@ body{background:linear-gradient(145deg,#fff8ea,#fffdf8)}
   }
 }
 
-/* PC cleanup requested: hide only the duplicate back/title strip on these three pages.
-   Mobile behavior is untouched. */
-@media (min-width:761px){
-  .materials-clean-page > .mobile-page-header,
-  .real-calc-page > .mobile-page-header,
-  .projects-clean-page > .mobile-page-header{display:none!important}
-  .materials-clean-page > .page-title,
-  .real-calc-page > .page-title,
-  .projects-clean-page > .page-title{margin-top:0!important}
+
+/* ==========================================================
+   MOBILE SIDEBAR VISIBILITY FIX — ONLY MOBILE
+   Keeps Dashboard/Homeboard and bottom homebar untouched.
+   ========================================================== */
+@media(max-width:760px){
+  /* no extra close X at the top of the drawer */
+  .drawer-close{display:none!important}
+
+  /* drawer itself fills the usable phone height */
+  .sidebar{
+    height:100dvh!important;
+    max-height:100dvh!important;
+    overflow:hidden!important;
+    padding-top:max(18px,env(safe-area-inset-top))!important;
+    padding-bottom:90px!important;
+  }
+
+  /* keep logo visible but reclaim vertical space */
+  .sidebar .brand{
+    flex:0 0 auto!important;
+    margin:0 8px 14px!important;
+  }
+
+  /* only the menu list scrolls; Settings can always be reached */
+  .sidebar nav{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding-bottom:20px!important;
+    scrollbar-width:none!important;
+  }
+  .sidebar nav::-webkit-scrollbar{display:none!important}
+
+  /* slightly tighter rows so all items fit more naturally */
+  .sidebar nav a{
+    min-height:48px!important;
+    padding:8px 10px!important;
+    margin:0!important;
+  }
+
+  /* profile remains below nav but above the fixed homebar */
+  .sidebar-bottom{
+    position:relative!important;
+    bottom:auto!important;
+    flex:0 0 auto!important;
+    margin-top:8px!important;
+    padding-top:10px!important;
+    min-height:58px!important;
+  }
+
+  /* do not alter the existing homebar layout/appearance */
+  .retro-homebar{ }
 }
