@@ -1,121 +1,44 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react'
-import {ClipboardList,Filter,Plus,Search,X} from 'lucide-react'
+import {ClipboardList,Filter,Plus,Search,X,Save,Trash2,CalendarDays,UserRound,Euro,FileText} from 'lucide-react'
 import {useI18n} from '../i18n/I18n'
 import {getProjects} from '../lib/projectsStore'
-import {createOrder,deleteOrder,getOrders,updateOrder} from '../lib/businessStore'
+import {createOrder,deleteOrder,getOrders,updateOrder,getBusinessReports,createBusinessReport,deleteBusinessReport} from '../lib/businessStore'
+import {makeBusinessPdf} from '../lib/businessPdf'
 import '../styles/business-pc.css'
 
 const COLORS=['#00995E','#552CB7','#FD5A46','#058CD7','#FB7DA8','#FFC567']
-
 export default function Orders(){
- const {lang}=useI18n()
- const tx=labels(lang)
- const dialog=useRef(null)
- const [rows,setRows]=useState([])
- const [projects,setProjects]=useState([])
- const [q,setQ]=useState('')
- const [filter,setFilter]=useState('all')
- const [editing,setEditing]=useState(null)
- const [saving,setSaving]=useState(false)
-
- async function load(){
-  const [a,b]=await Promise.all([getOrders().catch(()=>[]),getProjects().catch(()=>[])])
-  setRows(a);setProjects(b)
- }
+ const {lang}=useI18n(),tx=labels(lang),dialog=useRef(null)
+ const [rows,setRows]=useState([]),[reports,setReports]=useState([]),[projects,setProjects]=useState([]),[q,setQ]=useState(''),[filter,setFilter]=useState('all'),[editing,setEditing]=useState(null),[saving,setSaving]=useState(false)
+ async function load(){const[a,b,c]=await Promise.all([getOrders().catch(()=>[]),getProjects().catch(()=>[]),getBusinessReports('orders').catch(()=>[])]);setRows(a);setProjects(b);setReports(c)}
  useEffect(()=>{load()},[])
-
- const shown=useMemo(()=>rows.filter(r=>{
-  const hit=[r.client_name,r.project_name,r.status].join(' ').toLowerCase().includes(q.toLowerCase())
-  const ok=filter==='all'||r.status===filter
-  return hit&&ok
- }),[rows,q,filter])
-
+ const shown=useMemo(()=>rows.filter(r=>{const hit=[r.client_name,r.project_name,r.status].join(' ').toLowerCase().includes(q.toLowerCase());return hit&&(filter==='all'||r.status===filter)}),[rows,q,filter])
  function open(row=null){setEditing(row);dialog.current?.showModal()}
- async function submit(e){
-  e.preventDefault();setSaving(true)
-  const f=new FormData(e.currentTarget)
-  const project=projects.find(p=>p.id===f.get('project_id'))
-  const price=Number(f.get('price'))||0,deposit=Number(f.get('deposit'))||0
-  const data={
-   client_name:String(f.get('client_name')||'').trim(),
-   project_id:String(f.get('project_id')||''),
-   project_name:String(f.get('project_name')||project?.name||'').trim(),
-   width_cm:Number(f.get('width_cm'))||0,
-   height_cm:Number(f.get('height_cm'))||0,
-   price,deposit,balance:Math.max(0,price-deposit),
-   status:String(f.get('status')||'In Progress'),
-   deadline:String(f.get('deadline')||''),
-   notes:String(f.get('notes')||''),
-   image_data:editing?.image_data||project?.image_data||'',
-   material_cost:Number(editing?.material_cost)||Number(project?.material_cost)||0,
-   labor_cost:Number(editing?.labor_cost)||0,
-   other_cost:Number(editing?.other_cost)||0
-  }
-  if(editing)await updateOrder(editing.id,data);else await createOrder(data)
-  await load();setSaving(false);dialog.current?.close();setEditing(null)
- }
- async function remove(id){if(!confirm(tx.confirmDelete))return;await deleteOrder(id);await load()}
-
- return <div className="business-page orders">
-  <section className="business-shell-card">
-   <header className="business-head">
-    <div className="business-number">1</div>
-    <div className="business-title-icon"><ClipboardList/></div>
-    <div className="business-heading"><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
-    <div className="business-actions">
-      <label className="biz-search"><Search/><input value={q} onChange={e=>setQ(e.target.value)} placeholder={tx.search}/></label>
-      <button className="biz-btn" type="button"><Filter/>{tx.filter}</button>
-      <button className="biz-btn primary" type="button" onClick={()=>open()}><Plus/>{tx.add}</button>
-    </div>
-   </header>
-   <div className="biz-filter-row">
-    {[
-      ['all',tx.all],['In Progress',tx.inProgress],['Waiting',tx.waiting],['Waiting Material',tx.waitMaterial],['Completed',tx.completed]
-    ].map(([k,l])=><button key={k} className={`biz-chip ${filter===k?'active':''}`} onClick={()=>setFilter(k)}>{l}</button>)}
-   </div>
-   <div className="business-table-wrap">
-    {shown.length?<table className="business-table"><thead><tr><th>{tx.client}</th><th>{tx.project}</th><th>{tx.size}</th><th>{tx.price}</th><th>{tx.deposit}</th><th>{tx.balance}</th><th>{tx.status}</th><th>{tx.deadline}</th><th/></tr></thead><tbody>
-      {shown.map((r,i)=><tr key={r.id}>
-        <td><div className="biz-person"><span className="biz-avatar" style={{background:COLORS[i%COLORS.length]}}>{initials(r.client_name)}</span>{r.client_name||'—'}</div></td>
-        <td>{r.project_name||'—'}</td>
-        <td>{r.width_cm||0} × {r.height_cm||0} cm</td>
-        <td className="biz-money">€{money(r.price)}</td>
-        <td>€{money(r.deposit)}</td>
-        <td>€{money(r.balance)}</td>
-        <td><span className={`biz-status ${statusClass(r.status)}`}>{statusLabel(r.status,tx)}</span></td>
-        <td>{formatDate(r.deadline)}</td>
-        <td><button className="biz-kebab" onClick={()=>open(r)}>•••</button></td>
-      </tr>)}
-    </tbody></table>:<div className="biz-empty">{tx.empty}</div>}
-   </div>
-  </section>
-
-  <dialog className="biz-dialog" ref={dialog} onClose={()=>setEditing(null)}>
-   <div className="biz-dialog-head"><h2>{editing?tx.edit:tx.add}</h2><button className="biz-dialog-close" onClick={()=>dialog.current?.close()}><X/></button></div>
-   <form className="biz-form" onSubmit={submit} key={editing?.id||'new'}>
-    <label>{tx.client}<input name="client_name" required defaultValue={editing?.client_name||''}/></label>
-    <label>{tx.project}<select name="project_id" defaultValue={editing?.project_id||''} onChange={e=>{const p=projects.find(x=>x.id===e.target.value);if(p){const form=e.currentTarget.form;form.elements.project_name.value=p.name||'';form.elements.width_cm.value=p.width_cm||0;form.elements.height_cm.value=p.height_cm||0}}}><option value="">—</option>{projects.map(p=><option value={p.id} key={p.id}>{p.name}</option>)}</select></label>
-    <label className="full">{tx.projectName}<input name="project_name" defaultValue={editing?.project_name||''}/></label>
-    <label>{tx.width}<input name="width_cm" type="number" min="0" defaultValue={editing?.width_cm||''}/></label>
-    <label>{tx.height}<input name="height_cm" type="number" min="0" defaultValue={editing?.height_cm||''}/></label>
-    <label>{tx.price}<input name="price" type="number" min="0" step="0.01" defaultValue={editing?.price||''}/></label>
-    <label>{tx.deposit}<input name="deposit" type="number" min="0" step="0.01" defaultValue={editing?.deposit||''}/></label>
-    <label>{tx.status}<select name="status" defaultValue={editing?.status||'In Progress'}><option>In Progress</option><option>Waiting</option><option>Waiting Material</option><option>Completed</option></select></label>
-    <label>{tx.deadline}<input name="deadline" type="date" defaultValue={editing?.deadline||''}/></label>
-    <label className="full">{tx.notes}<textarea name="notes" defaultValue={editing?.notes||''}/></label>
-    <div className="biz-form-actions">{editing&&<button type="button" className="biz-btn danger" onClick={()=>remove(editing.id)}>{tx.delete}</button>}<button type="button" className="biz-btn" onClick={()=>dialog.current?.close()}>{tx.cancel}</button><button className="biz-btn primary" disabled={saving}>{saving?tx.saving:tx.save}</button></div>
-   </form>
-  </dialog>
- </div>
+ function close(){dialog.current?.close();setEditing(null)}
+ async function submit(e){e.preventDefault();setSaving(true);const f=new FormData(e.currentTarget),p=projects.find(x=>x.id===f.get('project_id')),price=num(f.get('price')),deposit=num(f.get('deposit'));const data={client_name:String(f.get('client_name')||'').trim(),project_id:String(f.get('project_id')||''),project_name:String(f.get('project_name')||p?.name||'').trim(),width_cm:num(f.get('width_cm')),height_cm:num(f.get('height_cm')),price,deposit,balance:Math.max(0,price-deposit),status:String(f.get('status')||'In Progress'),deadline:String(f.get('deadline')||''),notes:String(f.get('notes')||''),image_data:editing?.image_data||p?.image_data||'',material_cost:num(editing?.material_cost)||num(p?.material_cost),labor_cost:num(editing?.labor_cost),other_cost:num(editing?.other_cost)};if(editing)await updateOrder(editing.id,data);else await createOrder(data);await load();setSaving(false);close()}
+ async function remove(id){if(!confirm(tx.confirmDelete))return;await deleteOrder(id);await load();close()}
+ async function pdfOrder(r){const lines=[`#${r.project_name||tx.project}`,`${tx.client}: ${r.client_name||'—'}`,`${tx.size}: ${r.width_cm||0} × ${r.height_cm||0} cm`,`${tx.price}: €${money(r.price)}`,`${tx.deposit}: €${money(r.deposit)}`,`${tx.balance}: €${money(r.balance)}`,`${tx.status}: ${statusLabel(r.status,tx)}`,`${tx.deadline}: ${formatDate(r.deadline)}`,`${tx.notes}: ${r.notes||'—'}`];const file=makeBusinessPdf({title:tx.pdfTitle,subtitle:r.project_name||'',lines,filename:`order-${r.id}.pdf`});await createBusinessReport({module:'orders',title:`${tx.pdfTitle} – ${r.project_name||r.client_name}`,file_name:file,lines});await load()}
+ async function pdfAll(){const lines=shown.flatMap(r=>[`#${r.project_name||'—'}`,`${tx.client}: ${r.client_name||'—'}   |   ${tx.price}: €${money(r.price)}   |   ${tx.balance}: €${money(r.balance)}   |   ${tx.status}: ${statusLabel(r.status,tx)}   |   ${tx.deadline}: ${formatDate(r.deadline)}`,'']);const file=makeBusinessPdf({title:tx.listPdf,subtitle:tx.subtitle,lines,filename:'tufting-orders.pdf'});await createBusinessReport({module:'orders',title:tx.listPdf,file_name:file,lines});await load()}
+ async function openReport(r){makeBusinessPdf({title:r.title||tx.listPdf,subtitle:tx.subtitle,lines:r.lines||[],filename:r.file_name||'orders.pdf'})}
+ return <div className="business-page orders retro-business-page"><section className="business-shell-card">
+  <header className="business-head"><div className="business-number">1</div><div className="business-title-icon"><ClipboardList/></div><div className="business-heading"><h1>{tx.title}</h1><p>{tx.subtitle}</p></div><div className="business-actions"><button className="biz-btn retro-purple" onClick={pdfAll}>PDF</button><label className="biz-search"><Search/><input value={q} onChange={e=>setQ(e.target.value)} placeholder={tx.search}/></label><button className="biz-btn"><Filter/>{tx.filter}</button><button className="biz-btn primary" onClick={()=>open()}><Plus/>{tx.add}</button></div></header>
+  <div className="biz-filter-row">{[['all',tx.all],['In Progress',tx.inProgress],['Waiting',tx.waiting],['Waiting Material',tx.waitMaterial],['Completed',tx.completed]].map(([k,l])=><button key={k} className={`biz-chip ${filter===k?'active':''}`} onClick={()=>setFilter(k)}>{l}</button>)}</div>
+  <div className="business-table-wrap"><table className="business-table orders-table"><thead><tr><th>{tx.client}</th><th>{tx.project}</th><th>{tx.size}</th><th>{tx.price}</th><th>{tx.deposit}</th><th>{tx.balance}</th><th>{tx.status}</th><th>{tx.deadline}</th><th>PDF</th><th/></tr></thead><tbody>{shown.map((r,i)=><tr key={r.id}><td><div className="biz-person"><span className="biz-avatar" style={{background:COLORS[i%COLORS.length]}}>{initials(r.client_name)}</span>{r.client_name||'—'}</div></td><td><b>{r.project_name||'—'}</b></td><td>{r.width_cm||0} × {r.height_cm||0} cm</td><td className="biz-money">€{money(r.price)}</td><td>€{money(r.deposit)}</td><td className="biz-negative">€{money(r.balance)}</td><td><span className={`biz-status ${statusClass(r.status)}`}>{statusLabel(r.status,tx)}</span></td><td>{formatDate(r.deadline)}</td><td><button className="pdf-mini" onClick={()=>pdfOrder(r)}>PDF</button></td><td><button className="biz-kebab" onClick={()=>open(r)}>•••</button></td></tr>)}</tbody></table>{!shown.length&&<div className="biz-empty">{tx.empty}</div>}</div>
+ </section>
+ <SavedReports title={tx.saved} reports={reports} openReport={openReport} onDelete={async id=>{await deleteBusinessReport(id);await load()}}/>
+ <dialog className="biz-dialog retro-dialog orders-dialog" ref={dialog} onClose={()=>setEditing(null)}><div className="biz-dialog-head retro-dialog-head"><div className="business-title-icon"><ClipboardList/></div><div><h2>{editing?tx.edit:tx.add}</h2><p>{tx.dialogSubtitle}</p></div><button className="biz-dialog-close" onClick={close}><X/></button></div><form className="biz-form retro-form" onSubmit={submit} key={editing?.id||'new'}>
+  <section className="retro-field-card green"><div className="retro-field-title"><UserRound/>{tx.client}</div><input name="client_name" required defaultValue={editing?.client_name||''}/></section>
+  <section className="retro-field-card purple"><div className="retro-field-title"><FileText/>{tx.project}</div><select name="project_id" defaultValue={editing?.project_id||''} onChange={e=>{const p=projects.find(x=>x.id===e.target.value);if(p){const form=e.currentTarget.form;form.elements.project_name.value=p.name||'';form.elements.width_cm.value=p.width_cm||0;form.elements.height_cm.value=p.height_cm||0}}}><option value="">—</option>{projects.map(p=><option value={p.id} key={p.id}>{p.name}</option>)}</select></section>
+  <section className="retro-field-card orange"><div className="retro-field-title">{tx.projectName}</div><input name="project_name" defaultValue={editing?.project_name||''}/></section>
+  <section className="retro-field-card blue"><div className="retro-field-title">{tx.size}</div><div className="inline-two"><input name="width_cm" type="number" min="0" placeholder={tx.width} defaultValue={editing?.width_cm||''}/><input name="height_cm" type="number" min="0" placeholder={tx.height} defaultValue={editing?.height_cm||''}/></div></section>
+  <section className="retro-field-card pink"><div className="retro-field-title"><Euro/>{tx.price}</div><input name="price" type="number" min="0" step="0.01" defaultValue={editing?.price||''}/></section>
+  <section className="retro-field-card green"><div className="retro-field-title"><Euro/>{tx.deposit}</div><input name="deposit" type="number" min="0" step="0.01" defaultValue={editing?.deposit||''}/></section>
+  <section className="retro-field-card coral"><div className="retro-field-title">{tx.status}</div><select name="status" defaultValue={editing?.status||'In Progress'}><option>In Progress</option><option>Waiting</option><option>Waiting Material</option><option>Completed</option></select></section>
+  <section className="retro-field-card yellow"><div className="retro-field-title"><CalendarDays/>{tx.deadline}</div><input name="deadline" type="date" defaultValue={editing?.deadline||''}/></section>
+  <section className="retro-field-card full purple"><div className="retro-field-title">{tx.notes}</div><textarea name="notes" defaultValue={editing?.notes||''}/></section>
+  <div className="biz-form-actions retro-actions">{editing&&<button type="button" className="biz-btn danger" onClick={()=>remove(editing.id)}><Trash2/>{tx.delete}</button>}<button type="button" className="biz-btn" onClick={close}>{tx.cancel}</button><button className="biz-btn retro-save"><Save/>{saving?tx.saving:tx.save}</button></div>
+ </form></dialog></div>
 }
-
-function initials(v=''){return v.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'—'}
-function money(v){return (Number(v)||0).toFixed(2)}
-function formatDate(v){if(!v)return'—';const [y,m,d]=String(v).split('-');return y&&m&&d?`${d}.${m}.${y}`:v}
-function statusClass(v){return v==='Completed'?'done':v==='Waiting Material'?'material':v==='Waiting'?'wait':'progress'}
-function statusLabel(v,t){return v==='Completed'?t.completed:v==='Waiting Material'?t.waitMaterial:v==='Waiting'?t.waiting:t.inProgress}
-function labels(lang){
- if(lang==='de')return{title:'Bestellungen',subtitle:'Kundenaufträge verwalten und Status verfolgen.',search:'Bestellungen suchen...',filter:'Filter',add:'Bestellung hinzufügen',all:'Alle',inProgress:'In Arbeit',waiting:'Wartet',waitMaterial:'Wartet auf Material',completed:'Fertig',client:'Kunde',project:'Projekt',projectName:'Projektname',size:'Größe',width:'Breite (cm)',height:'Höhe (cm)',price:'Preis',deposit:'Anzahlung',balance:'Rest',status:'Status',deadline:'Termin',notes:'Notizen',save:'Speichern',saving:'Speichern…',cancel:'Abbrechen',edit:'Bestellung bearbeiten',delete:'Löschen',empty:'Noch keine Bestellungen.',confirmDelete:'Diese Bestellung löschen?'}
- if(lang==='en')return{title:'Orders',subtitle:'Manage customer orders and track their status.',search:'Search orders...',filter:'Filter',add:'Add order',all:'All',inProgress:'In Progress',waiting:'Waiting',waitMaterial:'Waiting Material',completed:'Completed',client:'Client',project:'Project',projectName:'Project name',size:'Size',width:'Width (cm)',height:'Height (cm)',price:'Price',deposit:'Deposit',balance:'Balance',status:'Status',deadline:'Deadline',notes:'Notes',save:'Save',saving:'Saving…',cancel:'Cancel',edit:'Edit order',delete:'Delete',empty:'No orders yet.',confirmDelete:'Delete this order?'}
- return{title:'Porositë',subtitle:'Menaxho porositë e klientëve dhe ndiq statusin e tyre.',search:'Kërko në porosi...',filter:'Filtro',add:'Shto porosi',all:'Të gjitha',inProgress:'Në punë',waiting:'Në pritje',waitMaterial:'Prit material',completed:'Përfunduar',client:'Klienti',project:'Projekti',projectName:'Emri i projektit',size:'Përmasat',width:'Gjerësia (cm)',height:'Lartësia (cm)',price:'Çmimi',deposit:'Kapari',balance:'Mbetja',status:'Statusi',deadline:'Afati',notes:'Shënime',save:'Ruaj porosinë',saving:'Po ruhet…',cancel:'Mbyll',edit:'Redakto porosinë',delete:'Fshi',empty:'Ende nuk ka porosi.',confirmDelete:'Ta fshij këtë porosi?'}
-}
+function SavedReports({title,reports,openReport,onDelete}){return <section className="saved-docs"><h3>{title}</h3>{reports.length?<div className="saved-doc-grid">{reports.slice(0,8).map(r=><div className="saved-doc" key={r.id}><div><b>{r.title}</b><small>{new Date(r.created_at||Date.now()).toLocaleString()}</small></div><button onClick={()=>openReport(r)}>PDF</button><button className="danger-mini" onClick={()=>onDelete(r.id)}>×</button></div>)}</div>:<p>—</p>}</section>}
+function initials(v=''){return v.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'—'}function num(v){return Number(v)||0}function money(v){return num(v).toFixed(2)}function formatDate(v){if(!v)return'—';const[y,m,d]=String(v).split('-');return y&&m&&d?`${d}.${m}.${y}`:v}function statusClass(v){return v==='Completed'?'done':v==='Waiting Material'?'material':v==='Waiting'?'wait':'progress'}function statusLabel(v,t){return v==='Completed'?t.completed:v==='Waiting Material'?t.waitMaterial:v==='Waiting'?t.waiting:t.inProgress}
+function labels(lang){if(lang==='de')return{title:'Bestellungen',subtitle:'Kundenaufträge verwalten und Zahlungen verfolgen.',search:'Bestellungen suchen...',filter:'Filter',add:'Bestellung hinzufügen',all:'Alle',inProgress:'In Arbeit',waiting:'Wartet',waitMaterial:'Wartet auf Material',completed:'Fertig',client:'Kunde',project:'Projekt',projectName:'Projektname',size:'Größe',width:'Breite',height:'Höhe',price:'Preis',deposit:'Anzahlung',balance:'Rest',status:'Status',deadline:'Termin',notes:'Notizen',save:'Speichern',saving:'Speichern…',cancel:'Schließen',edit:'Bestellung bearbeiten',delete:'Löschen',empty:'Noch keine Bestellungen.',confirmDelete:'Diese Bestellung löschen?',dialogSubtitle:'Auftrag, Zahlung und Termin sauber erfassen.',saved:'Gespeicherte PDFs',pdfTitle:'Tufting Studio – Bestellung',listPdf:'Tufting Studio – Bestellungen'};if(lang==='en')return{title:'Orders',subtitle:'Manage orders, deposits, balances and deadlines.',search:'Search orders...',filter:'Filter',add:'Add order',all:'All',inProgress:'In progress',waiting:'Waiting',waitMaterial:'Waiting material',completed:'Completed',client:'Client',project:'Project',projectName:'Project name',size:'Size',width:'Width',height:'Height',price:'Price',deposit:'Deposit',balance:'Balance',status:'Status',deadline:'Deadline',notes:'Notes',save:'Save order',saving:'Saving…',cancel:'Close',edit:'Edit order',delete:'Delete',empty:'No orders yet.',confirmDelete:'Delete this order?',dialogSubtitle:'Record order, payment and deadline clearly.',saved:'Saved PDFs',pdfTitle:'Tufting Studio – Order',listPdf:'Tufting Studio – Orders'};return{title:'Porositë',subtitle:'Menaxho porositë, kaparin, mbetjen dhe afatet.',search:'Kërko në porosi...',filter:'Filtro',add:'Shto porosi',all:'Të gjitha',inProgress:'Në punë',waiting:'Në pritje',waitMaterial:'Prit material',completed:'Përfunduar',client:'Klienti',project:'Projekti',projectName:'Emri i projektit',size:'Përmasat',width:'Gjerësia',height:'Lartësia',price:'Çmimi',deposit:'Kapari',balance:'Mbetja',status:'Statusi',deadline:'Afati',notes:'Shënime',save:'Ruaj porosinë',saving:'Po ruhet…',cancel:'Mbyll',edit:'Redakto porosinë',delete:'Fshi',empty:'Ende nuk ka porosi.',confirmDelete:'Ta fshij këtë porosi?',dialogSubtitle:'Regjistro porosinë, pagesën dhe afatin qartë.',saved:'PDF / Faturat e ruajtura',pdfTitle:'Tufting Studio – Faturë porosie',listPdf:'Tufting Studio – Lista e porosive'}}
