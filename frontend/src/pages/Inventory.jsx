@@ -1,5 +1,5 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react'
-import {Boxes,Download,Plus,Search,X,Yarn,Tag,Palette,Hash,Database,ShieldCheck,Trash2,Save,Euro} from 'lucide-react'
+import {Boxes,Download,Plus,Search,X,Tag,Palette,Hash,Database,ShieldCheck,Trash2,Save,Euro} from 'lucide-react'
 import {useI18n} from '../i18n/I18n'
 import {createInventoryItem,deleteInventoryItem,getInventory,updateInventoryItem} from '../lib/businessStore'
 import '../styles/business-pc.css'
@@ -60,7 +60,7 @@ export default function Inventory(){
 
  return <div className="business-page inventory inventory-pro-page"><section className="business-shell-card inventory-pro-shell">
   <header className="business-head inventory-pro-head">
-   <div className="business-number">2</div><div className="business-title-icon inventory-title-icon"><Yarn/></div>
+   <div className="business-number">2</div><div className="business-title-icon inventory-title-icon"><Boxes/></div>
    <div className="business-heading"><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
    <div className="business-actions"><button className="biz-btn" onClick={exportCsv}><Download/>{tx.export}</button><label className="biz-search"><Search/><input value={q} onChange={e=>setQ(e.target.value)} placeholder={tx.search}/></label><button className="biz-btn primary" onClick={()=>open()}><Plus/>{tx.add}</button></div>
   </header>
@@ -86,14 +86,14 @@ export default function Inventory(){
 
  <dialog className="biz-dialog inventory-retro-dialog" ref={dialog} onClose={()=>{setEditing(null);setForm(emptyForm())}}>
   <div className="inventory-dialog-top">
-   <div className="inventory-dialog-icon"><Yarn/></div>
+   <div className="inventory-dialog-icon"><Boxes/></div>
    <div><h2>{editing?tx.edit:tx.add}</h2><p>{editing?tx.editSubtitle:tx.addSubtitle}</p></div>
    <div className="inventory-sparkles"><i/><i/><i/></div>
    <button className="biz-dialog-close inventory-dialog-close" type="button" onClick={close}><X/></button>
   </div>
 
   <form className="inventory-retro-form" onSubmit={submit}>
-   <section className="inventory-form-card pink"><div className="inventory-field-title"><Yarn/>{tx.yarnType}</div><div className="inventory-choice-row"><button type="button" className={form.yarn_type==='Acrylic'?'active':''} onClick={()=>setForm(v=>({...v,yarn_type:'Acrylic'}))}><Yarn/>{tx.acrylic}</button><button type="button" className={form.yarn_type==='Wool'?'active wool':''} onClick={()=>setForm(v=>({...v,yarn_type:'Wool'}))}><Yarn/>{tx.wool}</button></div><small>{tx.yarnHelp}</small></section>
+   <section className="inventory-form-card pink"><div className="inventory-field-title"><Boxes/>{tx.yarnType}</div><div className="inventory-choice-row"><button type="button" className={form.yarn_type==='Acrylic'?'active':''} onClick={()=>setForm(v=>({...v,yarn_type:'Acrylic'}))}><Boxes/>{tx.acrylic}</button><button type="button" className={form.yarn_type==='Wool'?'active wool':''} onClick={()=>setForm(v=>({...v,yarn_type:'Wool'}))}><Boxes/>{tx.wool}</button></div><small>{tx.yarnHelp}</small></section>
 
    <section className="inventory-form-card green"><label><span className="inventory-field-title"><Tag/>{tx.brand}</span><input value={form.brand} onChange={e=>setForm(v=>({...v,brand:e.target.value}))} placeholder={tx.brandPlaceholder}/><small>{tx.brandHelp}</small></label></section>
 
