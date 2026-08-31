@@ -14,9 +14,148 @@
 .inventory-empty-summary{min-height:270px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#776e61}.inventory-empty-summary strong{font-size:28px;color:var(--ink)}
 .biz-month-select{width:100%;height:42px;border:1px solid #e6d5bb;border-radius:11px;background:#fff;padding:0 12px}.biz-month-card{background:#fff4ed;border:1px solid #f1d4bf;border-radius:15px;padding:15px;margin-top:12px}.biz-month-card label{display:block;color:#786c62;font-size:12px}.biz-month-card strong{font-size:25px;color:#ff4f76}.biz-bottom-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.biz-mini-stat{border-radius:12px;padding:12px}.biz-mini-stat span{font-size:11px;display:block}.biz-mini-stat strong{font-size:20px}.biz-mini-stat.pink{background:#ffdce6;color:#dc3e68}.biz-mini-stat.good{background:#e4f5e8;color:#15904d}.biz-legend-dot{width:10px;height:10px;border-radius:50%}
 .saved-docs{margin-top:18px;padding:18px 20px}.saved-docs h3{font-family:Georgia,serif;font-size:24px;margin:0 0 12px}.saved-doc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:10px}.saved-doc{border:1px solid #ead8bd;background:#fffaf2;border-radius:12px;padding:11px 12px;display:flex;align-items:center;gap:10px}.saved-doc>div{min-width:0;flex:1}.saved-doc b,.saved-doc small{display:block}.saved-doc small{color:#8a7e70;margin-top:3px}.saved-doc button{border:0;border-radius:8px;padding:7px 10px;background:var(--purple);color:#fff;font-weight:800}.saved-doc .danger-mini{background:#fd5a46}
-/* Real yarn: photographic fiber texture + dynamic HEX tint */
-.real-yarn-skein{position:relative;display:inline-block;overflow:hidden;border-radius:42% 42% 38% 38% / 18% 18% 18% 18%;background:var(--yarn-color,#FB7DA8);box-shadow:0 3px 8px rgba(35,29,20,.18),inset 0 0 0 1px rgba(30,20,10,.1);flex:0 0 auto}.real-yarn-skein.xs{width:34px;height:52px}.real-yarn-skein.sm{width:46px;height:68px}.real-yarn-skein.lg{width:108px;height:178px}.real-yarn-color{position:absolute;inset:0;background:var(--yarn-color,#FB7DA8)}.real-yarn-skein img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;opacity:.93;filter:contrast(1.08)}.real-yarn-label{position:absolute;left:7%;right:7%;top:38%;height:27%;border-radius:3px;background:#f9edcf;border:1px solid rgba(120,84,33,.25);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#2a2118;font-family:Georgia,serif;box-shadow:0 1px 2px rgba(0,0,0,.08)}.real-yarn-label b{font-size:clamp(7px,1vw,13px);line-height:1}.real-yarn-label i{font:700 6px/1.2 Arial,sans-serif;letter-spacing:1px;margin-top:2px}.real-yarn-skein.xs .real-yarn-label{display:none}.yarn-cell{display:flex;align-items:center;gap:10px}
+
 /* Modals – compact, polished, retro */
 .biz-dialog{width:min(860px,calc(100vw - 40px));max-height:88vh;border:0;border-radius:20px;padding:0;background:#fffdf8;color:var(--ink);box-shadow:0 28px 80px rgba(14,20,33,.32);overflow:auto}.inventory-dialog{width:min(780px,calc(100vw - 40px))}.biz-dialog::backdrop{background:rgba(27,31,38,.50);backdrop-filter:blur(3px)}.biz-dialog-head{position:sticky;top:0;z-index:5;background:linear-gradient(90deg,#fff8e8,#f7fff9);padding:14px 18px;border-bottom:1px solid #ead7bc;display:flex;align-items:center;gap:12px}.biz-dialog-head h2{font-family:Georgia,serif;font-size:29px;margin:0}.biz-dialog-head p{margin:3px 0 0;color:#786d60;font-size:12px}.biz-dialog-close{margin-left:auto;width:38px;height:38px;border-radius:50%;border:1px solid #ead7bc;background:white;display:grid;place-items:center}.biz-dialog-close svg{width:20px}.biz-form{padding:16px 18px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.retro-field-card{border:1px solid #e8d7c0;border-radius:14px;padding:12px;background:#fffaf4}.retro-field-card.green{background:#f0fbf6;border-color:#cde8dd}.retro-field-card.purple{background:#f3eeff;border-color:#ddd0ff}.retro-field-card.orange{background:#fff4df;border-color:#f3d9aa}.retro-field-card.pink{background:#fff0f5;border-color:#f6cedb}.retro-field-card.coral{background:#fff0eb;border-color:#f5d0c5}.retro-field-card.blue{background:#eef7ff;border-color:#cfe2f4}.retro-field-card.yellow{background:#fff8df;border-color:#eedba0}.retro-field-card.full{grid-column:1/-1}.retro-field-title{display:flex;align-items:center;gap:7px;font-weight:900;margin-bottom:8px;font-size:14px;color:#15213a}.retro-field-title svg{width:17px;height:17px}.retro-field-card input,.retro-field-card select,.retro-field-card textarea{width:100%;border:1px solid #ddc7a6;border-radius:10px;background:#fffdfa;outline:none;padding:10px 12px;min-height:42px;color:#162038;font-weight:650}.retro-field-card textarea{min-height:80px;resize:vertical}.inline-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choice-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.choice-row button{min-height:39px;border:1px solid #e4cfb2;border-radius:10px;background:#fffdf9;font-weight:900}.choice-row button.active.acrylic{background:var(--pink);color:white;border-color:var(--pink)}.choice-row button.active.wool{background:#fff4e9;color:#5a341d;border-color:#d6a77e}.choice-row button.active.gram{background:var(--yellow);border-color:#e7a72a}.color-preview-wrap{display:flex;align-items:center;gap:14px}.color-preview-wrap input[type=color]{width:58px;height:48px;padding:4px}.biz-form-actions{grid-column:1/-1;border-top:1px solid #ead7bc;padding-top:13px;display:flex;gap:10px;justify-content:flex-end}.orders-dialog .retro-save{background:var(--yellow);color:#22180a;border-color:#e3a42b}.expenses-dialog .retro-save{background:var(--purple);border-color:var(--purple)}
 @media(max-width:1100px){.business-head{align-items:flex-start}.business-actions{gap:8px}.biz-layout-split{grid-template-columns:1fr 280px}.business-table{font-size:12px}.business-table th,.business-table td{padding:10px 8px}}
 @media(max-width:760px){.business-page{padding:12px}.business-head{display:grid;grid-template-columns:auto auto 1fr}.business-actions{grid-column:1/-1;margin:4px 0 0;justify-content:stretch}.business-actions .biz-btn,.biz-search{flex:1;min-width:0}.biz-layout-split{grid-template-columns:1fr}.biz-layout-split>.business-table-wrap{border-right:0}.business-table-wrap{overflow:auto}.biz-summary{border-top:1px solid #eadcc8}.biz-form{grid-template-columns:1fr}.retro-field-card.full{grid-column:auto}.biz-dialog{width:calc(100vw - 18px)}.business-heading h1{font-size:28px}.business-number{display:none}}
+
+
+/* =========================================================
+   RETRO PALETTE — BUSINESS PAGES ONLY
+   Exact palette requested by the user:
+   #FFC567 #FB7DA8 #FD5A46 #552CB7 #00995E #058CD7
+   ========================================================= */
+.retro-business-page{
+  --yellow:#FFC567;
+  --pink:#FB7DA8;
+  --coral:#FD5A46;
+  --purple:#552CB7;
+  --green:#00995E;
+  --blue:#058CD7;
+}
+
+/* Buttons: exact palette + readable contrast */
+.retro-business-page .biz-btn.primary,
+.retro-business-page .retro-save{
+  background:#00995E;
+  border-color:#00995E;
+  color:#fff;
+}
+.retro-business-page .biz-btn.retro-yellow{
+  background:#FFC567;
+  border-color:#FFC567;
+  color:#172038;
+}
+.retro-business-page .biz-btn.retro-purple,
+.retro-business-page .pdf-mini,
+.retro-business-page .saved-doc button{
+  background:#552CB7;
+  border-color:#552CB7;
+  color:#fff;
+}
+.retro-business-page .biz-btn.danger,
+.retro-business-page .saved-doc .danger-mini{
+  background:#FD5A46;
+  border-color:#FD5A46;
+  color:#fff;
+}
+
+/* Page identity colors */
+.orders .business-number{background:#FFC567;color:#172038}
+.inventory .business-number{background:#00995E;color:#fff}
+.expenses .business-number{background:#FB7DA8;color:#172038}
+
+.orders .business-title-icon{background:#FFC567;color:#172038}
+.inventory .business-title-icon{background:#00995E;color:#fff}
+.expenses .business-title-icon{background:#FB7DA8;color:#172038}
+
+/* Statuses use only the six retro colors */
+.retro-business-page .biz-status.progress{background:#FFC567;color:#172038}
+.retro-business-page .biz-status.wait{background:#552CB7;color:#fff}
+.retro-business-page .biz-status.material{background:#058CD7;color:#fff}
+.retro-business-page .biz-status.done{background:#00995E;color:#fff}
+.retro-business-page .payment-pill{background:#552CB7;color:#fff}
+.retro-business-page .biz-stock-ok{background:#00995E;color:#fff}
+.retro-business-page .biz-stock-alert{background:#FD5A46;color:#fff}
+
+/* Modal field cards: exact palette, but inputs stay clean and readable */
+.retro-business-page .retro-field-card.pink{background:#FB7DA8;border-color:#FB7DA8}
+.retro-business-page .retro-field-card.purple{background:#552CB7;border-color:#552CB7}
+.retro-business-page .retro-field-card.orange,
+.retro-business-page .retro-field-card.yellow{background:#FFC567;border-color:#FFC567}
+.retro-business-page .retro-field-card.coral{background:#FD5A46;border-color:#FD5A46}
+.retro-business-page .retro-field-card.green{background:#00995E;border-color:#00995E}
+.retro-business-page .retro-field-card.blue{background:#058CD7;border-color:#058CD7}
+
+/* White text on dark cards; dark text on light yellow/pink */
+.retro-business-page .retro-field-card.green .retro-field-title,
+.retro-business-page .retro-field-card.green .retro-field-title svg,
+.retro-business-page .retro-field-card.blue .retro-field-title,
+.retro-business-page .retro-field-card.blue .retro-field-title svg,
+.retro-business-page .retro-field-card.purple .retro-field-title,
+.retro-business-page .retro-field-card.purple .retro-field-title svg,
+.retro-business-page .retro-field-card.coral .retro-field-title,
+.retro-business-page .retro-field-card.coral .retro-field-title svg{
+  color:#fff;
+}
+.retro-business-page .retro-field-card.pink .retro-field-title,
+.retro-business-page .retro-field-card.pink .retro-field-title svg,
+.retro-business-page .retro-field-card.orange .retro-field-title,
+.retro-business-page .retro-field-card.orange .retro-field-title svg,
+.retro-business-page .retro-field-card.yellow .retro-field-title,
+.retro-business-page .retro-field-card.yellow .retro-field-title svg{
+  color:#172038;
+}
+.retro-business-page .retro-field-card input,
+.retro-business-page .retro-field-card select,
+.retro-business-page .retro-field-card textarea{
+  background:#fffdf8;
+  color:#172038;
+  border-color:rgba(23,32,56,.22);
+}
+.retro-business-page .choice-row button{
+  background:#fffdf8;
+  color:#172038;
+}
+.retro-business-page .choice-row button.active.acrylic{
+  background:#FB7DA8;
+  border-color:#FB7DA8;
+  color:#172038;
+}
+.retro-business-page .choice-row button.active.wool{
+  background:#552CB7;
+  border-color:#552CB7;
+  color:#fff;
+}
+.retro-business-page .choice-row button.active.gram{
+  background:#FFC567;
+  border-color:#FFC567;
+  color:#172038;
+}
+
+/* Larger/clearer typography without changing the layout */
+.retro-business-page .business-heading h1{font-size:36px}
+.retro-business-page .business-heading p{font-size:15px}
+.retro-business-page .business-table{font-size:15px}
+.retro-business-page .business-table th{font-size:14px;font-weight:900}
+.retro-business-page .business-table td{font-size:15px}
+.retro-business-page .retro-field-title{font-size:15px}
+.retro-business-page .retro-field-card input,
+.retro-business-page .retro-field-card select,
+.retro-business-page .retro-field-card textarea{font-size:15px}
+
+/* Pure SVG yarn bundle: no image/asset files */
+.real-yarn-skein{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  vertical-align:middle;
+  filter:drop-shadow(0 2px 4px rgba(18,26,38,.16));
+}
+.real-yarn-skein svg{width:100%;height:100%;display:block;overflow:visible}
+.real-yarn-skein.xs{width:46px;height:29px}
+.real-yarn-skein.sm{width:68px;height:42px}
+.real-yarn-skein.lg{width:132px;height:79px}
+.yarn-cell{display:flex;align-items:center;gap:10px}
