@@ -21,6 +21,70 @@
 @media(max-width:1100px){.business-head{align-items:flex-start}.business-actions{gap:8px}.biz-layout-split{grid-template-columns:1fr 280px}.business-table{font-size:12px}.business-table th,.business-table td{padding:10px 8px}}
 @media(max-width:760px){.business-page{padding:12px}.business-head{display:grid;grid-template-columns:auto auto 1fr}.business-actions{grid-column:1/-1;margin:4px 0 0;justify-content:stretch}.business-actions .biz-btn,.biz-search{flex:1;min-width:0}.biz-layout-split{grid-template-columns:1fr}.biz-layout-split>.business-table-wrap{border-right:0}.business-table-wrap{overflow:auto}.biz-summary{border-top:1px solid #eadcc8}.biz-form{grid-template-columns:1fr}.retro-field-card.full{grid-column:auto}.biz-dialog{width:calc(100vw - 18px)}.business-heading h1{font-size:28px}.business-number{display:none}}
 
+
+
+/* ==========================================================
+   TABLET FIX — only Inventory / Expenses desktop-tablet layout
+   Prevent table content from running under the side summary card.
+   ========================================================== */
+@media (min-width:761px) and (max-width:1180px){
+  .inventory .biz-layout-split,
+  .expenses .biz-layout-split{
+    grid-template-columns:1fr!important;
+  }
+
+  .inventory .biz-layout-split>.business-table-wrap,
+  .expenses .biz-layout-split>.business-table-wrap{
+    border-right:0!important;
+    border-bottom:1px solid #eadcc8!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .inventory .business-table,
+  .expenses .business-table{
+    min-width:760px;
+  }
+
+  .inventory .biz-summary,
+  .expenses .biz-summary{
+    border-top:0!important;
+    padding:18px 20px 20px!important;
+  }
+
+  .inventory .biz-summary h3,
+  .expenses .biz-summary h3{
+    font-size:22px!important;
+  }
+
+  .inventory .biz-donut,
+  .expenses .biz-donut{
+    width:170px;
+    height:170px;
+  }
+
+  .inventory .biz-donut:after,
+  .expenses .biz-donut:after{
+    inset:36px;
+  }
+}
+
+@media (min-width:1181px) and (max-width:1366px){
+  .inventory .biz-layout-split,
+  .expenses .biz-layout-split{
+    grid-template-columns:minmax(0,1fr) 300px;
+  }
+
+  .inventory .biz-layout-split>.business-table-wrap,
+  .expenses .biz-layout-split>.business-table-wrap{
+    overflow-x:auto;
+    overflow-y:hidden;
+  }
+
+  .inventory .business-table{min-width:860px}
+  .expenses .business-table{min-width:820px}
+}
 /* ==========================================================
    FINAL MOBILE BUSINESS UI — ONLY Porosite / Inventari / Shpenzimet
    PC + tablet remain on existing desktop markup.
@@ -209,94 +273,65 @@
   .business-page .saved-doc .danger-mini{background:#fff0ee!important;color:#b52b20!important;border-color:#f1b8ae!important}
 }
 
-
 /* ==========================================================
-   TABLET EXACT OVERFLOW FIX — Inventory + Expenses only
-   Keep summary on the right; table scrolls only inside left pane.
-   No phone or desktop changes.
+   TABLET HARD FIX — Inventory + Expenses only
+   Force summary below the table on tablet-sized layouts so
+   table text can never sit underneath the summary column.
+   Phone rules (<761px) and normal desktop (>1500px) untouched.
    ========================================================== */
-@media (min-width:761px) and (max-width:1366px) {
+@media (min-width:761px) and (max-width:1500px){
   .business-page.inventory .biz-layout-split,
-  .business-page.expenses .biz-layout-split {
-    display:grid !important;
-    grid-template-columns:minmax(0, 1fr) 280px !important;
-    width:100% !important;
-    max-width:100% !important;
-    overflow:hidden !important;
+  .business-page.expenses .biz-layout-split{
+    display:block!important;
+    grid-template-columns:none!important;
+    width:100%!important;
   }
 
-  .business-page.inventory .biz-layout-split > .business-table-wrap,
-  .business-page.expenses .biz-layout-split > .business-table-wrap {
-    min-width:0 !important;
-    width:100% !important;
-    max-width:100% !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
-    overscroll-behavior-x:contain;
-    -webkit-overflow-scrolling:touch;
-    border-right:1px solid #eadcc8 !important;
+  .business-page.inventory .biz-layout-split>.business-table-wrap,
+  .business-page.expenses .biz-layout-split>.business-table-wrap{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    border-right:0!important;
+    border-bottom:1px solid #eadcc8!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    position:relative!important;
+    z-index:1!important;
   }
 
   .business-page.inventory .business-table,
-  .business-page.expenses .business-table {
-    width:max-content !important;
-    min-width:100% !important;
-    table-layout:auto !important;
+  .business-page.expenses .business-table{
+    width:max-content!important;
+    min-width:100%!important;
+    table-layout:auto!important;
   }
 
   .business-page.inventory .business-table th,
   .business-page.inventory .business-table td,
   .business-page.expenses .business-table th,
-  .business-page.expenses .business-table td {
-    white-space:nowrap !important;
+  .business-page.expenses .business-table td{
+    white-space:nowrap!important;
   }
 
   .business-page.inventory .biz-summary,
-  .business-page.expenses .biz-summary {
-    min-width:0 !important;
-    width:280px !important;
-    max-width:280px !important;
-    overflow:hidden !important;
-    position:relative !important;
-    z-index:2 !important;
-    background:#fffdf8 !important;
+  .business-page.expenses .biz-summary{
+    display:block!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    border-left:0!important;
+    border-top:0!important;
+    position:relative!important;
+    z-index:0!important;
+    clear:both!important;
   }
 
-  .business-page.inventory .business-head,
-  .business-page.expenses .business-head {
-    flex-wrap:wrap !important;
-  }
-
-  .business-page.inventory .business-actions,
-  .business-page.expenses .business-actions {
-    min-width:0 !important;
-    max-width:100% !important;
-  }
-}
-
-/* Smaller tablet portrait: keep the same two-column structure but narrow summary. */
-@media (min-width:761px) and (max-width:980px) {
-  .business-page.inventory .biz-layout-split,
-  .business-page.expenses .biz-layout-split {
-    grid-template-columns:minmax(0, 1fr) 230px !important;
-  }
-  .business-page.inventory .biz-summary,
-  .business-page.expenses .biz-summary {
-    width:230px !important;
-    max-width:230px !important;
-    padding:14px !important;
-  }
-  .business-page.inventory .biz-summary h3,
-  .business-page.expenses .biz-summary h3 {
-    font-size:20px !important;
-  }
-  .business-page.inventory .biz-donut,
-  .business-page.expenses .biz-donut {
-    width:150px !important;
-    height:150px !important;
-  }
-  .business-page.inventory .biz-donut:after,
-  .business-page.expenses .biz-donut:after {
-    inset:32px !important;
+  .business-page.inventory .biz-summary .biz-donut,
+  .business-page.expenses .biz-summary .biz-donut{
+    margin-left:auto!important;
+    margin-right:auto!important;
   }
 }
