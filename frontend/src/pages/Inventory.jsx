@@ -6,7 +6,21 @@ import {makeBusinessPdf,reportLinesFromRows} from '../lib/businessPdf'
 import '../styles/business-pc.css'
 
 const BALLS=[50,100,500]
-const YARN_COLORS=['#FFFFFF','#F6F0E4','#E4D4B5','#C7A77A','#9C6B3D','#5B3A29','#1D1D1D','#8A8A8A','#C7C7C7','#FFC567','#E9A23B','#F28C28','#FD5A46','#D93A3A','#9E2430','#FB7DA8','#E64A8A','#B22F70','#552CB7','#7A55C7','#A987D8','#058CD7','#0D6FB8','#69BCE8','#00995E','#30A46C','#75C69A','#A8D86E','#2F6D4A','#33B7A6','#6ECAC4','#C9A227','#D9B44A','#F0D36B']
+const YARN_COLORS=[
+ '#FFFFFF','#F8F3E8','#F2E8D5','#E8D4B8','#D7BE9B','#C6A77E','#B08A63','#8F684A','#6D4A36','#4B3328','#2A211D','#111111',
+ '#D9D9D9','#B9B9B9','#929292','#686868','#3F3F3F',
+ '#FFF1B8','#FFE08A','#FFC567','#E9B949','#D89A27','#B87716','#8D5C12',
+ '#FFD1B8','#FFAE82','#F58A5C','#FD5A46','#E74335','#C52E2E','#98252B','#6F1E27',
+ '#FFE0E9','#F8B6CB','#FB7DA8','#F15D91','#D83D78','#B92E67','#8D285A','#681D48',
+ '#F2D9EC','#D7B2DF','#B68DCE','#9A6BC4','#7A55C7','#552CB7','#44208E','#32176A',
+ '#E5E7FF','#C7CBF6','#A6ACEA','#7E8ED9','#5878C7','#3864B5','#244A8F','#18356B',
+ '#D9F0FF','#B8E1FA','#8FCEF0','#69BCE8','#32A5DB','#058CD7','#0D6FB8','#0A558E',
+ '#DDF7F3','#B5E8DF','#82D2C5','#4CBFB0','#33B7A6','#1B9B8D','#14786E','#105B54',
+ '#E0F3E8','#BCE2CA','#91CFA9','#75C69A','#4EB47D','#30A46C','#00995E','#08764D','#075A3C','#2F6D4A',
+ '#ECF4D9','#D3E7A9','#B6D777','#A8D86E','#85BD4F','#669E39','#4C7A2D',
+ '#F7E9B9','#F0D36B','#D9B44A','#C9A227','#A6821D',
+ '#F3DDD2','#D6B3A2','#BC8F7A','#9C6B5A','#7D5144','#5B3A29'
+]
 export default function Inventory(){
  const {lang}=useI18n(),tx=labels(lang),dialog=useRef(null)
  const [rows,setRows]=useState([]),[reports,setReports]=useState([]),[q,setQ]=useState(''),[editing,setEditing]=useState(null),[saving,setSaving]=useState(false),[form,setForm]=useState(empty())
