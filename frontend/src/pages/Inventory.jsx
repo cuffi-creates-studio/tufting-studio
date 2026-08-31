@@ -1,5 +1,5 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react'
-import {Boxes,Download,Plus,Search,X,Trash2,Save,Tag,Palette,Hash,Database,ShieldCheck} from 'lucide-react'
+import {ArrowLeft,Boxes,Download,Plus,Search,X,Trash2,Save,Tag,Palette,Hash,Database,ShieldCheck} from 'lucide-react'
 import {useI18n} from '../i18n/I18n'
 import {createInventoryItem,deleteInventoryItem,getInventory,updateInventoryItem,getBusinessReports,createBusinessReport,deleteBusinessReport} from '../lib/businessStore'
 import {makeBusinessPdf,reportLinesFromRows} from '../lib/businessPdf'
@@ -57,7 +57,7 @@ function MobileInventory({tx,rows,q,setQ,filter,setFilter,open,detail,setDetail,
  const totalG=rows.reduce((s,r)=>s+num(r.stock_g),0)
  function addStock(r){const value=prompt('Sasia që do të shtosh (g)','100');const n=Number(value);if(Number.isFinite(n)&&n>0)updateQty(r,n)}
  return <section className="biz-mobile-app biz-mobile-inventory">
-  <div className="bma-head"><div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div><div className="bma-head-group"><button className="bma-head-btn secondary" onClick={csv}><Download/></button><button className="bma-head-btn" onClick={()=>open()}><Plus/></button></div></div>
+  <div className="bma-head"><button type="button" className="bma-back" onClick={mobileBack} aria-label="Kthehu mbrapa"><ArrowLeft/></button><div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div><div className="bma-head-group"><button className="bma-head-btn secondary" onClick={csv}><Download/></button><button className="bma-head-btn" onClick={()=>open()}><Plus/></button></div></div>
   <div className="bma-stats three"><div><b>{rows.length}</b><span>{tx.items}</span></div><div><b>{rows.filter(r=>num(r.stock_g)>num(r.min_stock_g)).length}</b><span>OK</span></div><div className={low?'warning':''}><b>{low}</b><span>{tx.low}</span></div></div>
   <label className="bma-search"><Search/><input value={q} onChange={e=>setQ(e.target.value)} placeholder={tx.search}/></label>
   <div className="bma-chips">{[['all','Të gjitha'],['Acrylic',tx.acrylic],['Wool',tx.wool],['low',tx.low]].map(([k,l])=><button key={k} className={filter===k?'active':''} onClick={()=>setFilter(k)}>{l}</button>)}</div>
@@ -80,6 +80,7 @@ function empty(){return{yarn_type:'Acrylic',name:'',hex:'#FB7DA8',brand:'',stock
 function normalize(r){return{yarn_type:r.yarn_type||'Acrylic',name:r.name||'',hex:r.hex||'#FB7DA8',brand:r.brand||'',stock_g:r.stock_g||0,ball_g:r.ball_g||100,price_per_ball:r.price_per_ball||'',min_stock_g:r.min_stock_g||0}}
 function num(v){return Number(v)||0}function money(v){return num(v).toFixed(2)}function hex(v){const s=String(v||'').trim();return /^#[0-9a-f]{6}$/i.test(s)?s.toUpperCase():'#FB7DA8'}
 function labelYarn(v,t){return v==='Wool'?t.wool:t.acrylic}
+function mobileBack(){if(typeof window==='undefined')return;if(window.history.length>1)window.history.back();else window.location.hash='#/'}
 function labels(lang){
  if(lang==='de')return{title:'Inventar',subtitle:'Verwalte Garnbestand, Farben und Preise.',export:'Export',search:'Material suchen...',add:'Material hinzufügen',yarnType:'Garnart',acrylic:'Acryl',wool:'Wolle',color:'Farbe',hex:'HEX-Code',brand:'Marke',ballG:'Ballgewicht',stock:'Gesamtbestand (g)',price:'Preis / Ball',alert:'Bestand',low:'Niedrig',summary:'Bestandsübersicht',total:'Gesamt',items:'Materialien',noStock:'Noch kein realer Bestand.',totalValue:'Inventarwert',colorCard:'Farbkarte',min:'Mindestbestand (g)',save:'Material speichern',saving:'Speichern…',cancel:'Schließen',edit:'Material bearbeiten',delete:'Löschen',empty:'Noch keine Materialien.',confirmDelete:'Dieses Material löschen?',dialogSubtitle:'Garn und Bestand sauber erfassen.',saved:'Gespeicherte PDFs',pdfTitle:'Tufting Studio – Inventar'}
  if(lang==='en')return{title:'Inventory',subtitle:'Manage yarn stock, colors and real prices.',export:'Export',search:'Search material...',add:'Add material',yarnType:'Yarn type',acrylic:'Acrylic',wool:'Wool',color:'Color',hex:'HEX code',brand:'Brand',ballG:'Ball weight',stock:'Total stock (g)',price:'Price / ball',alert:'Stock',low:'Low stock',summary:'Stock summary',total:'Total',items:'materials',noStock:'No real stock yet.',totalValue:'Inventory value',colorCard:'Color card',min:'Minimum stock (g)',save:'Save material',saving:'Saving…',cancel:'Close',edit:'Edit material',delete:'Delete',empty:'No inventory items yet.',confirmDelete:'Delete this material?',dialogSubtitle:'Record yarn and stock clearly.',saved:'Saved PDFs',pdfTitle:'Tufting Studio – Inventory'}
