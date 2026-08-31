@@ -297,8 +297,8 @@
  .wh-section-title{margin:0 0 6px!important}.wh-section-title>svg{width:32px!important;height:32px!important;padding:7px!important}.wh-section-title h2{font-size:16px!important}.wh-section-title p{font-size:8px!important}.wh-history-toggle{min-height:42px!important;font-size:11px!important}
 }
 
-/* PC/TABLET ONLY: history is always visible; no extra toggle button */
-@media (min-width:761px){
+/* PC ONLY — remove the history toggle button; keep history visible */
+@media (min-width: 761px){
   .work-hours-page .wh-history-toggle{
     display:none!important;
   }
