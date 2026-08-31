@@ -80,3 +80,11 @@
 @media(max-width:1050px) and (min-width:761px){
  .inventory-v3 .inventory-retro-palette{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+
+
+/* FINAL yarn ball SVG — wound strands like the reference, dynamic for every HEX color */
+.inventory-v3 svg.yarn-ball-v3{display:block;flex:0 0 auto;border-radius:50%;overflow:visible;background:none!important;border:0!important;box-shadow:none!important}
+.inventory-v3 svg.yarn-ball-v3.xs{width:26px;height:26px}
+.inventory-v3 svg.yarn-ball-v3.md{width:46px;height:46px}
+.inventory-v3 svg.yarn-ball-v3.xl{width:96px;height:96px;filter:drop-shadow(0 5px 9px rgba(30,35,45,.18))}
+.inventory-v3 svg.yarn-ball-v3::before,.inventory-v3 svg.yarn-ball-v3::after,.inventory-v3 svg.yarn-ball-v3 i{display:none!important}
