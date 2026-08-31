@@ -534,3 +534,433 @@
     border-color:var(--neutral-line)!important;
   }
 }
+
+/* ========================================================================
+   BUSINESS MOBILE — iPhone / Android, MOBILE ONLY
+   Orders / Inventory / Expenses
+   Desktop/tablet rules above stay untouched.
+   ======================================================================== */
+@media (max-width:760px){
+  .retro-business-page{
+    --m-bg:#fffaf1;
+    --m-card:#fffdf9;
+    --m-line:#e8dece;
+    --m-text:#142038;
+    --m-muted:#756b60;
+    --m-dark:#1f2c28;
+    --m-accent:#1f6f55;
+    width:100%;
+    min-width:0;
+    padding:10px 10px 92px!important;
+    margin:0!important;
+    background:var(--m-bg)!important;
+    color:var(--m-text)!important;
+  }
+
+  .retro-business-page .business-shell-card{
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+    padding:0!important;
+    min-width:0!important;
+  }
+
+  /* Header like the phone reference */
+  .retro-business-page .business-head{
+    display:grid!important;
+    grid-template-columns:44px minmax(0,1fr)!important;
+    gap:10px 10px!important;
+    align-items:center!important;
+    padding:2px 2px 10px!important;
+  }
+  .retro-business-page .business-number{display:none!important}
+  .retro-business-page .business-title-icon{
+    width:42px!important;
+    height:42px!important;
+    border-radius:13px!important;
+    background:#eef3eb!important;
+    color:var(--m-accent)!important;
+    border:1px solid #dde8df!important;
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+  .retro-business-page .business-title-icon svg{width:21px!important;height:21px!important}
+  .retro-business-page .business-heading{grid-column:2!important;min-width:0!important}
+  .retro-business-page .business-heading h1{
+    font-size:28px!important;
+    line-height:1.05!important;
+    margin:0!important;
+    color:var(--m-text)!important;
+    letter-spacing:-.5px!important;
+  }
+  .retro-business-page .business-heading p{
+    font-size:12px!important;
+    margin:4px 0 0!important;
+    color:var(--m-muted)!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .retro-business-page .business-actions{
+    grid-column:1 / -1!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto auto!important;
+    gap:7px!important;
+    width:100%!important;
+    align-items:center!important;
+    margin-top:3px!important;
+  }
+  .retro-business-page .business-actions .biz-search{
+    grid-column:1!important;
+    height:42px!important;
+    min-width:0!important;
+    border:1px solid var(--m-line)!important;
+    background:#fff!important;
+    border-radius:12px!important;
+    padding:0 11px!important;
+  }
+  .retro-business-page .business-actions .biz-search svg{width:17px!important;height:17px!important}
+  .retro-business-page .business-actions .biz-search input{font-size:13px!important;min-width:0!important}
+  .retro-business-page .business-actions .biz-btn:not(.primary){
+    width:42px!important;
+    min-width:42px!important;
+    height:42px!important;
+    padding:0!important;
+    border-radius:12px!important;
+    background:#fff!important;
+    color:var(--m-text)!important;
+    border:1px solid var(--m-line)!important;
+    font-size:0!important;
+  }
+  .retro-business-page .business-actions .biz-btn:not(.primary) svg{width:18px!important;height:18px!important;margin:0!important}
+  .retro-business-page .business-actions .biz-btn.primary{
+    position:fixed!important;
+    z-index:35!important;
+    left:14px!important;
+    right:14px!important;
+    bottom:76px!important;
+    width:auto!important;
+    height:48px!important;
+    border-radius:13px!important;
+    display:flex!important;
+    justify-content:center!important;
+    gap:8px!important;
+    background:var(--m-accent)!important;
+    color:#fff!important;
+    border:0!important;
+    box-shadow:0 8px 24px rgba(20,56,45,.2)!important;
+    font-size:15px!important;
+    font-weight:800!important;
+  }
+
+  /* Horizontal status/category filters */
+  .retro-business-page .biz-filter-row{
+    display:flex!important;
+    gap:7px!important;
+    overflow-x:auto!important;
+    scrollbar-width:none!important;
+    padding:1px 1px 9px!important;
+    margin:0!important;
+  }
+  .retro-business-page .biz-filter-row::-webkit-scrollbar{display:none!important}
+  .retro-business-page .biz-chip{
+    flex:0 0 auto!important;
+    min-height:31px!important;
+    border-radius:999px!important;
+    padding:0 12px!important;
+    font-size:12px!important;
+    background:#f4efe6!important;
+    border:1px solid var(--m-line)!important;
+    color:var(--m-muted)!important;
+  }
+  .retro-business-page .biz-chip.active{
+    background:#e3eee7!important;
+    color:#1d634e!important;
+    border-color:#c9dfd1!important;
+  }
+
+  /* Table becomes compact phone list/cards */
+  .retro-business-page .business-table-wrap{
+    border:0!important;
+    background:transparent!important;
+    border-radius:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    max-height:calc(100dvh - 286px)!important;
+    min-height:240px!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding:0 1px 3px!important;
+  }
+  .retro-business-page .business-table{
+    display:block!important;
+    width:100%!important;
+    border:0!important;
+    background:transparent!important;
+  }
+  .retro-business-page .business-table thead{display:none!important}
+  .retro-business-page .business-table tbody{display:grid!important;gap:8px!important;width:100%!important}
+  .retro-business-page .business-table tr{
+    display:block!important;
+    position:relative!important;
+    padding:12px 42px 10px 12px!important;
+    border:1px solid var(--m-line)!important;
+    border-radius:14px!important;
+    background:var(--m-card)!important;
+    box-shadow:0 2px 7px rgba(59,44,24,.04)!important;
+    min-width:0!important;
+  }
+  .retro-business-page .business-table td{
+    border:0!important;
+    padding:3px 0!important;
+    min-height:0!important;
+    color:var(--m-text)!important;
+    font-size:13px!important;
+    white-space:normal!important;
+  }
+  .retro-business-page .business-table td::before{
+    display:inline-block;
+    min-width:82px;
+    margin-right:5px;
+    color:var(--m-muted);
+    font-size:11px;
+    font-weight:700;
+  }
+  .retro-business-page .business-table .biz-person{display:inline-flex!important;gap:7px!important}
+  .retro-business-page .business-table .biz-avatar{width:25px!important;height:25px!important;font-size:9px!important}
+  .retro-business-page .biz-status,
+  .retro-business-page .payment-pill,
+  .retro-business-page .biz-stock-ok,
+  .retro-business-page .biz-stock-alert{
+    padding:4px 8px!important;
+    border-radius:999px!important;
+    font-size:11px!important;
+    background:#f1ece4!important;
+    color:var(--m-text)!important;
+    border:1px solid var(--m-line)!important;
+  }
+  .retro-business-page .biz-kebab{
+    position:absolute!important;
+    top:9px!important;
+    right:8px!important;
+    width:32px!important;
+    height:32px!important;
+    border:0!important;
+    border-radius:10px!important;
+    background:#f7f2ea!important;
+    color:var(--m-text)!important;
+    font-size:17px!important;
+  }
+  .retro-business-page .pdf-mini{font-size:11px!important;padding:4px 8px!important}
+  .retro-business-page .biz-empty{
+    padding:52px 14px!important;
+    text-align:center!important;
+    color:var(--m-muted)!important;
+    font-size:14px!important;
+    border:1px dashed var(--m-line)!important;
+    border-radius:14px!important;
+    background:#fffdf9!important;
+  }
+
+  /* ORDER compact fields */
+  .orders .orders-table td:nth-child(1)::before{content:'Klienti:'}
+  .orders .orders-table td:nth-child(2)::before{content:'Projekti:'}
+  .orders .orders-table td:nth-child(3)::before{content:'Përmasat:'}
+  .orders .orders-table td:nth-child(4)::before{content:'Çmimi:'}
+  .orders .orders-table td:nth-child(5),
+  .orders .orders-table td:nth-child(6),
+  .orders .orders-table td:nth-child(9){display:none!important}
+  .orders .orders-table td:nth-child(7)::before{content:'Statusi:'}
+  .orders .orders-table td:nth-child(8)::before{content:'Afati:'}
+  .orders .orders-table td:last-child{display:block!important}
+  .orders .orders-table td:last-child::before{display:none!important}
+
+  /* INVENTORY compact fields */
+  .inventory .inventory-table td:nth-child(1)::before{content:'Lloji:'}
+  .inventory .inventory-table td:nth-child(2)::before{content:'Ngjyra:'}
+  .inventory .inventory-table td:nth-child(3)::before{content:'HEX:'}
+  .inventory .inventory-table td:nth-child(4),
+  .inventory .inventory-table td:nth-child(5){display:none!important}
+  .inventory .inventory-table td:nth-child(6)::before{content:'Stoku:'}
+  .inventory .inventory-table td:nth-child(7)::before{content:'Çmimi:'}
+  .inventory .inventory-table td:nth-child(8)::before{content:'Alarm:'}
+  .inventory .inventory-table td:last-child{display:block!important}
+  .inventory .inventory-table td:last-child::before{display:none!important}
+
+  /* EXPENSES compact fields */
+  .expenses .expenses-table td:nth-child(1)::before{content:'Kategoria:'}
+  .expenses .expenses-table td:nth-child(2)::before{content:'Përshkrimi:'}
+  .expenses .expenses-table td:nth-child(3)::before{content:'Shuma:'}
+  .expenses .expenses-table td:nth-child(4)::before{content:'Data:'}
+  .expenses .expenses-table td:nth-child(5),
+  .expenses .expenses-table td:nth-child(6),
+  .expenses .expenses-table td:nth-child(7){display:none!important}
+  .expenses .expenses-table td:last-child{display:block!important}
+  .expenses .expenses-table td:last-child::before{display:none!important}
+
+  /* Inventory / Expenses summary becomes a compact top strip */
+  .retro-business-page .biz-layout-split{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:8px!important;
+  }
+  .inventory .biz-layout-split .biz-summary,
+  .expenses .biz-layout-split .biz-summary{
+    order:-1!important;
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    align-items:center!important;
+    gap:5px 10px!important;
+    padding:10px 12px!important;
+    border:1px solid var(--m-line)!important;
+    border-radius:14px!important;
+    background:#fffdf9!important;
+    min-height:0!important;
+  }
+  .inventory .biz-summary h2,
+  .inventory .biz-summary h3,
+  .expenses .biz-summary h2,
+  .expenses .biz-summary h3{font-size:14px!important;margin:0!important}
+  .inventory .biz-donut,
+  .inventory .biz-legend,
+  .expenses .biz-donut,
+  .expenses .biz-legend{display:none!important}
+  .expenses .biz-month-select{grid-column:1 / -1!important;height:36px!important;font-size:12px!important}
+  .expenses .biz-month-card{padding:0!important;border:0!important;background:transparent!important}
+  .expenses .biz-month-card label{font-size:11px!important;color:var(--m-muted)!important}
+  .expenses .biz-month-card strong{font-size:20px!important;color:var(--m-text)!important}
+  .expenses .biz-bottom-stats{grid-column:2!important;display:flex!important;gap:6px!important}
+  .expenses .biz-mini-stat{padding:6px 9px!important;min-width:70px!important;background:#f5f0e8!important;border:1px solid var(--m-line)!important;border-radius:10px!important}
+  .expenses .biz-mini-stat span{font-size:9px!important}.expenses .biz-mini-stat strong{font-size:14px!important}
+
+  /* Saved PDFs remain available, but compact and internally scrollable */
+  .retro-business-page .saved-docs{
+    margin:9px 0 0!important;
+    padding:10px!important;
+    border:1px solid var(--m-line)!important;
+    border-radius:14px!important;
+    background:#fffdf9!important;
+    max-height:118px!important;
+    overflow:auto!important;
+  }
+  .retro-business-page .saved-docs h3{font-size:14px!important;margin:0 0 7px!important}
+  .retro-business-page .saved-doc-grid{display:grid!important;gap:6px!important}
+  .retro-business-page .saved-doc{padding:8px!important;border-radius:10px!important;min-width:0!important}
+  .retro-business-page .saved-doc b{font-size:11px!important}.retro-business-page .saved-doc small{font-size:9px!important}
+
+  /* Full-screen mobile forms; only the form body scrolls */
+  .retro-business-page .biz-dialog,
+  .biz-dialog.retro-dialog{
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    max-width:none!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:#fffaf2!important;
+    overflow:hidden!important;
+  }
+  .biz-dialog::backdrop{background:rgba(16,21,24,.48)!important;backdrop-filter:blur(3px)!important}
+  .biz-dialog .biz-dialog-head{
+    position:sticky!important;
+    top:0!important;
+    z-index:5!important;
+    min-height:74px!important;
+    padding:12px 14px!important;
+    background:#fffaf2!important;
+    border-bottom:1px solid var(--m-line)!important;
+    display:grid!important;
+    grid-template-columns:42px 1fr 38px!important;
+    gap:10px!important;
+    align-items:center!important;
+  }
+  .biz-dialog .biz-dialog-head .business-title-icon{width:42px!important;height:42px!important;border-radius:12px!important;background:#eef3eb!important;color:var(--m-accent)!important}
+  .biz-dialog .biz-dialog-head h2{font-size:21px!important;margin:0!important;color:var(--m-text)!important}
+  .biz-dialog .biz-dialog-head p{font-size:11px!important;margin:2px 0 0!important;color:var(--m-muted)!important}
+  .biz-dialog .biz-dialog-close{width:36px!important;height:36px!important;border-radius:50%!important;background:#fff!important;border:1px solid var(--m-line)!important}
+
+  .biz-dialog .biz-form{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:9px!important;
+    padding:12px 12px 96px!important;
+    max-height:calc(100dvh - 74px)!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    background:#fffaf2!important;
+  }
+  .biz-dialog .retro-field-card,
+  .biz-dialog .retro-field-card.yellow,
+  .biz-dialog .retro-field-card.orange,
+  .biz-dialog .retro-field-card.pink,
+  .biz-dialog .retro-field-card.coral,
+  .biz-dialog .retro-field-card.purple,
+  .biz-dialog .retro-field-card.green,
+  .biz-dialog .retro-field-card.blue{
+    grid-column:1!important;
+    background:#fffdf9!important;
+    border:1px solid var(--m-line)!important;
+    border-radius:13px!important;
+    padding:10px!important;
+    box-shadow:none!important;
+  }
+  .biz-dialog .retro-field-title{font-size:13px!important;color:var(--m-text)!important;margin-bottom:7px!important}
+  .biz-dialog .retro-field-title svg{width:16px!important;height:16px!important;color:var(--m-text)!important;stroke:currentColor!important}
+  .biz-dialog input,
+  .biz-dialog select,
+  .biz-dialog textarea{
+    width:100%!important;
+    min-height:44px!important;
+    border-radius:10px!important;
+    border:1px solid #d9cebe!important;
+    background:#fff!important;
+    color:var(--m-text)!important;
+    font-size:14px!important;
+  }
+  .biz-dialog textarea{min-height:82px!important}
+  .biz-dialog .inline-two{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important}
+  .biz-dialog .choice-row{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:7px!important}
+  .biz-dialog .choice-row button{min-height:42px!important;border-radius:10px!important;background:#fff!important;color:var(--m-text)!important;border:1px solid #d9cebe!important}
+  .biz-dialog .choice-row button.active{background:#eee5d8!important;border-color:#bba98e!important;box-shadow:inset 0 0 0 1px #bba98e!important}
+
+  .biz-dialog .biz-form-actions{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    z-index:10!important;
+    display:grid!important;
+    grid-template-columns:auto 1fr!important;
+    gap:8px!important;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom))!important;
+    background:rgba(255,250,242,.97)!important;
+    border-top:1px solid var(--m-line)!important;
+    backdrop-filter:blur(10px)!important;
+  }
+  .biz-dialog .biz-form-actions .biz-btn{height:46px!important;border-radius:11px!important;font-size:13px!important;padding:0 14px!important}
+  .biz-dialog .biz-form-actions .retro-save{background:var(--m-accent)!important;color:#fff!important;border:0!important}
+  .biz-dialog .biz-form-actions .danger{grid-column:1 / -1!important;order:-1!important;color:#b54238!important;background:#fff4f1!important;border:1px solid #edc8c1!important}
+
+  /* Inventory yarn catalog: larger useful swatches, scrolls inside its own card */
+  .inventory-dialog .yarn-color-catalog{
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    gap:7px!important;
+    max-height:132px!important;
+    overflow-y:auto!important;
+    padding:2px 2px 4px!important;
+  }
+  .inventory-dialog .yarn-color-catalog button{
+    min-height:30px!important;
+    border-radius:8px!important;
+    border:2px solid #fff!important;
+    box-shadow:0 0 0 1px #cfc4b6!important;
+  }
+  .inventory-dialog .yarn-color-catalog button.selected{box-shadow:0 0 0 3px #24302d!important}
+
+  /* Keep the app's existing mobile/bottom navigation visible */
+  .retro-business-page + *{min-width:0!important}
+}
