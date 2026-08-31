@@ -82,72 +82,103 @@
 }
 
 
-/* FINAL yarn ball SVG — wound strands like the reference, dynamic for every HEX color */
-.inventory-v3 svg.yarn-ball-v3{display:block;flex:0 0 auto;border-radius:50%;overflow:visible;background:none!important;border:0!important;box-shadow:none!important}
-.inventory-v3 svg.yarn-ball-v3.xs{width:26px;height:26px}
-.inventory-v3 svg.yarn-ball-v3.md{width:46px;height:46px}
-.inventory-v3 svg.yarn-ball-v3.xl{width:96px;height:96px;filter:drop-shadow(0 5px 9px rgba(30,35,45,.18))}
-.inventory-v3 svg.yarn-ball-v3::before,.inventory-v3 svg.yarn-ball-v3::after,.inventory-v3 svg.yarn-ball-v3 i{display:none!important}
-
-
-/* ===== REAL YARN BALL — reference-based fiber texture ===== */
-.inventory-v3 .real-yarn-ball{
-  --yarn-color:#FB7DA8;
+/* ===== Yarn ball: real strand reference, dynamic HEX ===== */
+.inventory-v3 .yarn-ball-photo{
+  --yarn:#FB7DA8;
   position:relative;
   display:inline-block;
   flex:0 0 auto;
-  border-radius:50%;
   overflow:hidden;
+  border-radius:50%;
   background:
-    radial-gradient(circle at 34% 28%, rgba(255,255,255,.28) 0 9%, rgba(255,255,255,.08) 25%, transparent 48%),
-    radial-gradient(circle at 68% 74%, rgba(0,0,0,.11), transparent 42%),
-    var(--yarn-color);
-  border:2px solid #fffaf1;
-  box-shadow:
-    0 2px 7px rgba(25,30,38,.20),
-    inset 0 0 0 1px rgba(18,24,33,.13);
+    radial-gradient(circle at 34% 26%,rgba(255,255,255,.26) 0 9%,transparent 30%),
+    radial-gradient(circle at 69% 76%,rgba(0,0,0,.13),transparent 45%),
+    var(--yarn);
+  border:2px solid #fffdf8;
+  box-shadow:0 2px 7px rgba(25,31,42,.18), inset 0 0 0 1px rgba(20,25,35,.13);
   vertical-align:middle;
 }
-.inventory-v3 .real-yarn-ball img{
+.inventory-v3 .yarn-ball-photo::before{
+  content:"";
   position:absolute;
   inset:0;
-  width:100%;
-  height:100%;
+  border-radius:50%;
+  background:radial-gradient(circle at 36% 30%,rgba(255,255,255,.24),transparent 32%);
+  pointer-events:none;
+  z-index:3;
+}
+.inventory-v3 .yarn-ball-photo img{
+  position:absolute;
+  inset:-4%;
+  width:108%;
+  height:108%;
   object-fit:cover;
-  display:block;
-  opacity:.74;
-  mix-blend-mode:multiply;
   pointer-events:none;
   user-select:none;
 }
-.inventory-v3 .real-yarn-ball .real-yarn-highlight{
-  position:absolute;
-  inset:0;
-  border-radius:50%;
-  background:
-    radial-gradient(ellipse at 31% 25%, rgba(255,255,255,.30) 0 8%, transparent 32%),
-    linear-gradient(145deg, rgba(255,255,255,.12), transparent 44%, rgba(0,0,0,.07));
-  pointer-events:none;
+.inventory-v3 .yarn-ball-photo .yarn-fibers-dark{
+  filter:brightness(0) saturate(0);
+  opacity:.22;
+  mix-blend-mode:multiply;
+  transform:translate(.35px,.45px);
 }
-.inventory-v3 .real-yarn-ball::after{
-  content:"";
-  position:absolute;
-  inset:1px;
-  border-radius:50%;
-  border:1px solid rgba(25,30,38,.13);
-  pointer-events:none;
+.inventory-v3 .yarn-ball-photo .yarn-fibers-light{
+  opacity:.52;
+  mix-blend-mode:screen;
 }
-.inventory-v3 .real-yarn-ball.xs{width:27px;height:27px}
-.inventory-v3 .real-yarn-ball.md{width:43px;height:43px}
-.inventory-v3 .real-yarn-ball.xl{
-  width:96px;
-  height:96px;
-  border-width:4px;
-  box-shadow:
-    0 7px 18px rgba(25,30,38,.22),
-    inset 0 0 0 1px rgba(18,24,33,.12);
+.inventory-v3 .yarn-ball-photo.xs{width:26px;height:26px}
+.inventory-v3 .yarn-ball-photo.md{width:42px;height:42px}
+.inventory-v3 .yarn-ball-photo.xl{width:88px;height:88px;border-width:4px;box-shadow:0 7px 18px rgba(25,31,42,.20),inset 0 0 0 1px rgba(20,25,35,.13)}
+/* old artificial ball must never show */
+.inventory-v3 .yarn-ball-v3{display:none!important}
+
+
+/* ===== FINAL PROFESSIONAL YARN BALL ===== */
+.inventory-v3 .yarn-ball-pro{
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 auto;
+  vertical-align:middle;
+  filter:drop-shadow(0 2px 4px rgba(20,28,40,.16));
+}
+.inventory-v3 .yarn-ball-pro svg{
+  width:100%;
+  height:100%;
+  display:block;
+  overflow:visible;
+}
+.inventory-v3 .yarn-ball-pro.xs{width:30px;height:30px}
+.inventory-v3 .yarn-ball-pro.md{width:46px;height:46px}
+.inventory-v3 .yarn-ball-pro.xl{width:92px;height:92px}
+.inventory-v3 .inventory-yarn-cell{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.inventory-v3 .inventory-yarn-cell .yarn-ball-pro{
+  margin-right:2px;
 }
 
-/* Hide any legacy yarn-ball CSS if browser cached older selectors. */
-.inventory-v3 svg.yarn-ball-v3,
-.inventory-v3 .yarn-ball-v3{display:none!important}
+
+/* ===== FINAL YARN SKEIN (labelled bundle) ===== */
+.inventory-v3 .yarn-skein-pro{
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 auto;
+  vertical-align:middle;
+  filter:drop-shadow(0 2px 4px rgba(21,28,38,.16));
+}
+.inventory-v3 .yarn-skein-pro svg{
+  width:100%;
+  height:100%;
+  display:block;
+  overflow:visible;
+}
+.inventory-v3 .yarn-skein-pro.xs{width:48px;height:30px}
+.inventory-v3 .yarn-skein-pro.md{width:72px;height:42px}
+.inventory-v3 .yarn-skein-pro.xl{width:140px;height:82px}
+.inventory-v3 .inventory-yarn-cell{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
