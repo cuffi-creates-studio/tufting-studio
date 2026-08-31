@@ -343,3 +343,194 @@
   .inventory-dialog .inventory-color-preview{width:62px;height:38px;border:2px solid #fffdf8;box-shadow:0 0 0 1px #111}
   .inventory-dialog .color-preview-wrap input[type=color]{width:54px;height:38px;border:1.5px solid #111!important;background:#fffdf8!important}
 }
+
+
+/* ==========================================================================
+   NEUTRAL BUSINESS UI — FINAL OVERRIDE, PC/TABLET ONLY
+   Orders / Inventory / Expenses use one calm neutral system.
+   Only real data visualizations (inventory color statistics) remain colorful.
+   ========================================================================== */
+@media (min-width:761px){
+  .retro-business-page{
+    --neutral-bg:#FFFDF8;
+    --neutral-card:#FFFCF6;
+    --neutral-soft:#F7F1E8;
+    --neutral-soft-2:#EFE6D9;
+    --neutral-line:#E4D7C6;
+    --neutral-text:#142038;
+    --neutral-muted:#766B5D;
+    --neutral-dark:#242526;
+  }
+
+  /* Main containers */
+  .retro-business-page .business-shell-card,
+  .retro-business-page .saved-docs,
+  .retro-business-page .biz-summary,
+  .retro-business-page .business-table-wrap{
+    background:var(--neutral-bg)!important;
+  }
+
+  /* Tables: one neutral header, no rainbow columns/rows */
+  .retro-business-page .business-table{
+    background:var(--neutral-bg)!important;
+    border:1px solid var(--neutral-line)!important;
+  }
+  .retro-business-page .business-table thead th,
+  .retro-business-page .business-table thead th:nth-child(n){
+    background:var(--neutral-soft)!important;
+    color:var(--neutral-text)!important;
+    border-bottom:1px solid var(--neutral-line)!important;
+    font-weight:900!important;
+  }
+  .retro-business-page .business-table tbody tr,
+  .retro-business-page .business-table tbody tr:nth-child(n){
+    background:var(--neutral-bg)!important;
+  }
+  .retro-business-page .business-table tbody tr:nth-child(even){
+    background:#FFFAF2!important;
+  }
+  .retro-business-page .business-table tbody tr:hover{
+    background:#F9F2E8!important;
+    filter:none!important;
+  }
+  .retro-business-page .business-table td,
+  .retro-business-page .business-table td b,
+  .retro-business-page .business-table code{color:var(--neutral-text)!important}
+
+  /* Modal field cards: same neutral card everywhere */
+  .retro-business-page .retro-field-card,
+  .retro-business-page .retro-field-card.yellow,
+  .retro-business-page .retro-field-card.orange,
+  .retro-business-page .retro-field-card.pink,
+  .retro-business-page .retro-field-card.coral,
+  .retro-business-page .retro-field-card.purple,
+  .retro-business-page .retro-field-card.green,
+  .retro-business-page .retro-field-card.blue{
+    background:var(--neutral-card)!important;
+    border:1px solid var(--neutral-line)!important;
+    box-shadow:none!important;
+  }
+  .retro-business-page .retro-field-title,
+  .retro-business-page .retro-field-title svg,
+  .retro-business-page .retro-field-card label,
+  .retro-business-page .retro-field-card small{
+    color:var(--neutral-text)!important;
+    stroke:currentColor!important;
+    text-shadow:none!important;
+  }
+  .retro-business-page .retro-field-card input,
+  .retro-business-page .retro-field-card select,
+  .retro-business-page .retro-field-card textarea{
+    background:#FFF!important;
+    color:var(--neutral-text)!important;
+    border:1px solid #D9CBB9!important;
+    box-shadow:none!important;
+  }
+  .retro-business-page .retro-field-card input:focus,
+  .retro-business-page .retro-field-card select:focus,
+  .retro-business-page .retro-field-card textarea:focus{
+    outline:2px solid #C9B69C!important;
+    outline-offset:1px!important;
+  }
+
+  /* Neutral choices/buttons */
+  .retro-business-page .choice-row button,
+  .retro-business-page .choice-row button.active.acrylic,
+  .retro-business-page .choice-row button.active.wool,
+  .retro-business-page .choice-row button.active.gram{
+    background:#FFF!important;
+    color:var(--neutral-text)!important;
+    border:1px solid #D9CBB9!important;
+  }
+  .retro-business-page .choice-row button.active{
+    background:#EDE2D3!important;
+    border-color:#BFA98A!important;
+    box-shadow:inset 0 0 0 1px #BFA98A!important;
+  }
+
+  .retro-business-page .biz-btn,
+  .retro-business-page .biz-btn.retro-yellow,
+  .retro-business-page .biz-btn.retro-purple,
+  .retro-business-page .pdf-mini,
+  .retro-business-page .saved-doc button{
+    background:#FFF!important;
+    color:var(--neutral-text)!important;
+    border:1px solid var(--neutral-line)!important;
+  }
+  .retro-business-page .biz-btn.primary,
+  .retro-business-page .retro-save{
+    background:var(--neutral-dark)!important;
+    color:#FFF!important;
+    border-color:var(--neutral-dark)!important;
+  }
+  .retro-business-page .biz-btn.danger,
+  .retro-business-page .danger-mini{
+    background:#FFF!important;
+    color:#B33A32!important;
+    border-color:#E1B9B4!important;
+  }
+
+  /* Small labels stay subtle, not rainbow */
+  .retro-business-page .biz-status,
+  .retro-business-page .biz-status.progress,
+  .retro-business-page .biz-status.wait,
+  .retro-business-page .biz-status.material,
+  .retro-business-page .biz-status.done,
+  .retro-business-page .payment-pill,
+  .retro-business-page .biz-stock-ok,
+  .retro-business-page .biz-stock-alert{
+    background:#EFE6D9!important;
+    color:var(--neutral-text)!important;
+    border:1px solid #DDCFBC!important;
+  }
+  .retro-business-page .biz-stock-alert{color:#A23B31!important;background:#FFF3F0!important;border-color:#E7BBB5!important}
+
+  /* Saved PDFs */
+  .retro-business-page .saved-doc{
+    background:#FFFCF6!important;
+    border:1px solid var(--neutral-line)!important;
+  }
+
+  /* Inventory color catalog: neutral container, many practical yarn colors. */
+  .inventory-dialog .color-card{
+    background:var(--neutral-card)!important;
+    border-color:var(--neutral-line)!important;
+  }
+  .inventory-dialog .yarn-color-catalog{
+    grid-template-columns:repeat(12,minmax(0,1fr))!important;
+    gap:6px!important;
+    padding-top:2px!important;
+  }
+  .inventory-dialog .yarn-color-catalog button{
+    min-height:25px!important;
+    border:2px solid #FFF!important;
+    border-radius:7px!important;
+    box-shadow:0 0 0 1px #D4C7B5!important;
+    transition:transform .12s ease,box-shadow .12s ease!important;
+  }
+  .inventory-dialog .yarn-color-catalog button:hover{transform:translateY(-1px)!important}
+  .inventory-dialog .yarn-color-catalog button.selected{
+    box-shadow:0 0 0 3px #242526!important;
+    transform:scale(1.05)!important;
+  }
+  .inventory-dialog .color-preview-wrap{
+    border-top:1px solid var(--neutral-line)!important;
+    margin-top:8px!important;
+    padding-top:9px!important;
+  }
+
+  /* IMPORTANT: statistics remain colorful from real saved data only. */
+  .inventory .biz-donut.inventory-color-donut{filter:none!important}
+  .inventory .biz-legend-dot{border:1px solid rgba(0,0,0,.12)!important}
+  .inventory .biz-legend-row{color:var(--neutral-text)!important}
+
+  /* Expenses summary is neutral unless real category colors are supplied by its chart. */
+  .expenses .biz-summary-total,
+  .expenses .expense-stat-card,
+  .expenses .expense-average-card,
+  .expenses .expense-count-card{
+    background:var(--neutral-card)!important;
+    color:var(--neutral-text)!important;
+    border-color:var(--neutral-line)!important;
+  }
+}
