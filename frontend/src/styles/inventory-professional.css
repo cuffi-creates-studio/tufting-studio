@@ -8,3 +8,74 @@
 .inventory-pro .inventory-form{padding:16px 18px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fffdf8}.inventory-pro .inventory-field-card{border:1px solid var(--ip-line);border-radius:14px;padding:12px 13px;min-width:0;background:#fff}.inventory-pro .inventory-field-card.pink{background:#fff1f6;border-color:#f4cfe0}.inventory-pro .inventory-field-card.green,.inventory-pro .inventory-field-card.mint{background:#effaf6;border-color:#cde9df}.inventory-pro .inventory-field-card.purple{background:#f5f0ff;border-color:#dfd3fa}.inventory-pro .inventory-field-card.yellow{background:#fff5df;border-color:#f2dfb8}.inventory-pro .inventory-field-card.coral{background:#fff1ed;border-color:#f6d0c7}.inventory-pro .inventory-field-card.blue,.inventory-pro .inventory-field-card.sky{background:#eef7ff;border-color:#cfe3f5}.inventory-pro .inventory-field-card.rose{background:#fff0f5;border-color:#f3cbd9}.inventory-pro .inventory-field-card label{display:grid;gap:7px;font-size:13px;font-weight:900}.inventory-pro .field-label{font-size:13px;font-weight:900;margin-bottom:8px}.inventory-pro .inventory-field-card small{display:block;margin-top:7px;color:#7b7269;font-size:10.5px;line-height:1.25}.inventory-pro .inventory-field-card input{width:100%;height:40px;border:1px solid #dcc9b5;border-radius:10px;background:#fffdf9;padding:0 11px;font:inherit;font-size:13px;font-weight:650;color:var(--ip-ink);outline:none}.inventory-pro .inventory-field-card input:focus{border-color:#058CD7;box-shadow:0 0 0 3px rgba(5,140,215,.10)}.inventory-pro .choice-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.inventory-pro .choice-row.grams{grid-template-columns:repeat(3,1fr)}.inventory-pro .choice-row button{height:38px;border-radius:9px;border:1px solid #e3d0be;background:#fffdf8;font-weight:900;cursor:pointer}.inventory-pro .pink .choice-row button.active{background:var(--ip-pink);border-color:var(--ip-pink);color:#fff}.inventory-pro .yellow .choice-row button.active{background:var(--ip-yellow);border-color:#efaa21;color:#172033}.inventory-pro .color-card{grid-row:span 2;display:grid;grid-template-columns:1fr;gap:10px}.inventory-pro .skein-preview{display:flex;align-items:center;gap:12px}.inventory-pro .skein-preview>div{display:grid;gap:4px}.inventory-pro .skein-preview b{font-size:14px}.inventory-pro .skein-preview code{font-size:11px;color:#6d6258}.inventory-pro .preset-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}.inventory-pro .preset-grid button{height:28px;border-radius:8px;background:var(--preset);border:2px solid #fff;box-shadow:0 0 0 1px #d8c7b5;cursor:pointer}.inventory-pro .preset-grid button.selected{box-shadow:0 0 0 2px #10213d,0 0 0 4px #fff}.inventory-pro .input-unit{display:grid;grid-template-columns:1fr auto;align-items:center;border:1px solid #dcc9b5;border-radius:10px;background:#fffdf9;overflow:hidden}.inventory-pro .input-unit input{border:0!important;box-shadow:none!important}.inventory-pro .input-unit span{padding:0 11px;font-size:12px;font-weight:900}.inventory-pro .input-unit.euro{grid-template-columns:auto 1fr}.inventory-pro .hex-row{display:grid;grid-template-columns:1fr 44px;gap:7px}.inventory-pro .native-color{padding:4px!important;cursor:pointer}.inventory-pro .inventory-form-actions{grid-column:1/-1;display:grid;grid-template-columns:auto 1fr auto auto;gap:9px;align-items:center;border-top:1px solid var(--ip-line);padding-top:13px;margin-top:1px}.inventory-pro .inventory-form-actions .biz-btn{height:40px}
 @media(min-width:761px) and (max-width:1180px){.inventory-pro .inventory-layout{grid-template-columns:1fr}.inventory-pro .inventory-layout .business-table-wrap{border-right:0;border-bottom:1px solid var(--ip-line)}.inventory-pro .inventory-table{min-width:930px}.inventory-pro .inventory-summary{max-width:none}.inventory-pro .inventory-dialog{width:min(720px,calc(100vw - 34px))}}
 @media(max-width:760px){.inventory-pro .inventory-kpis{display:none}.inventory-pro .inventory-dialog{width:calc(100vw - 18px);max-height:calc(100vh - 18px)}.inventory-pro .inventory-form{grid-template-columns:1fr}.inventory-pro .inventory-form-actions{grid-column:1;grid-template-columns:1fr 1fr}.inventory-pro .inventory-form-actions>span{display:none}.inventory-pro .inventory-form-actions .danger{grid-column:1/-1}.inventory-pro .inventory-table{min-width:980px}}
+
+
+/* ===== PHOTOREAL YARN — ONLY THE YARN COMPONENT ===== */
+.inventory-pro .yarn-real-photo{
+  position:relative;
+  display:inline-block;
+  flex:0 0 auto;
+  overflow:visible;
+  vertical-align:middle;
+  filter:drop-shadow(0 2px 4px rgba(20,28,38,.16));
+}
+.inventory-pro .yarn-real-photo.row{width:74px;height:34px}
+.inventory-pro .yarn-real-photo.tiny{width:42px;height:20px}
+.inventory-pro .yarn-real-photo.mini{width:58px;height:27px}
+.inventory-pro .yarn-real-photo.preview{width:126px;height:58px}
+.inventory-pro .yarn-real-photo.empty{width:132px;height:60px}
+.inventory-pro .yarn-real-photo.summary{width:118px;height:54px}
+
+.inventory-pro .yarn-real-color,
+.inventory-pro .yarn-real-fibers{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  display:block;
+  pointer-events:none;
+  user-select:none;
+}
+.inventory-pro .yarn-real-color{
+  background:var(--yarn-color);
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+  -webkit-mask-position:center;
+  mask-position:center;
+}
+.inventory-pro .yarn-real-fibers{
+  mix-blend-mode:multiply;
+  opacity:.66;
+}
+.inventory-pro .yarn-real-photo::after{
+  content:"";
+  position:absolute;
+  inset:5% 2%;
+  border-radius:50%;
+  background:radial-gradient(ellipse at 30% 23%,rgba(255,255,255,.20),transparent 35%);
+  pointer-events:none;
+}
+.inventory-pro .yarn-real-label{
+  position:absolute;
+  top:8%;
+  bottom:8%;
+  left:43%;
+  width:14%;
+  border-radius:3px;
+  background:#F5E6C9;
+  border:1px solid rgba(106,76,34,.18);
+  box-shadow:0 1px 2px rgba(0,0,0,.06);
+  display:grid;
+  place-items:center;
+  color:#8B5E34;
+  font-family:Georgia,serif;
+  font-weight:800;
+  font-size:clamp(7px, .75em, 12px);
+  line-height:1;
+  z-index:3;
+}
+.inventory-pro .yarn-real-photo.tiny .yarn-real-label span,
+.inventory-pro .yarn-real-photo.mini .yarn-real-label span{font-size:6px}
