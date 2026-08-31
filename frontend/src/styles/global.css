@@ -1494,3 +1494,14 @@ body{background:linear-gradient(145deg,#fff8ea,#fffdf8)}
     background:#00995E!important;
   }
 }
+
+/* PC cleanup requested: hide only the duplicate back/title strip on these three pages.
+   Mobile behavior is untouched. */
+@media (min-width:761px){
+  .materials-clean-page > .mobile-page-header,
+  .real-calc-page > .mobile-page-header,
+  .projects-clean-page > .mobile-page-header{display:none!important}
+  .materials-clean-page > .page-title,
+  .real-calc-page > .page-title,
+  .projects-clean-page > .page-title{margin-top:0!important}
+}

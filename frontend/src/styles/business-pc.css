@@ -236,3 +236,110 @@
   .business-page.expenses + .saved-docs .saved-doc button{background:#552CB7;color:#fff}
   .business-page.expenses + .saved-docs .saved-doc .danger-mini{background:#FD5A46;color:#fff}
 }
+
+
+/* ==========================================================================
+   EXACT RETRO COLOR PASS — PC/TABLET ONLY
+   Only these UI colors are used: #FFC567 #FB7DA8 #FD5A46 #552CB7 #00995E #058CD7
+   Text on colored surfaces is black as requested. No gradients/pastel mixes.
+   ========================================================================== */
+@media (min-width:761px){
+  .retro-business-page{
+    --retro-yellow:#FFC567;
+    --retro-pink:#FB7DA8;
+    --retro-coral:#FD5A46;
+    --retro-purple:#552CB7;
+    --retro-green:#00995E;
+    --retro-blue:#058CD7;
+  }
+
+  /* Main tables: exact retro header colors, black lettering. */
+  .retro-business-page .business-table thead th{
+    color:#111!important;
+    font-weight:950!important;
+    border-bottom:1px solid #1112!important;
+  }
+  .retro-business-page .business-table thead th:nth-child(6n+1){background:#FFC567!important}
+  .retro-business-page .business-table thead th:nth-child(6n+2){background:#FB7DA8!important}
+  .retro-business-page .business-table thead th:nth-child(6n+3){background:#FD5A46!important}
+  .retro-business-page .business-table thead th:nth-child(6n+4){background:#552CB7!important}
+  .retro-business-page .business-table thead th:nth-child(6n+5){background:#00995E!important}
+  .retro-business-page .business-table thead th:nth-child(6n){background:#058CD7!important}
+  .retro-business-page .business-table tbody tr{background:#fffdf8!important}
+  .retro-business-page .business-table tbody tr:nth-child(even){background:#fff8ee!important}
+  .retro-business-page .business-table td,
+  .retro-business-page .business-table td b{color:#111!important}
+
+  /* Modal cards: exact solid retro colors, no invented tints/gradients. */
+  .retro-business-page .retro-field-card{
+    border:1.5px solid #111!important;
+    box-shadow:0 5px 12px rgba(32,24,15,.06)!important;
+  }
+  .retro-business-page .retro-field-card.yellow,
+  .retro-business-page .retro-field-card.orange{background:#FFC567!important;border-color:#111!important}
+  .retro-business-page .retro-field-card.pink{background:#FB7DA8!important;border-color:#111!important}
+  .retro-business-page .retro-field-card.coral{background:#FD5A46!important;border-color:#111!important}
+  .retro-business-page .retro-field-card.purple{background:#552CB7!important;border-color:#111!important}
+  .retro-business-page .retro-field-card.green{background:#00995E!important;border-color:#111!important}
+  .retro-business-page .retro-field-card.blue{background:#058CD7!important;border-color:#111!important}
+
+  .retro-business-page .retro-field-title,
+  .retro-business-page .retro-field-title svg,
+  .retro-business-page .retro-field-card label,
+  .retro-business-page .retro-field-card small{color:#111!important;stroke:#111!important}
+  .retro-business-page .retro-field-title{font-weight:950!important;text-shadow:none!important}
+  .retro-business-page .retro-field-card input,
+  .retro-business-page .retro-field-card select,
+  .retro-business-page .retro-field-card textarea{
+    background:#fffdf8!important;
+    color:#111!important;
+    border:1.5px solid #111!important;
+    font-weight:800!important;
+  }
+  .retro-business-page .retro-field-card input::placeholder,
+  .retro-business-page .retro-field-card textarea::placeholder{color:#666!important}
+
+  .retro-business-page .choice-row button{
+    background:#fffdf8!important;color:#111!important;border:1.5px solid #111!important
+  }
+  .retro-business-page .choice-row button.active.acrylic{background:#FB7DA8!important;color:#111!important;border-color:#111!important}
+  .retro-business-page .choice-row button.active.wool{background:#00995E!important;color:#111!important;border-color:#111!important}
+  .retro-business-page .choice-row button.active.gram{background:#FFC567!important;color:#111!important;border-color:#111!important}
+
+  /* Business buttons/statuses use only the same six colors. */
+  .retro-business-page .biz-btn.retro-yellow{background:#FFC567!important;color:#111!important;border-color:#111!important}
+  .retro-business-page .biz-btn.retro-purple,
+  .retro-business-page .pdf-mini{background:#552CB7!important;color:#111!important;border-color:#111!important}
+  .retro-business-page .biz-btn.primary,
+  .retro-business-page .retro-save{background:#00995E!important;color:#111!important;border-color:#111!important}
+  .retro-business-page .biz-btn.danger,
+  .retro-business-page .danger-mini{background:#FD5A46!important;color:#111!important;border-color:#111!important}
+  .retro-business-page .biz-status.progress{background:#FFC567!important;color:#111!important}
+  .retro-business-page .biz-status.wait{background:#552CB7!important;color:#111!important}
+  .retro-business-page .biz-status.material{background:#058CD7!important;color:#111!important}
+  .retro-business-page .biz-status.done{background:#00995E!important;color:#111!important}
+  .retro-business-page .payment-pill{background:#FB7DA8!important;color:#111!important}
+  .retro-business-page .biz-stock-alert{background:#FD5A46!important;color:#111!important}
+  .retro-business-page .biz-stock-ok{background:#00995E!important;color:#111!important}
+
+  /* Inventory yarn color catalog: many real yarn colors. Not limited to UI palette. */
+  .inventory-dialog .color-card{grid-row:auto!important}
+  .yarn-color-catalog{
+    display:grid;
+    grid-template-columns:repeat(9,minmax(0,1fr));
+    gap:7px;
+  }
+  .yarn-color-catalog button{
+    width:100%;
+    aspect-ratio:1.2/1;
+    min-height:28px;
+    border:2px solid #fffdf8;
+    border-radius:8px;
+    box-shadow:0 0 0 1px #1115;
+    cursor:pointer;
+  }
+  .yarn-color-catalog button.selected{box-shadow:0 0 0 3px #111!important;transform:scale(1.04)}
+  .inventory-dialog .color-preview-wrap{gap:10px}
+  .inventory-dialog .inventory-color-preview{width:62px;height:38px;border:2px solid #fffdf8;box-shadow:0 0 0 1px #111}
+  .inventory-dialog .color-preview-wrap input[type=color]{width:54px;height:38px;border:1.5px solid #111!important;background:#fffdf8!important}
+}
