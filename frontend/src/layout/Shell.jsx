@@ -1,9 +1,10 @@
 import React,{useEffect,useState} from 'react'
 import {NavLink,Outlet,useNavigate} from 'react-router-dom'
-import {Home,FolderKanban,Images,WandSparkles,Projector,Calculator,Boxes,Settings,Menu,Search,LogOut,X,Globe2,Clock3} from 'lucide-react'
+import {Home,FolderKanban,Images,WandSparkles,Projector,Calculator,Boxes,Settings,Menu,Search,LogOut,X,Globe2,Clock3,ClipboardList,Archive,WalletCards} from 'lucide-react'
 import {useI18n} from '../i18n/I18n'
 import {signOut} from 'firebase/auth'
 import {auth} from '../lib/firebase'
+import '../styles/business-desktop.css'
 
 const getProfile=()=>({
  name:localStorage.getItem('tufting_profile_name')||localStorage.getItem('tufting_name')||'Studio Owner',
@@ -33,7 +34,8 @@ export default function Shell(){
  const items=[
   ['/',Home,t('dashboard')],['/projects',FolderKanban,t('projects')],['/gallery',Images,t('gallery')],
   ['/design',WandSparkles,t('design')],['/projector',Projector,t('projector')],
-  ['/calculator',Calculator,t('calculator')],['/materials',Boxes,t('materials')],['/work-hours',Clock3,workHoursLabel(lang)],['/settings',Settings,t('settings')]
+  ['/calculator',Calculator,t('calculator')],['/materials',Boxes,t('materials')],['/work-hours',Clock3,workHoursLabel(lang)],
+  ['/orders',ClipboardList,businessLabel(lang,'orders'),true],['/inventory',Archive,businessLabel(lang,'inventory'),true],['/expenses',WalletCards,businessLabel(lang,'expenses'),true],['/settings',Settings,t('settings')]
  ]
  const avatar=p.photo?<img src={p.photo} alt={p.name}/>:<span>{p.name.slice(0,2).toUpperCase()}</span>
 
@@ -44,7 +46,7 @@ export default function Shell(){
     <div className={`brand-logo ${p.logo?'has-image':''}`}>{p.logo?<img src={p.logo} alt="logo"/>:'🌼'}</div>
     <div className="brand-copy"><b>Tufting</b><strong>Studio</strong></div>
    </div>
-   <nav>{items.map(([to,I,label])=><NavLink key={to} to={to} end={to==='/'} onClick={()=>setDrawer(false)}><span className="nav-icon"><I/></span><span>{label}</span></NavLink>)}</nav>
+   <nav>{items.map(([to,I,label,isNew])=><NavLink key={to} to={to} end={to==='/'} onClick={()=>setDrawer(false)}><span className="nav-icon"><I/></span><span>{label}</span>{isNew&&<small className="biz-new-badge">New</small>}</NavLink>)}</nav>
    <div className="sidebar-bottom">
     <div className="profile-avatar">{avatar}</div>
     <div className="profile-text"><b>{adminLabel(lang)}</b><small>Professional</small></div>
@@ -76,3 +78,5 @@ export default function Shell(){
 
 function workHoursLabel(lang){return lang==='sq'?'Orët e punës':lang==='de'?'Arbeitszeit':'Work Hours'}
 function adminLabel(lang){return lang==='sq'?'Administratori':lang==='de'?'Administrator':'Administrator'}
+
+function businessLabel(lang,key){const map={sq:{orders:'Porositë',inventory:'Inventari',expenses:'Shpenzimet'},de:{orders:'Bestellungen',inventory:'Inventar',expenses:'Ausgaben'},en:{orders:'Orders',inventory:'Inventory',expenses:'Expenses'}};return (map[lang]||map.sq)[key]}
