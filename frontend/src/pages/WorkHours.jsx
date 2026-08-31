@@ -11,6 +11,7 @@ export default function WorkHours(){
  const [running,setRunning]=useState(getRunningWorkSession())
  const [sessions,setSessions]=useState([])
  const [busy,setBusy]=useState(false)
+ const [historyOpen,setHistoryOpen]=useState(false)
 
  async function load(){
    try{setSessions(await getWorkSessions())}catch(e){console.error(e);setSessions([])}
@@ -50,9 +51,16 @@ export default function WorkHours(){
      <article className="blue"><Clock3/><span>{tx.month}</span><b>{formatDuration(month)}</b></article>
    </div>
 
-   <section className="wh-history-card">
+   <section className={`wh-history-card ${historyOpen?'open':''}`}>
      <div className="wh-section-title"><History/><div><h2>{tx.history}</h2><p>{tx.historySub}</p></div></div>
-     {sessions.length?<div className="wh-table-wrap"><table><thead><tr><th>{tx.date}</th><th>{tx.startAt}</th><th>{tx.endAt}</th><th>{tx.duration}</th></tr></thead><tbody>{sessions.slice(0,60).map(s=><tr key={s.id}><td>{formatDate(new Date(s.started_at),lang)}</td><td>{formatTime(new Date(s.started_at),lang)}</td><td>{formatTime(new Date(s.ended_at),lang)}</td><td><b>{formatDuration(Number(s.duration_seconds)||0)}</b></td></tr>)}</tbody></table></div>:<div className="wh-empty">{tx.empty}</div>}
+     <button type="button" className="wh-history-toggle" onClick={()=>setHistoryOpen(v=>!v)} aria-expanded={historyOpen}>
+       <span className="wh-history-toggle-icon"><History/></span>
+       <span>{historyOpen?tx.hideHistory:tx.showHistory}</span>
+       <b aria-hidden="true">›</b>
+     </button>
+     <div className="wh-history-content">
+       {sessions.length?<div className="wh-table-wrap"><table><thead><tr><th>{tx.date}</th><th>{tx.startAt}</th><th>{tx.endAt}</th><th>{tx.duration}</th></tr></thead><tbody>{sessions.slice(0,60).map(s=><tr key={s.id}><td>{formatDate(new Date(s.started_at),lang)}</td><td>{formatTime(new Date(s.started_at),lang)}</td><td>{formatTime(new Date(s.ended_at),lang)}</td><td><b>{formatDuration(Number(s.duration_seconds)||0)}</b></td></tr>)}</tbody></table></div>:<div className="wh-empty">{tx.empty}</div>}
+     </div>
    </section>
  </div>
 }
@@ -65,9 +73,9 @@ function locale(lang){return lang==='sq'?'sq-AL':lang==='de'?'de-DE':'en-GB'}
 function formatDate(d,lang){return d.toLocaleDateString(locale(lang),{day:'2-digit',month:'2-digit',year:'numeric'})}
 function formatTime(d,lang){return d.toLocaleTimeString(locale(lang),{hour:'2-digit',minute:'2-digit'})}
 function labels(lang){
- if(lang==='sq')return{title:'Orët e punës',subtitle:'Regjistro kohën reale që punon në projektet e tufting.',running:'Duke punuar',stopped:'I ndalur',current:'Sesioni aktual',notStarted:'Nuk ka sesion aktiv',start:'Start',stop:'Stop',today:'Sot',week:'Këtë javë',month:'Këtë muaj',history:'Historiku i punës',historySub:'Çdo Stop ruhet automatikisht.',date:'Data',startAt:'Fillimi',endAt:'Mbarimi',duration:'Kohëzgjatja',empty:'Ende nuk ka orë pune të ruajtura.',saveError:'Nuk u ruajt sesioni. Kontrollo lidhjen dhe provo përsëri.'}
- if(lang==='de')return{title:'Arbeitszeit',subtitle:'Erfasse deine echte Arbeitszeit für Tufting-Projekte.',running:'Läuft',stopped:'Gestoppt',current:'Aktuelle Sitzung',notStarted:'Keine aktive Sitzung',start:'Start',stop:'Stop',today:'Heute',week:'Diese Woche',month:'Dieser Monat',history:'Arbeitsverlauf',historySub:'Jeder Stop wird automatisch gespeichert.',date:'Datum',startAt:'Start',endAt:'Ende',duration:'Dauer',empty:'Noch keine Arbeitszeit gespeichert.',saveError:'Sitzung konnte nicht gespeichert werden. Bitte erneut versuchen.'}
- return{title:'Work Hours',subtitle:'Track the real time you spend on tufting projects.',running:'Running',stopped:'Stopped',current:'Current session',notStarted:'No active session',start:'Start',stop:'Stop',today:'Today',week:'This week',month:'This month',history:'Work history',historySub:'Every Stop is saved automatically.',date:'Date',startAt:'Start',endAt:'End',duration:'Duration',empty:'No saved work sessions yet.',saveError:'Could not save the session. Check the connection and try again.'}
+ if(lang==='sq')return{title:'Orët e punës',subtitle:'Regjistro kohën reale që punon në projektet e tufting.',running:'Duke punuar',stopped:'I ndalur',current:'Sesioni aktual',notStarted:'Nuk ka sesion aktiv',start:'Start',stop:'Stop',today:'Sot',week:'Këtë javë',month:'Këtë muaj',history:'Historiku i punës',historySub:'Çdo Stop ruhet automatikisht.',date:'Data',startAt:'Fillimi',endAt:'Mbarimi',duration:'Kohëzgjatja',empty:'Ende nuk ka orë pune të ruajtura.',showHistory:'Shiko historikun',hideHistory:'Mbyll historikun',saveError:'Nuk u ruajt sesioni. Kontrollo lidhjen dhe provo përsëri.'}
+ if(lang==='de')return{title:'Arbeitszeit',subtitle:'Erfasse deine echte Arbeitszeit für Tufting-Projekte.',running:'Läuft',stopped:'Gestoppt',current:'Aktuelle Sitzung',notStarted:'Keine aktive Sitzung',start:'Start',stop:'Stop',today:'Heute',week:'Diese Woche',month:'Dieser Monat',history:'Arbeitsverlauf',historySub:'Jeder Stop wird automatisch gespeichert.',date:'Datum',startAt:'Start',endAt:'Ende',duration:'Dauer',empty:'Noch keine Arbeitszeit gespeichert.',showHistory:'Verlauf anzeigen',hideHistory:'Verlauf schließen',saveError:'Sitzung konnte nicht gespeichert werden. Bitte erneut versuchen.'}
+ return{title:'Work Hours',subtitle:'Track the real time you spend on tufting projects.',running:'Running',stopped:'Stopped',current:'Current session',notStarted:'No active session',start:'Start',stop:'Stop',today:'Today',week:'This week',month:'This month',history:'Work history',historySub:'Every Stop is saved automatically.',date:'Date',startAt:'Start',endAt:'End',duration:'Duration',empty:'No saved work sessions yet.',showHistory:'View history',hideHistory:'Hide history',saveError:'Could not save the session. Check the connection and try again.'}
 }
 
 function runningSecondsForPeriod(running,now,period){
