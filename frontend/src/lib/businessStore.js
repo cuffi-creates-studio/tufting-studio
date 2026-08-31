@@ -62,3 +62,10 @@ export const getExpenses=()=>list('expenses')
 export const createExpense=data=>create('expenses',data)
 export const updateExpense=(id,data)=>update('expenses',id,data)
 export const deleteExpense=id=>remove('expenses',id)
+
+export const getBusinessReports=async module=>{
+  const rows=await list('business_reports')
+  return module?rows.filter(r=>r.module===module):rows
+}
+export const createBusinessReport=data=>create('business_reports',data)
+export const deleteBusinessReport=id=>remove('business_reports',id)
