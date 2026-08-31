@@ -286,3 +286,13 @@
   .wh-history-toggle-icon svg{width:16px!important;height:16px!important}
   .wh-history-toggle b{font-size:25px!important}
 }
+
+/* FINAL current-project phone sizing — Work Hours only */
+@media(max-width:760px){
+ .work-hours-page{padding:10px 14px 100px!important;gap:8px!important}
+ .wh-head{gap:5px!important}.wh-head h1{font-size:25px!important}.wh-head p{font-size:11px!important;margin-top:4px!important}.wh-status{min-height:32px!important;font-size:11px!important;padding:0 12px!important}
+ .wh-hero{gap:8px!important}.wh-hero-clock{min-height:108px!important;padding:13px 14px!important;grid-template-columns:50px minmax(0,1fr)!important;column-gap:12px!important;border-radius:17px!important}.wh-hero-clock>svg{width:48px!important;height:48px!important;padding:10px!important;border-width:4px!important}.wh-hero-clock span{font-size:13px!important}.wh-hero-clock b{font-size:28px!important}.wh-hero-clock small{font-size:9px!important}
+ .wh-main-action{min-height:48px!important;border-radius:14px!important;font-size:17px!important}.wh-main-action svg{width:21px!important;height:21px!important}
+ .wh-stats{gap:7px!important}.wh-stats article{min-height:64px!important;padding:8px 11px!important;grid-template-columns:38px minmax(0,1fr) 15px!important;column-gap:9px!important;border-radius:14px!important}.wh-stats svg{width:36px!important;height:36px!important;padding:8px!important}.wh-stats span{font-size:12px!important}.wh-stats b{font-size:20px!important}.wh-stats article::after{font-size:23px!important}
+ .wh-section-title{margin:0 0 6px!important}.wh-section-title>svg{width:32px!important;height:32px!important;padding:7px!important}.wh-section-title h2{font-size:16px!important}.wh-section-title p{font-size:8px!important}.wh-history-toggle{min-height:42px!important;font-size:11px!important}
+}
