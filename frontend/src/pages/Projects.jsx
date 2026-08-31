@@ -45,7 +45,7 @@ export default function Projects(){
    }catch(e){console.error(e);setError(t('saveFailed'))}
  }
 
- return <>
+ return <div className="projects-clean-page">
    <MobilePageHeader title={t('projects')}/>
    <div className="page-title">
      <div><h1>{t('projects')}</h1><p>{t('allSavedProjects')}</p></div>
@@ -92,7 +92,7 @@ export default function Projects(){
      {error&&<p style={{color:'#b42318',fontWeight:700}}>{error}</p>}
      <button className="btn teal" disabled={busy} onClick={create}>{busy?t('saving'):t('createProject')}</button>
    </div></div>}
- </>
+ </div>
 }
 
 function translateStatus(status,t){

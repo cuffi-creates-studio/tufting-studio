@@ -6,6 +6,7 @@ import {makeBusinessPdf,reportLinesFromRows} from '../lib/businessPdf'
 import '../styles/business-pc.css'
 
 const BALLS=[50,100,500]
+const YARN_COLORS=['#FFFFFF','#F6F0E4','#E4D4B5','#C7A77A','#9C6B3D','#5B3A29','#1D1D1D','#8A8A8A','#C7C7C7','#FFC567','#E9A23B','#F28C28','#FD5A46','#D93A3A','#9E2430','#FB7DA8','#E64A8A','#B22F70','#552CB7','#7A55C7','#A987D8','#058CD7','#0D6FB8','#69BCE8','#00995E','#30A46C','#75C69A','#A8D86E','#2F6D4A','#33B7A6','#6ECAC4','#C9A227','#D9B44A','#F0D36B']
 export default function Inventory(){
  const {lang}=useI18n(),tx=labels(lang),dialog=useRef(null)
  const [rows,setRows]=useState([]),[reports,setReports]=useState([]),[q,setQ]=useState(''),[editing,setEditing]=useState(null),[saving,setSaving]=useState(false),[form,setForm]=useState(empty())
@@ -40,7 +41,7 @@ export default function Inventory(){
     <section className="retro-field-card green"><div className="retro-field-title"><Tag/>{tx.brand}</div><input value={form.brand} onChange={e=>setForm(v=>({...v,brand:e.target.value}))} placeholder="p.sh. Kartopu, Alize..."/></section>
     <section className="retro-field-card purple"><div className="retro-field-title"><Palette/>{tx.color}</div><input required value={form.name} onChange={e=>setForm(v=>({...v,name:e.target.value}))} placeholder="p.sh. Rozë pastel"/></section>
     <section className="retro-field-card orange"><div className="retro-field-title"><Database/>{tx.ballG}</div><div className="choice-row">{BALLS.map(n=><button type="button" key={n} className={Number(form.ball_g)===n?'active gram':''} onClick={()=>setForm(v=>({...v,ball_g:n}))}>{n} g</button>)}</div></section>
-    <section className="retro-field-card coral color-card"><div className="retro-field-title"><Palette/>{tx.colorCard}</div><div className="color-preview-wrap"><span className="inventory-color-preview" style={{background:hex(form.hex)}}/><input type="color" value={hex(form.hex)} onChange={e=>setForm(v=>({...v,hex:e.target.value.toUpperCase()}))}/></div></section>
+    <section className="retro-field-card coral color-card"><div className="retro-field-title"><Palette/>{tx.colorCard}</div><div className="yarn-color-catalog">{YARN_COLORS.map(c=><button type="button" key={c} className={hex(form.hex)===c?'selected':''} style={{background:c}} title={c} aria-label={c} onClick={()=>setForm(v=>({...v,hex:c}))}/>)}</div><div className="color-preview-wrap"><span className="inventory-color-preview" style={{background:hex(form.hex)}}/><input type="color" value={hex(form.hex)} onChange={e=>setForm(v=>({...v,hex:e.target.value.toUpperCase()}))}/></div></section>
     <section className="retro-field-card green"><div className="retro-field-title"><Database/>{tx.stock}</div><input type="number" min="0" value={form.stock_g} onChange={e=>setForm(v=>({...v,stock_g:e.target.value}))}/></section>
     <section className="retro-field-card blue"><div className="retro-field-title"><Hash/>{tx.hex}</div><input value={form.hex} onChange={e=>setForm(v=>({...v,hex:e.target.value}))}/></section>
     <section className="retro-field-card pink"><div className="retro-field-title">€ {tx.price}</div><input type="number" min="0" step="0.01" value={form.price_per_ball} onChange={e=>setForm(v=>({...v,price_per_ball:e.target.value}))}/></section>
