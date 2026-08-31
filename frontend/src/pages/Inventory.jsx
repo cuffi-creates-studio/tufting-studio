@@ -5,7 +5,7 @@ import {createInventoryItem,deleteInventoryItem,getInventory,updateInventoryItem
 import {makeBusinessPdf,reportLinesFromRows} from '../lib/businessPdf'
 import '../styles/business-pc.css'
 import '../styles/inventory-retro-v3.css'
-import yarnFibers from '../assets/yarn-fibers-real.png'
+import yarnStrands from '../assets/yarn-strands-real.png'
 
 const BALLS=[50,100,500]
 const YARN_PALETTE=[
@@ -116,11 +116,63 @@ export default function Inventory(){
 
 function YarnBall({hex:color,size='md'}){
  const c=hex(color)
- return <span className={`real-yarn-ball ${size}`} style={{'--yarn-color':c}} aria-hidden="true">
-  <img src={yarnFibers} alt="" draggable="false"/>
-  <i className="real-yarn-highlight"/>
+ const dark=shadeHex(c,-34)
+ const darker=shadeHex(c,-50)
+ const light=shadeHex(c,38)
+ const band=shadeHex('#FFC567',0)
+ return <span className={`yarn-skein-pro ${size}`} aria-hidden="true">
+  <svg viewBox="0 0 140 82">
+   <defs>
+    <linearGradient id={`skein-${size}-${c.replace('#','')}`} x1="0" y1="0" x2="1" y2="1">
+     <stop offset="0%" stopColor={light}/>
+     <stop offset="32%" stopColor={c}/>
+     <stop offset="72%" stopColor={dark}/>
+     <stop offset="100%" stopColor={darker}/>
+    </linearGradient>
+    <clipPath id={`skeinclip-${size}-${c.replace('#','')}`}>
+      <path d="M10 41C10 19 24 8 44 8h52c20 0 34 11 34 33S116 74 96 74H44C24 74 10 63 10 41Z"/>
+    </clipPath>
+   </defs>
+
+   <path d="M10 41C10 19 24 8 44 8h52c20 0 34 11 34 33S116 74 96 74H44C24 74 10 63 10 41Z"
+         fill={`url(#skein-${size}-${c.replace('#','')})`} stroke={darker} strokeWidth="1.5"/>
+
+   <g clipPath={`url(#skeinclip-${size}-${c.replace('#','')})`} fill="none" strokeLinecap="round">
+    <path d="M5 17 C28 3,50 15,70 12 S110 4,136 19" stroke={light} strokeWidth="2.2" opacity=".9"/>
+    <path d="M2 23 C24 8,46 22,70 18 S111 8,139 24" stroke={dark} strokeWidth="1.8" opacity=".75"/>
+    <path d="M1 29 C23 14,47 28,70 24 S112 14,140 30" stroke={light} strokeWidth="1.9" opacity=".88"/>
+    <path d="M0 35 C23 20,47 34,70 30 S113 20,141 36" stroke={darker} strokeWidth="1.7" opacity=".6"/>
+    <path d="M0 41 C23 26,47 40,70 36 S113 26,141 42" stroke={light} strokeWidth="2.0" opacity=".86"/>
+    <path d="M0 47 C23 32,47 46,70 42 S113 32,141 48" stroke={dark} strokeWidth="1.8" opacity=".7"/>
+    <path d="M1 53 C24 38,47 52,70 48 S112 38,140 54" stroke={light} strokeWidth="2.0" opacity=".86"/>
+    <path d="M2 59 C25 44,47 58,70 54 S111 44,139 60" stroke={darker} strokeWidth="1.7" opacity=".58"/>
+    <path d="M5 65 C28 50,49 64,70 60 S109 50,136 66" stroke={light} strokeWidth="1.9" opacity=".82"/>
+
+    <path d="M19 4 C5 22,20 38,11 56 S16 79,31 82" stroke={dark} strokeWidth="1.7" opacity=".62"/>
+    <path d="M30 2 C15 21,31 39,21 58 S27 78,40 82" stroke={light} strokeWidth="1.7" opacity=".65"/>
+    <path d="M110 1 C126 21,111 39,121 57 S116 77,103 82" stroke={light} strokeWidth="1.7" opacity=".66"/>
+    <path d="M121 4 C136 23,121 40,130 57 S125 76,111 81" stroke={dark} strokeWidth="1.7" opacity=".6"/>
+   </g>
+
+   <rect x="51" y="4" width="38" height="74" rx="5" fill={band} stroke={shadeHex(band,-16)} strokeWidth="1.3"/>
+   <rect x="54" y="7" width="32" height="68" rx="3" fill="rgba(255,255,255,.10)"/>
+   <path d="M62 37c2-5 7-8 11-5 4 3 3 8 0 11-3 3-7 4-10 1-3-2-3-5-1-7Z"
+         fill="#FFFDF8" opacity=".96"/>
+   <path d="M65 31c2 2 3 4 3 7m5-7c-2 2-3 4-3 7m-7 6c4-1 8-1 12 0"
+         fill="none" stroke="#FFFDF8" strokeWidth="1.7" strokeLinecap="round"/>
+   <ellipse cx="38" cy="22" rx="18" ry="7" fill="#fff" opacity=".08"/>
+  </svg>
  </span>
 }
+
+function shadeHex(input,amount){
+ let h=(input||'#FB7DA8').replace('#','')
+ if(h.length===3)h=h.split('').map(x=>x+x).join('')
+ let r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16)
+ const mix=v=>Math.max(0,Math.min(255,Math.round(amount>=0?v+(255-v)*(amount/100):v*(1+amount/100))))
+ return '#'+[mix(r),mix(g),mix(b)].map(v=>v.toString(16).padStart(2,'0')).join('')
+}
+
 function makeDonut(rows,total){if(!rows.length||!total)return 'conic-gradient(#efe8dc 0 100%)';let cursor=0;const stops=[];rows.slice(0,10).forEach(r=>{const share=num(r.stock_g)/total*100;const start=cursor;cursor+=share;stops.push(`${hex(r.hex)} ${start}% ${cursor}%`)});if(cursor<100)stops.push(`#efe8dc ${cursor}% 100%`);return `conic-gradient(${stops.join(',')})`}
 function SavedReports({title,reports,openReport,onDelete}){return <section className="saved-docs"><h3>{title}</h3>{reports.length?<div className="saved-doc-grid">{reports.slice(0,8).map(r=><div className="saved-doc" key={r.id}><div><b>{r.title}</b><small>{new Date(r.created_at||Date.now()).toLocaleString()}</small></div><button onClick={()=>openReport(r)}>PDF</button><button className="danger-mini" onClick={()=>onDelete(r.id)}>×</button></div>)}</div>:<p>—</p>}</section>}
 function empty(){return{yarn_type:'Acrylic',name:'',hex:'#FB7DA8',brand:'',stock_g:0,ball_g:100,price_per_ball:'',min_stock_g:0}}
