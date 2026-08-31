@@ -47,3 +47,36 @@
 .inventory-actions-v3{grid-column:1/-1!important;margin:2px -24px 0!important;padding:16px 24px 18px!important;background:#fff5e4!important;border-top:1px solid #eadfce!important}.inventory-actions-v3 .biz-btn{height:46px!important;font-size:15px!important}.inventory-actions-v3 .retro-save{background:#00995E!important;color:#fff!important;border-color:#00995E!important}
 
 @media(max-width:1180px) and (min-width:761px){.inventory-v3 .inventory-layout-v3{grid-template-columns:1fr 310px}.inventory-v3 .business-actions{flex-wrap:wrap}.inventory-v3 .inventory-table-wrap-v3{overflow:auto}.inventory-v3 .inventory-table-v3{min-width:940px}}
+
+/* V3.1 — real yarn colors, not a six-color limit */
+.inventory-v3 .inventory-palette-card{grid-row:span 3;min-height:360px!important}
+.inventory-v3 .inventory-palette-layout{grid-template-columns:104px minmax(0,1fr);align-items:start;gap:16px}
+.inventory-v3 .inventory-retro-palette{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-height:285px;overflow:auto;padding:3px 6px 3px 3px;scrollbar-width:thin}
+.inventory-v3 .inventory-retro-palette button{min-height:76px;padding:6px 6px 7px;border-radius:12px;align-content:start}
+.inventory-v3 .inventory-retro-palette button i{height:34px;border-radius:8px;background:var(--swatch);border:1px solid rgba(0,0,0,.13);box-shadow:inset 0 1px 1px rgba(255,255,255,.45)}
+.inventory-v3 .inventory-retro-palette button span{font-size:10px;font-weight:900;line-height:1.05;color:#273142;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inventory-v3 .inventory-retro-palette button small{font-size:8px!important;margin:0!important;color:#756e66!important;line-height:1!important}
+
+/* Yarn ball closer to a wound skein/ball: curved overlapping strands, no pigment-wheel look */
+.yarn-ball-v3{--yarn:#FB7DA8;position:relative;display:inline-block;flex:0 0 auto;border-radius:50%;background:
+ radial-gradient(ellipse at 50% 46%,rgba(255,255,255,.18) 0 14%,transparent 15%),
+ radial-gradient(ellipse at 47% 55%,transparent 0 31%,rgba(22,20,18,.10) 32% 34%,transparent 35% 43%,rgba(255,255,255,.13) 44% 46%,transparent 47%),
+ var(--yarn);border:2px solid #fffaf2;box-shadow:0 2px 7px rgba(30,35,45,.18),0 0 0 1px rgba(35,30,25,.15);overflow:hidden}
+.yarn-ball-v3::before{content:"";position:absolute;inset:-8%;border-radius:50%;background:
+ repeating-radial-gradient(ellipse at 12% 55%,transparent 0 5px,rgba(255,255,255,.28) 5px 6px,transparent 6px 10px),
+ repeating-radial-gradient(ellipse at 88% 45%,transparent 0 6px,rgba(20,20,20,.17) 6px 7px,transparent 7px 11px);transform:rotate(18deg);opacity:.9}
+.yarn-ball-v3::after{content:"";position:absolute;inset:-12%;border-radius:50%;background:
+ repeating-linear-gradient(31deg,transparent 0 5px,rgba(255,255,255,.22) 5px 6px,transparent 6px 10px),
+ repeating-linear-gradient(-34deg,transparent 0 7px,rgba(25,22,18,.14) 7px 8px,transparent 8px 12px);transform:rotate(-7deg);mix-blend-mode:soft-light}
+.yarn-ball-v3 i{position:absolute;left:20%;right:20%;top:43%;height:13%;border-radius:50%;border-top:2px solid rgba(255,255,255,.26);border-bottom:2px solid rgba(20,20,20,.10);transform:rotate(-10deg);z-index:2}
+.yarn-ball-v3.xs{width:25px;height:25px}.yarn-ball-v3.md{width:48px;height:48px}.yarn-ball-v3.xl{width:94px;height:94px;border-width:4px}
+
+/* No fake stock chart when the inventory is empty */
+.inventory-v3 .inventory-summary-empty{min-height:310px;border:1px dashed #ddcfbe;border-radius:18px;background:#fffdf8;display:grid;place-items:center;align-content:center;text-align:center;padding:30px 22px;gap:10px;color:#776f65}
+.inventory-v3 .inventory-summary-empty svg{width:52px;height:52px;color:#00995E;opacity:.7}
+.inventory-v3 .inventory-summary-empty strong{font-family:Georgia,serif;font-size:21px;color:#17233c}
+.inventory-v3 .inventory-summary-empty span{max-width:240px;font-size:14px;line-height:1.5}
+
+@media(max-width:1050px) and (min-width:761px){
+ .inventory-v3 .inventory-retro-palette{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
