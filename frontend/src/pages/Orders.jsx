@@ -1,116 +1,121 @@
-import React,{useEffect,useMemo,useState} from 'react'
-import {ClipboardList,Filter,Plus,Search,MoreHorizontal,Pencil,Trash2,Euro,CalendarDays,UserRound,ImagePlus,X} from 'lucide-react'
-import {addOrder,deleteOrder,getOrders,updateOrder} from '../lib/businessStore'
-import BusinessModal from '../components/BusinessModal'
+import React,{useEffect,useMemo,useRef,useState} from 'react'
+import {ClipboardList,Filter,Plus,Search,X} from 'lucide-react'
 import {useI18n} from '../i18n/I18n'
-import '../styles/business-desktop.css'
+import {getProjects} from '../lib/projectsStore'
+import {createOrder,deleteOrder,getOrders,updateOrder} from '../lib/businessStore'
+import '../styles/business-pc.css'
 
-const EMPTY={client:'',project:'',width_cm:'',height_cm:'',price:'',deposit:'',status:'In Progress',due_date:'',notes:'',material_cost:'',labor_cost:'',other_cost:'',image_data:''}
+const COLORS=['#00995E','#552CB7','#FD5A46','#058CD7','#FB7DA8','#FFC567']
 
 export default function Orders(){
  const {lang}=useI18n()
- const L=labels(lang)
- const [rows,setRows]=useState([]),[loading,setLoading]=useState(true),[query,setQuery]=useState(''),[status,setStatus]=useState('All')
- const [form,setForm]=useState(EMPTY),[editing,setEditing]=useState(null),[open,setOpen]=useState(false),[menu,setMenu]=useState(null),[selectedId,setSelectedId]=useState(null)
+ const tx=labels(lang)
+ const dialog=useRef(null)
+ const [rows,setRows]=useState([])
+ const [projects,setProjects]=useState([])
+ const [q,setQ]=useState('')
+ const [filter,setFilter]=useState('all')
+ const [editing,setEditing]=useState(null)
+ const [saving,setSaving]=useState(false)
 
- async function load(){setLoading(true);try{const data=await getOrders();setRows(data);setSelectedId(v=>v||data[0]?.id||null)}finally{setLoading(false)}}
+ async function load(){
+  const [a,b]=await Promise.all([getOrders().catch(()=>[]),getProjects().catch(()=>[])])
+  setRows(a);setProjects(b)
+ }
  useEffect(()=>{load()},[])
 
- const selected=rows.find(r=>r.id===selectedId)||filteredFirst(rows)
- const filtered=useMemo(()=>rows.filter(r=>{
-  const q=query.trim().toLowerCase()
-  const hit=!q||[r.client,r.project,r.status].some(v=>String(v||'').toLowerCase().includes(q))
-  return hit&&(status==='All'||r.status===status)
- }),[rows,query,status])
+ const shown=useMemo(()=>rows.filter(r=>{
+  const hit=[r.client_name,r.project_name,r.status].join(' ').toLowerCase().includes(q.toLowerCase())
+  const ok=filter==='all'||r.status===filter
+  return hit&&ok
+ }),[rows,q,filter])
 
- function startAdd(){setEditing(null);setForm(EMPTY);setOpen(true)}
- function startEdit(r){setEditing(r.id);setForm({...EMPTY,...r});setMenu(null);setOpen(true)}
- async function save(e){e.preventDefault(); if(!form.client.trim()||!form.project.trim())return
-  if(editing)await updateOrder(editing,form);else await addOrder(form)
-  setOpen(false);setEditing(null);setForm(EMPTY);await load()
+ function open(row=null){setEditing(row);dialog.current?.showModal()}
+ async function submit(e){
+  e.preventDefault();setSaving(true)
+  const f=new FormData(e.currentTarget)
+  const project=projects.find(p=>p.id===f.get('project_id'))
+  const price=Number(f.get('price'))||0,deposit=Number(f.get('deposit'))||0
+  const data={
+   client_name:String(f.get('client_name')||'').trim(),
+   project_id:String(f.get('project_id')||''),
+   project_name:String(f.get('project_name')||project?.name||'').trim(),
+   width_cm:Number(f.get('width_cm'))||0,
+   height_cm:Number(f.get('height_cm'))||0,
+   price,deposit,balance:Math.max(0,price-deposit),
+   status:String(f.get('status')||'In Progress'),
+   deadline:String(f.get('deadline')||''),
+   notes:String(f.get('notes')||''),
+   image_data:editing?.image_data||project?.image_data||'',
+   material_cost:Number(editing?.material_cost)||Number(project?.material_cost)||0,
+   labor_cost:Number(editing?.labor_cost)||0,
+   other_cost:Number(editing?.other_cost)||0
+  }
+  if(editing)await updateOrder(editing.id,data);else await createOrder(data)
+  await load();setSaving(false);dialog.current?.close();setEditing(null)
  }
- async function remove(id){if(!confirm(L.confirmDelete))return;await deleteOrder(id);setMenu(null);await load()}
- async function pickImage(e){const f=e.target.files?.[0];if(!f)return; const data=await resizeImage(f);setForm(v=>({...v,image_data:data}))}
+ async function remove(id){if(!confirm(tx.confirmDelete))return;await deleteOrder(id);await load()}
 
- return <div className="biz-page orders-page">
-  <section className="biz-frame orders-frame">
-   <span className="biz-number orders-number">1</span>
-   <header className="biz-page-head">
-    <div className="biz-title-wrap"><span className="biz-title-icon orders-icon"><ClipboardList/></span><div><h1>{L.orders}</h1><p>{L.ordersSub}</p></div></div>
-    <div className="biz-head-actions">
-      <div className="biz-search"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={L.searchOrders}/></div>
-      <button className="biz-soft-btn" type="button"><Filter/>{L.filter}</button>
-      <button className="biz-primary orders-primary" type="button" onClick={startAdd}><Plus/>{L.addOrder}</button>
+ return <div className="business-page orders">
+  <section className="business-shell-card">
+   <header className="business-head">
+    <div className="business-number">1</div>
+    <div className="business-title-icon"><ClipboardList/></div>
+    <div className="business-heading"><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
+    <div className="business-actions">
+      <label className="biz-search"><Search/><input value={q} onChange={e=>setQ(e.target.value)} placeholder={tx.search}/></label>
+      <button className="biz-btn" type="button"><Filter/>{tx.filter}</button>
+      <button className="biz-btn primary" type="button" onClick={()=>open()}><Plus/>{tx.add}</button>
     </div>
    </header>
-
    <div className="biz-filter-row">
-    {[['All',L.all],['In Progress',L.inProgress],['Waiting Material',L.waitMaterial],['Completed',L.completed],['Waiting',L.waiting]].map(([k,v])=><button key={k} className={status===k?'active':''} onClick={()=>setStatus(k)}>{v}</button>)}
+    {[
+      ['all',tx.all],['In Progress',tx.inProgress],['Waiting',tx.waiting],['Waiting Material',tx.waitMaterial],['Completed',tx.completed]
+    ].map(([k,l])=><button key={k} className={`biz-chip ${filter===k?'active':''}`} onClick={()=>setFilter(k)}>{l}</button>)}
    </div>
-
-   <div className="orders-layout">
-   <div className="biz-table-wrap">
-    <table className="biz-table orders-table">
-      <thead><tr><th>{L.client}</th><th>{L.project}</th><th>{L.size}</th><th>{L.price}</th><th>{L.deposit}</th><th>{L.remaining}</th><th>{L.status}</th><th>{L.deadline}</th><th></th></tr></thead>
-      <tbody>
-       {filtered.map(r=><tr key={r.id} className={selectedId===r.id?'selected-row':''} onClick={()=>setSelectedId(r.id)}>
-        <td><div className="person-cell"><span className="person-dot">{initials(r.client)}</span><strong>{r.client}</strong></div></td>
-        <td>{r.project}</td><td>{r.width_cm||0} × {r.height_cm||0} cm</td><td>{eur(r.price)}</td><td>{eur(r.deposit)}</td><td>{eur(r.remaining)}</td>
-        <td><Status value={r.status} L={L}/></td><td>{formatDate(r.due_date,lang)}</td>
-        <td className="menu-cell"><button className="dots" onClick={()=>setMenu(menu===r.id?null:r.id)}><MoreHorizontal/></button>{menu===r.id&&<div className="row-menu"><button onClick={()=>startEdit(r)}><Pencil/> {L.edit}</button><button className="danger" onClick={()=>remove(r.id)}><Trash2/> {L.delete}</button></div>}</td>
-       </tr>)}
-      </tbody>
-    </table>
-    {!loading&&!filtered.length&&<div className="biz-empty">{L.noOrders}</div>}
-    {loading&&<div className="biz-empty">{L.loading}</div>}
+   <div className="business-table-wrap">
+    {shown.length?<table className="business-table"><thead><tr><th>{tx.client}</th><th>{tx.project}</th><th>{tx.size}</th><th>{tx.price}</th><th>{tx.deposit}</th><th>{tx.balance}</th><th>{tx.status}</th><th>{tx.deadline}</th><th/></tr></thead><tbody>
+      {shown.map((r,i)=><tr key={r.id}>
+        <td><div className="biz-person"><span className="biz-avatar" style={{background:COLORS[i%COLORS.length]}}>{initials(r.client_name)}</span>{r.client_name||'—'}</div></td>
+        <td>{r.project_name||'—'}</td>
+        <td>{r.width_cm||0} × {r.height_cm||0} cm</td>
+        <td className="biz-money">€{money(r.price)}</td>
+        <td>€{money(r.deposit)}</td>
+        <td>€{money(r.balance)}</td>
+        <td><span className={`biz-status ${statusClass(r.status)}`}>{statusLabel(r.status,tx)}</span></td>
+        <td>{formatDate(r.deadline)}</td>
+        <td><button className="biz-kebab" onClick={()=>open(r)}>•••</button></td>
+      </tr>)}
+    </tbody></table>:<div className="biz-empty">{tx.empty}</div>}
    </div>
   </section>
 
-  <BusinessModal open={open} onClose={()=>setOpen(false)} title={editing?L.editOrder:L.addOrder} subtitle={L.orderFormSub} wide>
-   <form className="biz-form two-col" onSubmit={save}>
-    <label><span>{L.client}</span><input value={form.client} onChange={e=>setForm({...form,client:e.target.value})} required/></label>
-    <label><span>{L.project}</span><input value={form.project} onChange={e=>setForm({...form,project:e.target.value})} required/></label>
-    <label><span>{L.width}</span><div className="input-unit"><input inputMode="decimal" value={form.width_cm} onChange={e=>setForm({...form,width_cm:e.target.value})}/><b>cm</b></div></label>
-    <label><span>{L.height}</span><div className="input-unit"><input inputMode="decimal" value={form.height_cm} onChange={e=>setForm({...form,height_cm:e.target.value})}/><b>cm</b></div></label>
-    <label><span>{L.totalPrice}</span><div className="input-unit"><b>€</b><input inputMode="decimal" value={form.price} onChange={e=>setForm({...form,price:e.target.value})}/></div></label>
-    <label><span>{L.deposit}</span><div className="input-unit"><b>€</b><input inputMode="decimal" value={form.deposit} onChange={e=>setForm({...form,deposit:e.target.value})}/></div></label>
-    <label><span>{L.deadline}</span><input type="date" value={form.due_date} onChange={e=>setForm({...form,due_date:e.target.value})}/></label>
-    <label><span>{L.status}</span><select value={form.status} onChange={e=>setForm({...form,status:e.target.value})}><option value="In Progress">{L.inProgress}</option><option value="Waiting Material">{L.waitMaterial}</option><option value="Completed">{L.completed}</option><option value="Waiting">{L.waiting}</option></select></label>
-    <label><span>{L.materialCost}</span><div className="input-unit"><b>€</b><input inputMode="decimal" value={form.material_cost} onChange={e=>setForm({...form,material_cost:e.target.value})}/></div></label>
-    <label><span>{L.laborCost}</span><div className="input-unit"><b>€</b><input inputMode="decimal" value={form.labor_cost} onChange={e=>setForm({...form,labor_cost:e.target.value})}/></div></label>
-    <label><span>{L.otherCost}</span><div className="input-unit"><b>€</b><input inputMode="decimal" value={form.other_cost} onChange={e=>setForm({...form,other_cost:e.target.value})}/></div></label>
-    <label className="span-2"><span>{L.notes}</span><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/></label>
-    <label className="span-2 biz-image-picker"><span>{L.projectImage}</span><div className="image-picker-row">{form.image_data?<img src={form.image_data} alt=""/>:<div className="image-ph"><ImagePlus/></div>}<span className="biz-upload-btn"><ImagePlus/>{L.chooseImage}<input type="file" accept="image/*" onChange={pickImage}/></span>{form.image_data&&<button type="button" className="biz-soft-btn" onClick={()=>setForm({...form,image_data:''})}><X/>{L.remove}</button>}</div></label>
-    <div className="biz-form-actions span-2"><button type="button" className="biz-soft-btn" onClick={()=>setOpen(false)}>{L.cancel}</button><button className="biz-primary orders-primary" type="submit">{L.save}</button></div>
+  <dialog className="biz-dialog" ref={dialog} onClose={()=>setEditing(null)}>
+   <div className="biz-dialog-head"><h2>{editing?tx.edit:tx.add}</h2><button className="biz-dialog-close" onClick={()=>dialog.current?.close()}><X/></button></div>
+   <form className="biz-form" onSubmit={submit} key={editing?.id||'new'}>
+    <label>{tx.client}<input name="client_name" required defaultValue={editing?.client_name||''}/></label>
+    <label>{tx.project}<select name="project_id" defaultValue={editing?.project_id||''} onChange={e=>{const p=projects.find(x=>x.id===e.target.value);if(p){const form=e.currentTarget.form;form.elements.project_name.value=p.name||'';form.elements.width_cm.value=p.width_cm||0;form.elements.height_cm.value=p.height_cm||0}}}><option value="">—</option>{projects.map(p=><option value={p.id} key={p.id}>{p.name}</option>)}</select></label>
+    <label className="full">{tx.projectName}<input name="project_name" defaultValue={editing?.project_name||''}/></label>
+    <label>{tx.width}<input name="width_cm" type="number" min="0" defaultValue={editing?.width_cm||''}/></label>
+    <label>{tx.height}<input name="height_cm" type="number" min="0" defaultValue={editing?.height_cm||''}/></label>
+    <label>{tx.price}<input name="price" type="number" min="0" step="0.01" defaultValue={editing?.price||''}/></label>
+    <label>{tx.deposit}<input name="deposit" type="number" min="0" step="0.01" defaultValue={editing?.deposit||''}/></label>
+    <label>{tx.status}<select name="status" defaultValue={editing?.status||'In Progress'}><option>In Progress</option><option>Waiting</option><option>Waiting Material</option><option>Completed</option></select></label>
+    <label>{tx.deadline}<input name="deadline" type="date" defaultValue={editing?.deadline||''}/></label>
+    <label className="full">{tx.notes}<textarea name="notes" defaultValue={editing?.notes||''}/></label>
+    <div className="biz-form-actions">{editing&&<button type="button" className="biz-btn danger" onClick={()=>remove(editing.id)}>{tx.delete}</button>}<button type="button" className="biz-btn" onClick={()=>dialog.current?.close()}>{tx.cancel}</button><button className="biz-btn primary" disabled={saving}>{saving?tx.saving:tx.save}</button></div>
    </form>
-  </BusinessModal>
+  </dialog>
  </div>
 }
 
-
-function OrderProfitPanel({order,L,lang}){
- if(!order)return <aside className="order-profit-panel"><div className="biz-empty">{L.noOrders}</div></aside>
- const profit=(Number(order.price)||0)-(Number(order.material_cost)||0)-(Number(order.labor_cost)||0)-(Number(order.other_cost)||0)
- return <aside className="order-profit-panel">
-  <div className="order-panel-label">{L.selectedOrder}</div>
-  <div className="order-panel-title"><div><h3>{order.project}</h3><Status value={order.status} L={L}/></div></div>
-  <div className="order-panel-image">{order.image_data?<img src={order.image_data} alt={order.project}/>:<div className="order-image-placeholder"><ImagePlus/><span>{L.projectImage}</span></div>}</div>
-  <div className="order-meta"><div><span><UserRound/> {L.client}</span><b>{order.client}</b></div><div><span>{L.size}</span><b>{order.width_cm||0} × {order.height_cm||0} cm</b></div><div><span><CalendarDays/> {L.deadline}</span><b>{formatDate(order.due_date,lang)}</b></div></div>
-  <div className="order-costs"><div><span>{L.salePrice}</span><b className="positive">{eur(order.price)}</b></div><div><span>{L.materialCost}</span><b className="negative">{eur(order.material_cost)}</b></div><div><span>{L.laborCost}</span><b className="negative">{eur(order.labor_cost)}</b></div><div><span>{L.otherCost}</span><b className="negative">{eur(order.other_cost)}</b></div></div>
-  <div className={`real-profit ${profit>=0?'profit-ok':'profit-bad'}`}><span>{L.realProfit}</span><strong>{eur(profit)}</strong></div>
- </aside>
-}
-function filteredFirst(rows){return rows?.[0]||null}
-
-function Status({value,L}){const map={"In Progress":['progress',L.inProgress],"Waiting Material":['material',L.waitMaterial],Completed:['done',L.completed],Waiting:['waiting',L.waiting]};const [c,t]=map[value]||['waiting',value];return <span className={`status-pill ${c}`}>{t}</span>}
-function initials(s){return String(s||'?').split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()}
-function eur(v){return new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(v)||0)}
-function formatDate(v,lang){if(!v)return '—';const d=new Date(`${v}T12:00:00`);return new Intl.DateTimeFormat(lang==='sq'?'sq-AL':lang==='de'?'de-DE':'en-GB').format(d)}
-async function resizeImage(file){return await new Promise((resolve,reject)=>{const r=new FileReader();r.onerror=reject;r.onload=()=>{const i=new Image();i.onload=()=>{const max=900,s=Math.min(1,max/Math.max(i.width,i.height));const c=document.createElement('canvas');c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);c.getContext('2d').drawImage(i,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.84))};i.onerror=reject;i.src=r.result};r.readAsDataURL(file)})}
-
+function initials(v=''){return v.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'—'}
+function money(v){return (Number(v)||0).toFixed(2)}
+function formatDate(v){if(!v)return'—';const [y,m,d]=String(v).split('-');return y&&m&&d?`${d}.${m}.${y}`:v}
+function statusClass(v){return v==='Completed'?'done':v==='Waiting Material'?'material':v==='Waiting'?'wait':'progress'}
+function statusLabel(v,t){return v==='Completed'?t.completed:v==='Waiting Material'?t.waitMaterial:v==='Waiting'?t.waiting:t.inProgress}
 function labels(lang){
- const sq={orders:'Porositë',ordersSub:'Menaxho porositë e klientëve dhe ndiq statusin e tyre.',searchOrders:'Kërko në porosi...',filter:'Filtro',addOrder:'Shto porosi',all:'Të gjitha',client:'Klienti',project:'Projekti',size:'Përmasat',price:'Çmimi',deposit:'Kapari',remaining:'Mbetja',status:'Statusi',deadline:'Afati',inProgress:'Në punë',waitMaterial:'Prit material',completed:'Përfunduar',waiting:'Në pritje',edit:'Redakto',delete:'Fshi',noOrders:'Nuk ka porosi të regjistruara.',loading:'Duke ngarkuar...',editOrder:'Redakto porosinë',orderFormSub:'Të dhënat ruhen në Firestore.',width:'Gjerësia',height:'Lartësia',totalPrice:'Çmimi total',notes:'Shënime',projectImage:'Foto e projektit',chooseImage:'Zgjidh foto',remove:'Hiq',cancel:'Anulo',save:'Ruaj porosinë',confirmDelete:'Ta fshij këtë porosi?',selectedOrder:'Porosia e zgjedhur',salePrice:'Çmimi i shitjes',materialCost:'Kosto e materialeve',laborCost:'Kosto e punës',otherCost:'Shpenzime të tjera',realProfit:'Fitimi real'}
- const de={...sq,orders:'Bestellungen',ordersSub:'Kundenaufträge verwalten und Status verfolgen.',searchOrders:'Bestellungen suchen...',filter:'Filter',addOrder:'Bestellung hinzufügen',all:'Alle',client:'Kunde',project:'Projekt',size:'Maße',price:'Preis',deposit:'Anzahlung',remaining:'Rest',status:'Status',deadline:'Frist',inProgress:'In Arbeit',waitMaterial:'Wartet auf Material',completed:'Abgeschlossen',waiting:'Wartet',edit:'Bearbeiten',delete:'Löschen',noOrders:'Keine Bestellungen gespeichert.',loading:'Wird geladen...',editOrder:'Bestellung bearbeiten',orderFormSub:'Die Daten werden in Firestore gespeichert.',width:'Breite',height:'Höhe',totalPrice:'Gesamtpreis',notes:'Notizen',projectImage:'Projektbild',chooseImage:'Bild wählen',remove:'Entfernen',cancel:'Abbrechen',save:'Bestellung speichern',confirmDelete:'Diese Bestellung löschen?',selectedOrder:'Ausgewählte Bestellung',salePrice:'Verkaufspreis',materialCost:'Materialkosten',laborCost:'Arbeitskosten',otherCost:'Weitere Kosten',realProfit:'Realer Gewinn'}
- const en={...sq,orders:'Orders',ordersSub:'Manage client orders and track their status.',searchOrders:'Search orders...',filter:'Filter',addOrder:'Add order',all:'All',client:'Client',project:'Project',size:'Size',price:'Price',deposit:'Deposit',remaining:'Remaining',status:'Status',deadline:'Deadline',inProgress:'In progress',waitMaterial:'Waiting material',completed:'Completed',waiting:'Waiting',edit:'Edit',delete:'Delete',noOrders:'No orders saved.',loading:'Loading...',editOrder:'Edit order',orderFormSub:'Data is saved in Firestore.',width:'Width',height:'Height',totalPrice:'Total price',notes:'Notes',projectImage:'Project image',chooseImage:'Choose image',remove:'Remove',cancel:'Cancel',save:'Save order',confirmDelete:'Delete this order?',selectedOrder:'Selected order',salePrice:'Sale price',materialCost:'Material cost',laborCost:'Labor cost',otherCost:'Other costs',realProfit:'Real profit'}
- return lang==='de'?de:lang==='en'?en:sq
+ if(lang==='de')return{title:'Bestellungen',subtitle:'Kundenaufträge verwalten und Status verfolgen.',search:'Bestellungen suchen...',filter:'Filter',add:'Bestellung hinzufügen',all:'Alle',inProgress:'In Arbeit',waiting:'Wartet',waitMaterial:'Wartet auf Material',completed:'Fertig',client:'Kunde',project:'Projekt',projectName:'Projektname',size:'Größe',width:'Breite (cm)',height:'Höhe (cm)',price:'Preis',deposit:'Anzahlung',balance:'Rest',status:'Status',deadline:'Termin',notes:'Notizen',save:'Speichern',saving:'Speichern…',cancel:'Abbrechen',edit:'Bestellung bearbeiten',delete:'Löschen',empty:'Noch keine Bestellungen.',confirmDelete:'Diese Bestellung löschen?'}
+ if(lang==='en')return{title:'Orders',subtitle:'Manage customer orders and track their status.',search:'Search orders...',filter:'Filter',add:'Add order',all:'All',inProgress:'In Progress',waiting:'Waiting',waitMaterial:'Waiting Material',completed:'Completed',client:'Client',project:'Project',projectName:'Project name',size:'Size',width:'Width (cm)',height:'Height (cm)',price:'Price',deposit:'Deposit',balance:'Balance',status:'Status',deadline:'Deadline',notes:'Notes',save:'Save',saving:'Saving…',cancel:'Cancel',edit:'Edit order',delete:'Delete',empty:'No orders yet.',confirmDelete:'Delete this order?'}
+ return{title:'Porositë',subtitle:'Menaxho porositë e klientëve dhe ndiq statusin e tyre.',search:'Kërko në porosi...',filter:'Filtro',add:'Shto porosi',all:'Të gjitha',inProgress:'Në punë',waiting:'Në pritje',waitMaterial:'Prit material',completed:'Përfunduar',client:'Klienti',project:'Projekti',projectName:'Emri i projektit',size:'Përmasat',width:'Gjerësia (cm)',height:'Lartësia (cm)',price:'Çmimi',deposit:'Kapari',balance:'Mbetja',status:'Statusi',deadline:'Afati',notes:'Shënime',save:'Ruaj porosinë',saving:'Po ruhet…',cancel:'Mbyll',edit:'Redakto porosinë',delete:'Fshi',empty:'Ende nuk ka porosi.',confirmDelete:'Ta fshij këtë porosi?'}
 }
