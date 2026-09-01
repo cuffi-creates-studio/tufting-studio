@@ -335,3 +335,80 @@
     margin-right:auto!important;
   }
 }
+
+/* ==========================================================
+   DESKTOP INVENTORY DIALOG CLEANUP
+   Neutral dialog on PC/tablet. Mobile styling remains untouched.
+   ========================================================== */
+@media(min-width:761px){
+  .inventory-dialog{
+    background:#fffdf8;
+  }
+
+  .inventory-dialog .biz-dialog-head{
+    background:linear-gradient(180deg,#fffdf9 0%,#fff8f0 100%);
+  }
+
+  .inventory-dialog .retro-form{
+    gap:14px;
+  }
+
+  .inventory-dialog .retro-field-card,
+  .inventory-dialog .retro-field-card.green,
+  .inventory-dialog .retro-field-card.purple,
+  .inventory-dialog .retro-field-card.orange,
+  .inventory-dialog .retro-field-card.pink,
+  .inventory-dialog .retro-field-card.coral,
+  .inventory-dialog .retro-field-card.blue,
+  .inventory-dialog .retro-field-card.yellow,
+  .inventory-dialog .retro-field-card.color-card{
+    background:#fffdf9;
+    border-color:#e4d5c2;
+    box-shadow:none;
+  }
+
+  .inventory-dialog .retro-field-title,
+  .inventory-dialog .retro-field-title svg{
+    color:#172033;
+  }
+
+  .inventory-dialog .retro-field-card input,
+  .inventory-dialog .retro-field-card select,
+  .inventory-dialog .retro-field-card textarea{
+    background:#ffffff;
+    border-color:#dccab1;
+    color:#172033;
+    box-shadow:none;
+  }
+
+  .inventory-dialog .retro-field-card input::placeholder,
+  .inventory-dialog .retro-field-card textarea::placeholder{
+    color:#8b847b;
+  }
+
+  .inventory-dialog .choice-row button{
+    background:#fff;
+    border-color:#dccab1;
+    color:#172033;
+  }
+
+  .inventory-dialog .choice-row button.active,
+  .inventory-dialog .choice-row button.active.acrylic,
+  .inventory-dialog .choice-row button.active.wool,
+  .inventory-dialog .choice-row button.active.gram{
+    background:#eef7f2;
+    border-color:#97cbb2;
+    color:#15624c;
+  }
+
+  .inventory-dialog .biz-form-actions{
+    margin-top:8px;
+    padding-top:14px;
+    border-top:1px solid #eadcc8;
+  }
+
+  .inventory-dialog .biz-form-actions .biz-btn:not(.retro-save):not(.danger){
+    background:#fffaf2;
+    color:#172033;
+  }
+}
