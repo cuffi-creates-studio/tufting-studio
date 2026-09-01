@@ -9,8 +9,16 @@ import {createEnergyExpenseForWorkSession,deleteEnergyExpenseForWorkSession} fro
 import '../styles/work-hours-retro.css'
 
 const RATE_KEY='tufting_energy_rate_eur_kwh'
-const GUN_W_KEY='tufting_gun_watts'
-const SHEARER_W_KEY='tufting_shearer_watts'
+const GUN_MODEL_KEY='tufting_gun_model'
+const SHEARER_MODEL_KEY='tufting_shearer_model'
+
+const GUN_MODELS=[
+ {id:'ak1h40',label:'AK-1H Long Pile 40 mm',watts:100},
+ {id:'ak1nduo20',label:'AK-1N Duo Cut & Loop 20 mm',watts:70},
+]
+const SHEARER_MODELS=[
+ {id:'trimmer12v',label:'Makina qethëse 12V',watts:24},
+]
 
 export default function WorkHours(){
  const {lang}=useI18n()
@@ -21,8 +29,12 @@ export default function WorkHours(){
  const [busy,setBusy]=useState(false)
  const [historyOpen,setHistoryOpen]=useState(false)
  const [rate,setRate]=useState(()=>readNumber(RATE_KEY,0.35))
- const [gunW,setGunW]=useState(()=>readNumber(GUN_W_KEY,100))
- const [shearerW,setShearerW]=useState(()=>readNumber(SHEARER_W_KEY,0))
+ const [gunModelId,setGunModelId]=useState(()=>readText(GUN_MODEL_KEY,GUN_MODELS[0].id))
+ const [shearerModelId,setShearerModelId]=useState(()=>readText(SHEARER_MODEL_KEY,SHEARER_MODELS[0].id))
+ const gunModel=GUN_MODELS.find(x=>x.id===gunModelId)||GUN_MODELS[0]
+ const shearerModel=SHEARER_MODELS.find(x=>x.id===shearerModelId)||SHEARER_MODELS[0]
+ const gunW=gunModel.watts
+ const shearerW=shearerModel.watts
 
  async function load(){
    try{setSessions(await getWorkSessions())}catch(e){console.error(e);setSessions([])}
@@ -30,8 +42,8 @@ export default function WorkHours(){
  }
  useEffect(()=>{load();const id=setInterval(()=>setNow(new Date()),1000);const refresh=()=>load();window.addEventListener('tufting-work-hours-updated',refresh);return()=>{clearInterval(id);window.removeEventListener('tufting-work-hours-updated',refresh)}},[])
  useEffect(()=>writeNumber(RATE_KEY,rate),[rate])
- useEffect(()=>writeNumber(GUN_W_KEY,gunW),[gunW])
- useEffect(()=>writeNumber(SHEARER_W_KEY,shearerW),[shearerW])
+ useEffect(()=>writeText(GUN_MODEL_KEY,gunModelId),[gunModelId])
+ useEffect(()=>writeText(SHEARER_MODEL_KEY,shearerModelId),[shearerModelId])
 
  const liveSeconds=running?Math.max(0,Math.floor((now-new Date(running.started_at))/1000)):0
  const gunSeconds=getRunningDeviceSeconds(running,'gun',now)
@@ -54,14 +66,20 @@ export default function WorkHours(){
    setBusy(true)
    try{
      if(running){
-       const finished=await stopWorkSession()
+       const finished=await stopWorkSession({
+         gun_w:gunW,
+         shearer_w:shearerW,
+         gun_model:gunModel.label,
+         shearer_model:shearerModel.label,
+         rate_eur_kwh:rate,
+       })
        if(finished){
          await createEnergyExpenseForWorkSession(finished,{
            gun_w:gunW,
            shearer_w:shearerW,
            rate_eur_kwh:rate,
-           gun_label:tx.gun,
-           shearer_label:tx.shearer,
+           gun_label:`${tx.gun} – ${gunModel.label}`,
+           shearer_label:`${tx.shearer} – ${shearerModel.label}`,
            auto_label:tx.automatic,
            note_label:tx.energyNote,
          })
@@ -94,14 +112,13 @@ export default function WorkHours(){
        <label className="wh-rate"><span>€/kWh</span><input type="number" min="0" step="0.001" value={rate} onChange={e=>setRate(safeNumber(e.target.value))}/></label>
      </div>
      <div className="wh-device-grid">
-       <DeviceCard icon={<Zap/>} name={tx.gun} seconds={gunSeconds} watts={gunW} setWatts={setGunW} active={running?.active_device==='gun'} disabled={!running} onToggle={()=>toggleDevice('gun')} tx={tx}/>
-       <DeviceCard icon={<Wrench/>} name={tx.shearer} seconds={shearerSeconds} watts={shearerW} setWatts={setShearerW} active={running?.active_device==='shearer'} disabled={!running} onToggle={()=>toggleDevice('shearer')} tx={tx}/>
+       <DeviceCard icon={<Zap/>} name={tx.gun} seconds={gunSeconds} modelId={gunModelId} setModelId={setGunModelId} models={GUN_MODELS} active={running?.active_device==='gun'} disabled={!running} onToggle={()=>toggleDevice('gun')} tx={tx}/>
+       <DeviceCard icon={<Wrench/>} name={tx.shearer} seconds={shearerSeconds} modelId={shearerModelId} setModelId={setShearerModelId} models={SHEARER_MODELS} active={running?.active_device==='shearer'} disabled={!running} onToggle={()=>toggleDevice('shearer')} tx={tx}/>
      </div>
      <div className="wh-energy-live">
        <span>{tx.currentEnergy}</span>
        <b>{liveEnergy.kwh.toFixed(4)} kWh</b>
        <strong>€{liveEnergy.cost.toFixed(4)}</strong>
-       {shearerW<=0&&<small>{tx.shearerHint}</small>}
      </div>
    </section>
 
@@ -119,17 +136,18 @@ export default function WorkHours(){
        <b aria-hidden="true">›</b>
      </button>
      <div className="wh-history-content">
-       {sessions.length?<div className="wh-table-wrap"><table><thead><tr><th>{tx.date}</th><th>{tx.startAt}</th><th>{tx.endAt}</th><th>{tx.duration}</th><th>{tx.gun}</th><th>{tx.shearer}</th><th>{tx.energyCost}</th><th>{tx.actions}</th></tr></thead><tbody>{sessions.slice(0,60).map(s=>{const e=energyTotals(Number(s.gun_seconds)||0,Number(s.shearer_seconds)||0,gunW,shearerW,rate);return <tr key={s.id}><td>{formatDate(new Date(s.started_at),lang)}</td><td>{formatTime(new Date(s.started_at),lang)}</td><td>{formatTime(new Date(s.ended_at),lang)}</td><td><b>{formatDuration(Number(s.duration_seconds)||0)}</b></td><td>{formatDuration(Number(s.gun_seconds)||0)}</td><td>{formatDuration(Number(s.shearer_seconds)||0)}</td><td>€{e.cost.toFixed(4)}</td><td><button type="button" className="wh-delete-session" onClick={()=>removeSession(s.id)} title={tx.delete}><Trash2/><span>{tx.delete}</span></button></td></tr>})}</tbody></table></div>:<div className="wh-empty">{tx.empty}</div>}
+       {sessions.length?<div className="wh-table-wrap"><table><thead><tr><th>{tx.date}</th><th>{tx.startAt}</th><th>{tx.endAt}</th><th>{tx.duration}</th><th>{tx.gun}</th><th>{tx.shearer}</th><th>{tx.energyCost}</th><th>{tx.actions}</th></tr></thead><tbody>{sessions.slice(0,60).map(s=>{const e=energyTotals(Number(s.gun_seconds)||0,Number(s.shearer_seconds)||0,Number(s.gun_w)||gunW,Number(s.shearer_w)||shearerW,Number(s.rate_eur_kwh)||rate);return <tr key={s.id}><td>{formatDate(new Date(s.started_at),lang)}</td><td>{formatTime(new Date(s.started_at),lang)}</td><td>{formatTime(new Date(s.ended_at),lang)}</td><td><b>{formatDuration(Number(s.duration_seconds)||0)}</b></td><td>{formatDuration(Number(s.gun_seconds)||0)}</td><td>{formatDuration(Number(s.shearer_seconds)||0)}</td><td>€{e.cost.toFixed(4)}</td><td><button type="button" className="wh-delete-session" onClick={()=>removeSession(s.id)} title={tx.delete}><Trash2/><span>{tx.delete}</span></button></td></tr>})}</tbody></table></div>:<div className="wh-empty">{tx.empty}</div>}
      </div>
    </section>
  </div>
 }
 
-function DeviceCard({icon,name,seconds,watts,setWatts,active,disabled,onToggle,tx}){
+function DeviceCard({icon,name,seconds,modelId,setModelId,models,active,disabled,onToggle,tx}){
+ const model=models.find(x=>x.id===modelId)||models[0]
  return <article className={`wh-device-card ${active?'active':''}`}>
    <div className="wh-device-icon">{icon}</div>
    <div className="wh-device-main"><span>{name}</span><b>{formatDuration(seconds)}</b></div>
-   <label className="wh-watts"><span>W</span><input type="number" min="0" step="1" value={watts} onChange={e=>setWatts(safeNumber(e.target.value))}/></label>
+   <label className="wh-device-model"><span>{tx.model}</span><select value={model.id} onChange={e=>setModelId(e.target.value)} disabled={active}>{models.map(m=><option key={m.id} value={m.id}>{m.label}</option>)}</select><strong>{model.watts} W</strong></label>
    <button type="button" className={active?'stop':'start'} disabled={disabled} onClick={onToggle}>{active?<><Square/>{tx.deviceStop}</>:<><Play/>{tx.deviceStart}</>}</button>
  </article>
 }
@@ -140,14 +158,16 @@ function energyTotals(gunSeconds,shearerSeconds,gunW,shearerW,rate){
 }
 function readNumber(key,fallback){try{const v=Number(localStorage.getItem(key));return Number.isFinite(v)&&v>=0?v:fallback}catch{return fallback}}
 function writeNumber(key,value){try{localStorage.setItem(key,String(Math.max(0,Number(value)||0)))}catch{}}
+function readText(key,fallback){try{return localStorage.getItem(key)||fallback}catch{return fallback}}
+function writeText(key,value){try{localStorage.setItem(key,String(value||''))}catch{}}
 function safeNumber(v){const n=Number(v);return Number.isFinite(n)&&n>=0?n:0}
 function formatDuration(sec){sec=Math.max(0,Math.floor(Number(sec)||0));const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
 function locale(lang){return lang==='sq'?'sq-AL':lang==='de'?'de-DE':'en-GB'}
 function formatDate(d,lang){return d.toLocaleDateString(locale(lang),{day:'2-digit',month:'2-digit',year:'numeric'})}
 function formatTime(d,lang){return d.toLocaleTimeString(locale(lang),{hour:'2-digit',minute:'2-digit'})}
 function labels(lang){
- if(lang==='sq')return{title:'Orët e punës',subtitle:'Regjistro kohën reale që punon në projektet e tufting.',running:'Duke punuar',stopped:'I ndalur',current:'Sesioni aktual',notStarted:'Nuk ka sesion aktiv',start:'Start',stop:'Stop',today:'Sot',week:'Këtë javë',month:'Këtë muaj',history:'Historiku i punës',historySub:'Çdo Stop ruhet automatikisht.',date:'Data',startAt:'Fillimi',endAt:'Mbarimi',duration:'Kohëzgjatja',empty:'Ende nuk ka orë pune të ruajtura.',showHistory:'Shiko historikun',hideHistory:'Mbyll historikun',saveError:'Nuk u ruajt sesioni. Kontrollo lidhjen dhe provo përsëri.',actions:'Veprime',delete:'Fshi',confirmDelete:'Ta fshij këtë sesion pune dhe shpenzimin e energjisë?',deleteError:'Sesioni nuk u fshi. Provo përsëri.',devices:'Pajisjet gjatë punës',devicesSub:'Mat vetëm kohën kur pajisja është realisht në përdorim.',gun:'Pistoleta',shearer:'Makina qethëse',deviceStart:'Nis',deviceStop:'Ndalo',currentEnergy:'Energjia e këtij sesioni',energyCost:'Kosto energjie',shearerHint:'Vendos fuqinë W të qethëses nga etiketa/adapteri që llogaritja të jetë e saktë.',automatic:'Automatik',energyNote:'Gjeneruar automatikisht nga Orët e punës.'}
- if(lang==='de')return{title:'Arbeitszeit',subtitle:'Erfasse deine echte Arbeitszeit für Tufting-Projekte.',running:'Läuft',stopped:'Gestoppt',current:'Aktuelle Sitzung',notStarted:'Keine aktive Sitzung',start:'Start',stop:'Stop',today:'Heute',week:'Diese Woche',month:'Dieser Monat',history:'Arbeitsverlauf',historySub:'Jeder Stop wird automatisch gespeichert.',date:'Datum',startAt:'Start',endAt:'Ende',duration:'Dauer',empty:'Noch keine Arbeitszeit gespeichert.',showHistory:'Verlauf anzeigen',hideHistory:'Verlauf schließen',saveError:'Sitzung konnte nicht gespeichert werden. Bitte erneut versuchen.',actions:'Aktionen',delete:'Löschen',confirmDelete:'Diese Arbeitssitzung und die Energiekosten löschen?',deleteError:'Sitzung konnte nicht gelöscht werden.',devices:'Geräte während der Arbeit',devicesSub:'Nur die echte Nutzungszeit des Geräts wird gemessen.',gun:'Tufting-Pistole',shearer:'Schermaschine',deviceStart:'Start',deviceStop:'Stop',currentEnergy:'Energie dieser Sitzung',energyCost:'Energiekosten',shearerHint:'Trage die Wattzahl der Schermaschine vom Typenschild/Netzteil ein.',automatic:'Automatisch',energyNote:'Automatisch aus der Arbeitszeit erstellt.'}
- return{title:'Work Hours',subtitle:'Track the real time you spend on tufting projects.',running:'Running',stopped:'Stopped',current:'Current session',notStarted:'No active session',start:'Start',stop:'Stop',today:'Today',week:'This week',month:'This month',history:'Work history',historySub:'Every Stop is saved automatically.',date:'Date',startAt:'Start',endAt:'End',duration:'Duration',empty:'No saved work sessions yet.',showHistory:'View history',hideHistory:'Hide history',saveError:'Could not save the session. Check the connection and try again.',actions:'Actions',delete:'Delete',confirmDelete:'Delete this work session and its energy expense?',deleteError:'Could not delete the session.',devices:'Devices during work',devicesSub:'Measure only the time the device is actually being used.',gun:'Tufting gun',shearer:'Shearing machine',deviceStart:'Start',deviceStop:'Stop',currentEnergy:'Energy for this session',energyCost:'Energy cost',shearerHint:'Enter the shearing machine wattage from its label/adapter for an accurate calculation.',automatic:'Automatic',energyNote:'Generated automatically from Work Hours.'}
+ if(lang==='sq')return{title:'Orët e punës',subtitle:'Regjistro kohën reale që punon në projektet e tufting.',running:'Duke punuar',stopped:'I ndalur',current:'Sesioni aktual',notStarted:'Nuk ka sesion aktiv',start:'Start',stop:'Stop',today:'Sot',week:'Këtë javë',month:'Këtë muaj',history:'Historiku i punës',historySub:'Çdo Stop ruhet automatikisht.',date:'Data',startAt:'Fillimi',endAt:'Mbarimi',duration:'Kohëzgjatja',empty:'Ende nuk ka orë pune të ruajtura.',showHistory:'Shiko historikun',hideHistory:'Mbyll historikun',saveError:'Nuk u ruajt sesioni. Kontrollo lidhjen dhe provo përsëri.',actions:'Veprime',delete:'Fshi',confirmDelete:'Ta fshij këtë sesion pune dhe shpenzimin e energjisë?',deleteError:'Sesioni nuk u fshi. Provo përsëri.',devices:'Pajisjet gjatë punës',devicesSub:'Zgjidh modelin; fuqia W vendoset automatikisht.',gun:'Pistoleta',shearer:'Makina qethëse',model:'Modeli',deviceStart:'Nis',deviceStop:'Ndalo',currentEnergy:'Energjia e këtij sesioni',energyCost:'Kosto energjie',shearerHint:'Vendos fuqinë W të qethëses nga etiketa/adapteri që llogaritja të jetë e saktë.',automatic:'Automatik',energyNote:'Gjeneruar automatikisht nga Orët e punës.'}
+ if(lang==='de')return{title:'Arbeitszeit',subtitle:'Erfasse deine echte Arbeitszeit für Tufting-Projekte.',running:'Läuft',stopped:'Gestoppt',current:'Aktuelle Sitzung',notStarted:'Keine aktive Sitzung',start:'Start',stop:'Stop',today:'Heute',week:'Diese Woche',month:'Dieser Monat',history:'Arbeitsverlauf',historySub:'Jeder Stop wird automatisch gespeichert.',date:'Datum',startAt:'Start',endAt:'Ende',duration:'Dauer',empty:'Noch keine Arbeitszeit gespeichert.',showHistory:'Verlauf anzeigen',hideHistory:'Verlauf schließen',saveError:'Sitzung konnte nicht gespeichert werden. Bitte erneut versuchen.',actions:'Aktionen',delete:'Löschen',confirmDelete:'Diese Arbeitssitzung und die Energiekosten löschen?',deleteError:'Sitzung konnte nicht gelöscht werden.',devices:'Geräte während der Arbeit',devicesSub:'Modell auswählen; die Wattzahl wird automatisch gesetzt.',gun:'Tufting-Pistole',shearer:'Schermaschine',model:'Modell',deviceStart:'Start',deviceStop:'Stop',currentEnergy:'Energie dieser Sitzung',energyCost:'Energiekosten',shearerHint:'Trage die Wattzahl der Schermaschine vom Typenschild/Netzteil ein.',automatic:'Automatisch',energyNote:'Automatisch aus der Arbeitszeit erstellt.'}
+ return{title:'Work Hours',subtitle:'Track the real time you spend on tufting projects.',running:'Running',stopped:'Stopped',current:'Current session',notStarted:'No active session',start:'Start',stop:'Stop',today:'Today',week:'This week',month:'This month',history:'Work history',historySub:'Every Stop is saved automatically.',date:'Date',startAt:'Start',endAt:'End',duration:'Duration',empty:'No saved work sessions yet.',showHistory:'View history',hideHistory:'Hide history',saveError:'Could not save the session. Check the connection and try again.',actions:'Actions',delete:'Delete',confirmDelete:'Delete this work session and its energy expense?',deleteError:'Could not delete the session.',devices:'Devices during work',devicesSub:'Choose the model; wattage is filled automatically.',gun:'Tufting gun',shearer:'Shearing machine',model:'Model',deviceStart:'Start',deviceStop:'Stop',currentEnergy:'Energy for this session',energyCost:'Energy cost',shearerHint:'Enter the shearing machine wattage from its label/adapter for an accurate calculation.',automatic:'Automatic',energyNote:'Generated automatically from Work Hours.'}
 }
 function runningSecondsForPeriod(running,now,period){if(!running?.started_at)return 0;const start=new Date(running.started_at);let boundary=new Date(now);if(period==='day'){boundary.setHours(0,0,0,0)}else if(period==='week'){const d=(boundary.getDay()+6)%7;boundary.setHours(0,0,0,0);boundary.setDate(boundary.getDate()-d)}else if(period==='month'){boundary=new Date(now.getFullYear(),now.getMonth(),1)}const effective=start>boundary?start:boundary;return Math.max(0,Math.floor((now-effective)/1000))}
