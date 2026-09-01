@@ -412,3 +412,147 @@
     color:#172033;
   }
 }
+
+/* ==========================================================
+   DESKTOP-ONLY CLEAN FORM DIALOGS
+   Inventory + Expenses + Orders modal forms should be neutral,
+   without strong colorful cards. Phone and tablet stay untouched.
+   ========================================================== */
+@media(min-width:1025px){
+  .inventory-dialog,
+  .expenses-dialog,
+  .orders-dialog{
+    background:#fffdf9!important;
+  }
+
+  .inventory-dialog .biz-dialog-head,
+  .expenses-dialog .biz-dialog-head,
+  .orders-dialog .biz-dialog-head{
+    background:linear-gradient(180deg,#fffdf9 0%,#fff7ef 100%)!important;
+    border-bottom:1px solid #e8d9c6!important;
+  }
+
+  .inventory-dialog .biz-dialog-head h2,
+  .expenses-dialog .biz-dialog-head h2,
+  .orders-dialog .biz-dialog-head h2{
+    color:#172033!important;
+  }
+
+  .inventory-dialog .biz-dialog-head p,
+  .expenses-dialog .biz-dialog-head p,
+  .orders-dialog .biz-dialog-head p{
+    color:#746b61!important;
+  }
+
+  .inventory-dialog .retro-form,
+  .expenses-dialog .retro-form,
+  .orders-dialog .retro-form{
+    background:#fffdf9!important;
+    gap:14px!important;
+  }
+
+  .inventory-dialog .retro-field-card,
+  .inventory-dialog .retro-field-card.green,
+  .inventory-dialog .retro-field-card.purple,
+  .inventory-dialog .retro-field-card.orange,
+  .inventory-dialog .retro-field-card.pink,
+  .inventory-dialog .retro-field-card.coral,
+  .inventory-dialog .retro-field-card.blue,
+  .inventory-dialog .retro-field-card.yellow,
+  .inventory-dialog .retro-field-card.color-card,
+  .expenses-dialog .retro-field-card,
+  .expenses-dialog .retro-field-card.green,
+  .expenses-dialog .retro-field-card.purple,
+  .expenses-dialog .retro-field-card.orange,
+  .expenses-dialog .retro-field-card.pink,
+  .expenses-dialog .retro-field-card.coral,
+  .expenses-dialog .retro-field-card.blue,
+  .expenses-dialog .retro-field-card.yellow,
+  .orders-dialog .retro-field-card,
+  .orders-dialog .retro-field-card.green,
+  .orders-dialog .retro-field-card.purple,
+  .orders-dialog .retro-field-card.orange,
+  .orders-dialog .retro-field-card.pink,
+  .orders-dialog .retro-field-card.coral,
+  .orders-dialog .retro-field-card.blue,
+  .orders-dialog .retro-field-card.yellow{
+    background:#fffdfa!important;
+    border:1px solid #e4d4c1!important;
+    box-shadow:none!important;
+  }
+
+  .inventory-dialog .retro-field-title,
+  .inventory-dialog .retro-field-title svg,
+  .expenses-dialog .retro-field-title,
+  .expenses-dialog .retro-field-title svg,
+  .orders-dialog .retro-field-title,
+  .orders-dialog .retro-field-title svg{
+    color:#172033!important;
+  }
+
+  .inventory-dialog .retro-field-card input,
+  .inventory-dialog .retro-field-card select,
+  .inventory-dialog .retro-field-card textarea,
+  .expenses-dialog .retro-field-card input,
+  .expenses-dialog .retro-field-card select,
+  .expenses-dialog .retro-field-card textarea,
+  .orders-dialog .retro-field-card input,
+  .orders-dialog .retro-field-card select,
+  .orders-dialog .retro-field-card textarea{
+    background:#ffffff!important;
+    border:1px solid #dbc8af!important;
+    color:#172033!important;
+    box-shadow:none!important;
+  }
+
+  .inventory-dialog .retro-field-card input::placeholder,
+  .inventory-dialog .retro-field-card textarea::placeholder,
+  .expenses-dialog .retro-field-card input::placeholder,
+  .expenses-dialog .retro-field-card textarea::placeholder,
+  .orders-dialog .retro-field-card input::placeholder,
+  .orders-dialog .retro-field-card textarea::placeholder{
+    color:#8b847b!important;
+  }
+
+  .inventory-dialog .choice-row button,
+  .expenses-dialog .choice-row button,
+  .orders-dialog .choice-row button{
+    background:#fff!important;
+    border:1px solid #dbc8af!important;
+    color:#172033!important;
+  }
+
+  .inventory-dialog .choice-row button.active,
+  .inventory-dialog .choice-row button.active.acrylic,
+  .inventory-dialog .choice-row button.active.wool,
+  .inventory-dialog .choice-row button.active.gram,
+  .expenses-dialog .choice-row button.active,
+  .orders-dialog .choice-row button.active{
+    background:#eef7f2!important;
+    border-color:#9bcbb5!important;
+    color:#15624c!important;
+  }
+
+  .inventory-dialog .biz-form-actions,
+  .expenses-dialog .biz-form-actions,
+  .orders-dialog .biz-form-actions{
+    margin-top:8px!important;
+    padding-top:14px!important;
+    border-top:1px solid #eadcc8!important;
+    background:transparent!important;
+  }
+
+  .inventory-dialog .biz-form-actions .biz-btn:not(.retro-save):not(.danger),
+  .expenses-dialog .biz-form-actions .biz-btn:not(.retro-save):not(.danger),
+  .orders-dialog .biz-form-actions .biz-btn:not(.retro-save):not(.danger){
+    background:#fffaf2!important;
+    color:#172033!important;
+    border-color:#dcc9b0!important;
+  }
+
+  .inventory-dialog .retro-save,
+  .expenses-dialog .retro-save,
+  .orders-dialog .retro-save{
+    box-shadow:none!important;
+  }
+}
