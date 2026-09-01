@@ -74,7 +74,7 @@ export function getRunningDeviceSeconds(running,device,now=new Date()){
   return total
 }
 
-export async function stopWorkSession(){
+export async function stopWorkSession(deviceSettings={}){
   const raw=getRunningWorkSession();if(!raw)return null
   const endedAt=new Date(),running=finalizeActiveDevice(raw,endedAt),startedAt=new Date(running.started_at)
   const clean={
@@ -84,6 +84,11 @@ export async function stopWorkSession(){
     duration_seconds:Math.max(0,Math.round((endedAt-startedAt)/1000)),
     gun_seconds:Number(running.gun_seconds)||0,
     shearer_seconds:Number(running.shearer_seconds)||0,
+    gun_w:Math.max(0,Number(deviceSettings.gun_w)||0),
+    shearer_w:Math.max(0,Number(deviceSettings.shearer_w)||0),
+    gun_model:String(deviceSettings.gun_model||''),
+    shearer_model:String(deviceSettings.shearer_model||''),
+    rate_eur_kwh:Math.max(0,Number(deviceSettings.rate_eur_kwh)||0),
     created_at:endedAt.toISOString(),
     pending:true
   }
@@ -104,6 +109,11 @@ async function syncOne(row){
     duration_seconds:Number(row.duration_seconds)||0,
     gun_seconds:Number(row.gun_seconds)||0,
     shearer_seconds:Number(row.shearer_seconds)||0,
+    gun_w:Math.max(0,Number(row.gun_w)||0),
+    shearer_w:Math.max(0,Number(row.shearer_w)||0),
+    gun_model:String(row.gun_model||''),
+    shearer_model:String(row.shearer_model||''),
+    rate_eur_kwh:Math.max(0,Number(row.rate_eur_kwh)||0),
     created_at:row.created_at||new Date().toISOString()
   }
   await setDoc(doc(db,'work_hours',row.id),payload,{merge:true})
