@@ -189,206 +189,111 @@
 }
 
 /* ==========================================================
-   MOBILE WORK HOURS — COMPACT SIZE FIX ONLY
-   Keep functionality and desktop/tablet unchanged.
+   FINAL SIZE FIX ONLY — Work Hours
+   Phone: make the colored cards a little smaller so lower controls fit.
+   Tablet: reduce overall scale of Work Hours only.
+   No other pages are affected.
    ========================================================== */
 @media (max-width:760px){
   .work-hours-page{
-    padding:12px 14px 104px!important;
     gap:10px!important;
+    padding:14px 14px 108px!important;
   }
-
   .wh-head{gap:7px!important}
-  .wh-head>div:first-child h1{
-    font-size:27px!important;
-    line-height:1!important;
-  }
-  .wh-head>div:first-child p{
-    margin-top:5px!important;
-    font-size:12px!important;
-    line-height:1.3!important;
-  }
-  .wh-status{
-    min-height:34px!important;
-    padding:0 13px!important;
-    font-size:12px!important;
-  }
-  .wh-status i{width:8px!important;height:8px!important}
+  .wh-head>div:first-child h1{font-size:28px!important}
+  .wh-head>div:first-child p{font-size:12px!important;margin-top:5px!important}
+  .wh-status{min-height:36px!important;padding:0 14px!important;font-size:13px!important}
 
   .wh-hero{gap:9px!important}
   .wh-hero-clock{
-    min-height:124px!important;
-    border-radius:18px!important;
-    padding:15px 16px!important;
-    grid-template-columns:58px minmax(0,1fr)!important;
+    min-height:132px!important;
+    padding:16px!important;
+    grid-template-columns:62px minmax(0,1fr)!important;
     column-gap:14px!important;
+    border-radius:19px!important;
   }
   .wh-hero-clock>svg{
-    width:54px!important;
-    height:54px!important;
+    width:58px!important;
+    height:58px!important;
     padding:12px!important;
-    border-width:5px!important;
   }
   .wh-hero-clock span{font-size:14px!important}
-  .wh-hero-clock b{font-size:31px!important}
-  .wh-hero-clock small{font-size:10px!important;margin-top:3px!important}
-
+  .wh-hero-clock b{font-size:32px!important}
+  .wh-hero-clock small{font-size:11px!important}
   .wh-main-action{
-    min-height:52px!important;
-    border-radius:15px!important;
+    min-height:54px!important;
+    border-radius:16px!important;
     font-size:18px!important;
-    gap:8px!important;
   }
   .wh-main-action svg{width:23px!important;height:23px!important}
 
   .wh-stats{gap:8px!important}
   .wh-stats article{
-    min-height:72px!important;
-    border-radius:15px!important;
-    padding:10px 13px!important;
-    grid-template-columns:44px minmax(0,1fr) 18px!important;
+    min-height:76px!important;
+    padding:10px 14px!important;
+    grid-template-columns:48px minmax(0,1fr) 18px!important;
     column-gap:11px!important;
+    border-radius:16px!important;
   }
-  .wh-stats article::after{font-size:27px!important}
   .wh-stats svg{
-    width:42px!important;
-    height:42px!important;
+    width:44px!important;
+    height:44px!important;
     padding:10px!important;
   }
   .wh-stats span{font-size:13px!important}
+  .wh-stats b{font-size:24px!important}
+  .wh-stats article::after{font-size:28px!important}
+
+  .wh-section-title{margin:0 0 7px!important}
+  .wh-section-title>svg{width:38px!important;height:38px!important;padding:9px!important}
+  .wh-section-title h2{font-size:18px!important}
+  .wh-section-title p{font-size:10px!important}
+  .wh-history-toggle{min-height:50px!important;border-radius:15px!important;font-size:13px!important}
+}
+
+@media (min-width:761px) and (max-width:1180px){
+  .work-hours-page{
+    max-width:none!important;
+    gap:12px!important;
+    padding:8px 10px 24px!important;
+  }
+  .wh-head h1{font-size:27px!important}
+  .wh-head p{font-size:12px!important;margin-top:4px!important}
+  .wh-status{padding:7px 11px!important;font-size:12px!important}
+
+  .wh-hero{
+    grid-template-columns:minmax(0,1fr) 150px!important;
+    gap:10px!important;
+  }
+  .wh-hero-clock{
+    min-height:122px!important;
+    padding:18px!important;
+    border-radius:18px!important;
+    grid-template-columns:auto 1fr!important;
+    column-gap:14px!important;
+  }
+  .wh-hero-clock>svg{width:52px!important;height:52px!important}
+  .wh-hero-clock span{font-size:13px!important}
+  .wh-hero-clock b{font-size:34px!important}
+  .wh-hero-clock small{font-size:11px!important}
+  .wh-main-action{border-radius:18px!important;font-size:17px!important}
+  .wh-main-action svg{width:22px!important;height:22px!important}
+
+  .wh-stats{gap:10px!important}
+  .wh-stats article{
+    min-height:88px!important;
+    padding:13px 14px!important;
+    border-radius:16px!important;
+    column-gap:10px!important;
+  }
+  .wh-stats svg{width:31px!important;height:31px!important}
+  .wh-stats span{font-size:13px!important}
   .wh-stats b{font-size:23px!important}
 
-  .wh-section-title{
-    margin:0 0 7px!important;
-    gap:8px!important;
-  }
-  .wh-section-title>svg{
-    width:36px!important;
-    height:36px!important;
-    padding:8px!important;
-  }
-  .wh-section-title h2{font-size:17px!important}
-  .wh-section-title p{font-size:9px!important;margin-top:2px!important}
-
-  .wh-history-toggle{
-    min-height:46px!important;
-    border-radius:14px!important;
-    grid-template-columns:29px 1fr auto!important;
-    gap:8px!important;
-    padding:0 12px!important;
-    font-size:12px!important;
-  }
-  .wh-history-toggle-icon{
-    width:29px!important;
-    height:29px!important;
-    border-radius:9px!important;
-  }
-  .wh-history-toggle-icon svg{width:16px!important;height:16px!important}
-  .wh-history-toggle b{font-size:25px!important}
-}
-
-/* FINAL current-project phone sizing — Work Hours only */
-@media(max-width:760px){
- .work-hours-page{padding:10px 14px 100px!important;gap:8px!important}
- .wh-head{gap:5px!important}.wh-head h1{font-size:25px!important}.wh-head p{font-size:11px!important;margin-top:4px!important}.wh-status{min-height:32px!important;font-size:11px!important;padding:0 12px!important}
- .wh-hero{gap:8px!important}.wh-hero-clock{min-height:108px!important;padding:13px 14px!important;grid-template-columns:50px minmax(0,1fr)!important;column-gap:12px!important;border-radius:17px!important}.wh-hero-clock>svg{width:48px!important;height:48px!important;padding:10px!important;border-width:4px!important}.wh-hero-clock span{font-size:13px!important}.wh-hero-clock b{font-size:28px!important}.wh-hero-clock small{font-size:9px!important}
- .wh-main-action{min-height:48px!important;border-radius:14px!important;font-size:17px!important}.wh-main-action svg{width:21px!important;height:21px!important}
- .wh-stats{gap:7px!important}.wh-stats article{min-height:64px!important;padding:8px 11px!important;grid-template-columns:38px minmax(0,1fr) 15px!important;column-gap:9px!important;border-radius:14px!important}.wh-stats svg{width:36px!important;height:36px!important;padding:8px!important}.wh-stats span{font-size:12px!important}.wh-stats b{font-size:20px!important}.wh-stats article::after{font-size:23px!important}
- .wh-section-title{margin:0 0 6px!important}.wh-section-title>svg{width:32px!important;height:32px!important;padding:7px!important}.wh-section-title h2{font-size:16px!important}.wh-section-title p{font-size:8px!important}.wh-history-toggle{min-height:42px!important;font-size:11px!important}
-}
-
-/* PC ONLY — remove the history toggle button; keep history visible */
-@media (min-width: 761px){
-  .work-hours-page .wh-history-toggle{
-    display:none!important;
-  }
-  .work-hours-page .wh-history-content{
-    display:block!important;
-    margin-top:0!important;
-  }
-}
-
-
-/* Work-hours saved session delete button */
-.wh-delete-session{
-  border:1px solid #f1c8c2;
-  background:#fff4f2;
-  color:#d84a3d;
-  min-height:34px;
-  padding:0 10px;
-  border-radius:10px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  font-weight:850;
-  cursor:pointer;
-}
-.wh-delete-session svg{width:15px;height:15px}
-@media(max-width:760px){
-  .wh-delete-session{width:34px;min-width:34px;height:34px;padding:0;border-radius:10px}
-  .wh-delete-session span{display:none}
-  .wh-history-card table{min-width:610px!important}
-}
-
-/* ==========================================================
-   DEVICE TIME + AUTOMATIC ENERGY — Work Hours only
-   Desktop/tablet keep desktop structure; phone keeps compact layout.
-   ========================================================== */
-.wh-device-panel{
-  background:#fffdf8;
-  border:1px solid #eadcc8;
-  border-radius:22px;
-  padding:18px;
-  box-shadow:0 9px 22px rgba(75,46,23,.06);
-}
-.wh-device-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
-.wh-device-head h2{margin:0;font-size:20px;color:#172033}.wh-device-head p{margin:4px 0 0;color:#777;font-size:12px}
-.wh-rate{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;color:#172033}.wh-rate input{width:92px;height:40px;border:1px solid #dfcfba;border-radius:10px;background:#fff;padding:0 10px;color:#172033;font-weight:800}
-.wh-device-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.wh-device-card{min-height:104px;border:1px solid #e6d8c5;border-radius:17px;background:#fffaf3;padding:14px;display:grid;grid-template-columns:48px minmax(0,1fr) 90px 108px;gap:12px;align-items:center;transition:.18s ease}
-.wh-device-card.active{border-color:#94cdb5;background:#f1faf5;box-shadow:0 0 0 2px #00995e12}
-.wh-device-icon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#eef7f2;color:#087b56}.wh-device-icon svg{width:23px;height:23px}
-.wh-device-main{min-width:0}.wh-device-main span{display:block;font-size:13px;font-weight:900;color:#172033}.wh-device-main b{display:block;margin-top:4px;font-size:24px;line-height:1;color:#172033;letter-spacing:.4px}
-.wh-watts{display:grid;grid-template-columns:auto 1fr;align-items:center;border:1px solid #e1d2bf;border-radius:11px;background:#fff;overflow:hidden;height:42px}.wh-watts span{padding:0 8px;font-size:11px;font-weight:900;color:#6f675e;border-right:1px solid #eadfce}.wh-watts input{width:100%;height:100%;min-width:0;border:0;outline:0;background:#fff;padding:0 8px;color:#172033;font-weight:800}
-.wh-device-card>button{height:42px;border:0;border-radius:11px;display:flex;align-items:center;justify-content:center;gap:7px;font-weight:900}.wh-device-card>button svg{width:17px;height:17px}.wh-device-card>button.start{background:#e9f5ef;color:#087b56}.wh-device-card>button.stop{background:#fff0ed;color:#d94f40}.wh-device-card>button:disabled{opacity:.42;cursor:not-allowed}
-.wh-energy-live{margin-top:12px;padding:12px 14px;border-radius:14px;background:#f7f2ea;border:1px solid #e8dccb;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;color:#172033}.wh-energy-live span{font-size:12px;font-weight:850}.wh-energy-live b{font-size:14px}.wh-energy-live strong{font-size:18px;color:#087b56}.wh-energy-live small{grid-column:1/-1;color:#8a6b38;font-size:10px}
-
-@media(min-width:761px) and (max-width:1100px){
-  .wh-device-card{grid-template-columns:44px minmax(0,1fr) 82px;grid-template-areas:'icon main watts' 'icon button button'}
-  .wh-device-icon{grid-area:icon}.wh-device-main{grid-area:main}.wh-watts{grid-area:watts}.wh-device-card>button{grid-area:button}
-}
-
-@media(max-width:760px){
-  .wh-device-panel{padding:11px!important;border-radius:15px!important;box-shadow:none!important}
-  .wh-device-head{margin-bottom:9px!important;gap:8px!important;align-items:flex-end!important}
-  .wh-device-head h2{font-size:15px!important}.wh-device-head p{font-size:9px!important;line-height:1.3!important}
-  .wh-rate{font-size:9px!important;gap:5px!important}.wh-rate input{width:70px!important;height:34px!important;border-radius:9px!important;padding:0 7px!important;font-size:11px!important}
-  .wh-device-grid{grid-template-columns:1fr!important;gap:7px!important}
-  .wh-device-card{min-height:64px!important;padding:8px!important;border-radius:13px!important;grid-template-columns:36px minmax(0,1fr) 66px 68px!important;gap:7px!important}
-  .wh-device-icon{width:34px!important;height:34px!important;border-radius:10px!important}.wh-device-icon svg{width:18px!important;height:18px!important}
-  .wh-device-main span{font-size:10px!important}.wh-device-main b{font-size:17px!important;margin-top:2px!important}
-  .wh-watts{height:34px!important;border-radius:9px!important}.wh-watts span{font-size:8px!important;padding:0 5px!important}.wh-watts input{font-size:10px!important;padding:0 5px!important}
-  .wh-device-card>button{height:34px!important;border-radius:9px!important;font-size:9px!important;gap:4px!important}.wh-device-card>button svg{width:13px!important;height:13px!important}
-  .wh-energy-live{margin-top:8px!important;padding:8px 9px!important;border-radius:11px!important;grid-template-columns:1fr auto auto!important;gap:7px!important}.wh-energy-live span{font-size:9px!important}.wh-energy-live b{font-size:10px!important}.wh-energy-live strong{font-size:12px!important}.wh-energy-live small{font-size:8px!important;line-height:1.25!important}
-  .wh-history-card table{min-width:900px!important}
-}
-
-/* Device model presets: select model, wattage is automatic */
-.wh-device-model{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;align-items:center;min-width:0}
-.wh-device-model>span{grid-column:1/-1;font-size:9px;font-weight:850;color:#7a7167;text-transform:uppercase;letter-spacing:.06em}
-.wh-device-model select{min-width:0;width:100%;height:38px;border:1px solid #ddcfbd;border-radius:10px;background:#fffdf9;color:#172033;padding:0 9px;font-size:11px;font-weight:750;outline:none}
-.wh-device-model strong{min-width:58px;height:38px;border-radius:10px;background:#eef7f2;border:1px solid #bddfce;color:#087b56;display:grid;place-items:center;font-size:12px;white-space:nowrap}
-.wh-device-model select:disabled{opacity:.72;cursor:not-allowed}
-
-@media(min-width:761px){
- .wh-device-card{grid-template-columns:48px minmax(145px,.75fr) minmax(250px,1.25fr) 108px}
-}
-
-@media(max-width:760px){
- .wh-device-card{grid-template-columns:36px minmax(0,1fr) 72px!important;grid-template-areas:'icon main button' 'model model model'!important}
- .wh-device-icon{grid-area:icon!important}.wh-device-main{grid-area:main!important}.wh-device-card>button{grid-area:button!important}.wh-device-model{grid-area:model!important;grid-template-columns:minmax(0,1fr) 60px!important}
- .wh-device-model>span{display:none!important}
- .wh-device-model select{height:34px!important;font-size:9px!important;border-radius:9px!important}
- .wh-device-model strong{height:34px!important;min-width:60px!important;font-size:10px!important;border-radius:9px!important}
+  .wh-history-card{padding:15px!important;border-radius:18px!important}
+  .wh-section-title{margin-bottom:10px!important}
+  .wh-section-title>svg{width:38px!important;height:38px!important;padding:9px!important;border-radius:11px!important}
+  .wh-section-title h2{font-size:20px!important}
+  .wh-section-title p{font-size:11px!important}
+  .wh-history-card th,.wh-history-card td{padding:9px 8px!important;font-size:11px!important}
 }
