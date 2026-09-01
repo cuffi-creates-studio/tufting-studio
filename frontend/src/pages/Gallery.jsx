@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react'
-import {X} from 'lucide-react'
+import {Image as ImageIcon,X} from 'lucide-react'
 import {getProjects} from '../lib/projectsStore'
 import MobilePageHeader from '../components/MobilePageHeader'
 import {useI18n} from '../i18n/I18n'
@@ -63,18 +63,101 @@ export default function Gallery(){
       word-break:break-word;
     }
 
+    .gallery-status{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid transparent;
+    }
+
+    .gallery-status.done{
+      background:#e9f8f0;
+      color:#0d8e5d;
+      border-color:#bde4cd;
+    }
+
+    .gallery-status.progress{
+      background:#fff1ea;
+      color:#e15e3d;
+      border-color:#f3c8bb;
+    }
+
+    .gallery-desktop-hero{display:none;}
+
     @media(min-width:761px){
       .mobile-standard-page.gallery-desktop-page{
         width:100%;
         max-width:1450px;
         margin:0 auto;
-        padding:28px 30px 46px;
+        padding:24px 30px 50px;
         box-sizing:border-box;
       }
 
+      .gallery-desktop-hero{
+        display:flex;
+        align-items:flex-end;
+        justify-content:space-between;
+        gap:18px;
+        margin:0 0 26px;
+        padding:28px 30px;
+        border:1px solid #eadcc9;
+        border-radius:28px;
+        background:linear-gradient(135deg,#fffdf9 0%,#fff7ed 56%,#fdfaf6 100%);
+        box-shadow:0 14px 36px rgba(39,31,21,.06);
+      }
+
+      .gallery-desktop-copy small{
+        display:inline-block;
+        margin:0 0 10px;
+        color:#8f7a61;
+        font-size:12px;
+        font-weight:800;
+        letter-spacing:.12em;
+        text-transform:uppercase;
+      }
+
+      .gallery-desktop-copy h1{
+        margin:0;
+        font-size:42px;
+        line-height:1;
+        letter-spacing:-1.2px;
+        color:#172033;
+      }
+
+      .gallery-desktop-copy p{
+        max-width:640px;
+        margin:10px 0 0;
+        color:#6d7480;
+        font-size:15px;
+      }
+
+      .gallery-desktop-badge{
+        display:inline-flex;
+        align-items:center;
+        gap:10px;
+        align-self:center;
+        padding:13px 16px;
+        border-radius:18px;
+        border:1px solid #eadcc9;
+        background:#fffdf8;
+        color:#172033;
+        font-weight:800;
+        box-shadow:0 8px 20px rgba(39,31,21,.04);
+        white-space:nowrap;
+      }
+
+      .gallery-desktop-badge svg{
+        width:18px;
+        height:18px;
+        color:#744be3;
+      }
+
       .gallery-desktop-page .page-subtitle{
-        margin:0 0 20px;
-        color:#737b86;
+        display:none;
       }
 
       .gallery-project-grid{
@@ -84,38 +167,52 @@ export default function Gallery(){
       }
 
       .gallery-project-card{
-        border-radius:22px;
+        border-radius:24px;
         border:1px solid #e5d5c1;
         background:#fffaf3;
-        box-shadow:0 10px 28px rgba(39,31,21,.06);
+        box-shadow:0 12px 28px rgba(39,31,21,.06);
+        transition:transform .18s ease, box-shadow .18s ease;
+      }
+
+      .gallery-project-card:hover{
+        transform:translateY(-4px);
+        box-shadow:0 18px 38px rgba(39,31,21,.09);
       }
 
       .gallery-image-button{
-        height:auto;
-        min-height:220px;
-        background:#f7efe5;
+        height:310px;
+        min-height:310px;
+        background:linear-gradient(180deg,#fbf5eb 0%,#f7efe5 100%);
         cursor:zoom-in;
-        overflow:visible;
+        overflow:hidden;
       }
 
       .gallery-project-image{
         width:100%;
-        height:auto;
-        max-height:none;
-        object-fit:contain;
+        height:100%;
+        object-fit:cover;
         object-position:center;
         display:block;
       }
 
       .gallery-card-info{
-        padding:15px 17px 17px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:14px;
+        padding:16px 18px 18px;
         background:#fffaf3;
         border-top:1px solid #eee0cf;
       }
 
       .gallery-card-info b{
-        font-size:17px;
-        margin-bottom:6px;
+        font-size:18px;
+        margin-bottom:5px;
+      }
+
+      .gallery-card-copy{
+        min-width:0;
+        flex:1;
       }
     }
 
@@ -123,39 +220,56 @@ export default function Gallery(){
       .gallery-project-grid{
         grid-template-columns:repeat(2,minmax(0,1fr));
       }
+
+      .gallery-desktop-hero{
+        padding:24px 22px;
+      }
+
+      .gallery-desktop-copy h1{
+        font-size:36px;
+      }
     }
   `}</style>
 
   <div className="mobile-standard-page gallery-desktop-page">
     <MobilePageHeader title={t('gallery')}/>
+
+    <div className="gallery-desktop-hero">
+      <div className="gallery-desktop-copy">
+        <small>Tufting Studio</small>
+        <h1>{t('gallery')}</h1>
+        <p>{t('projectLibrary')}</p>
+      </div>
+      <div className="gallery-desktop-badge"><ImageIcon/>{projects.length} {t('projects')}</div>
+    </div>
+
     <p className="page-subtitle">{t('projectLibrary')}</p>
 
     {projects.length
       ? <div className="gallery-project-grid">
-        {projects.map(p=><article className="gallery-project-card" key={p.id}>
-          <button
-            type="button"
-            className="gallery-image-button"
-            onClick={()=>p.image_data&&setSelected(p)}
-            style={{cursor:p.image_data?'zoom-in':'default'}}
-          >
-            {p.image_data
-              ? <img className="gallery-project-image" src={p.image_data} alt={p.name}/>
-              : <span style={{fontSize:42}}>🧶</span>}
-          </button>
+        {projects.map(p=>{
+          const done=p.status==='Completed'
+          return <article className="gallery-project-card" key={p.id}>
+            <button
+              type="button"
+              className="gallery-image-button"
+              onClick={()=>p.image_data&&setSelected(p)}
+              style={{cursor:p.image_data?'zoom-in':'default'}}
+            >
+              {p.image_data
+                ? <img className="gallery-project-image" src={p.image_data} alt={p.name}/>
+                : <span style={{fontSize:42}}>🧶</span>}
+            </button>
 
-          <div className="gallery-card-info">
-            <b>{p.name}</b>
-            <small style={{
-              display:'block',
-              fontSize:12,
-              color:p.status==='Completed'?'#00995E':'#FD5A46',
-              fontWeight:800
-            }}>
-              {statusLabel(p.status,t)}
-            </small>
-          </div>
-        </article>)}
+            <div className="gallery-card-info">
+              <div className="gallery-card-copy">
+                <b>{p.name}</b>
+                <small style={{display:'block',fontSize:12,color:'#7b8390'}}>{p.width_cm>0&&p.height_cm>0?`${p.width_cm} × ${p.height_cm} cm`:t('projectLibrary')}</small>
+              </div>
+              <span className={`gallery-status ${done?'done':'progress'}`}>{statusLabel(p.status,t)}</span>
+            </div>
+          </article>
+        })}
       </div>
       : <div className="gallery-empty">
           <div>🖼️</div>
