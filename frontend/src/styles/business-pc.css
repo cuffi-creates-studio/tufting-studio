@@ -556,3 +556,171 @@
     box-shadow:none!important;
   }
 }
+
+/* ==========================================================
+   INVENTORY YARN COLOR CATALOG — solid yarn-like swatches
+   No pigment/gradient palette. Works on PC, tablet and phone.
+   ========================================================== */
+.inventory-dialog .yarn-catalog-card{
+  background:#fffdf9!important;
+  border-color:#e4d5c2!important;
+}
+.yarn-catalog-tabs{
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  padding:1px 0 8px;
+  scrollbar-width:thin;
+}
+.yarn-catalog-tabs button{
+  flex:0 0 auto;
+  min-height:32px;
+  padding:0 11px;
+  border:1px solid #dfcfba;
+  border-radius:999px;
+  background:#fffaf3;
+  color:#4e4a45;
+  font-size:12px;
+  font-weight:800;
+}
+.yarn-catalog-tabs button.active{
+  background:#eaf5ef;
+  border-color:#8dc6ad;
+  color:#12694f;
+}
+.yarn-swatch-grid{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:8px;
+}
+.yarn-swatch{
+  min-width:0;
+  border:1px solid #e0d1bd;
+  border-radius:12px;
+  background:#fff;
+  padding:6px;
+  display:grid;
+  gap:5px;
+  align-items:center;
+  color:#172033;
+}
+.yarn-swatch i{
+  display:block;
+  width:100%;
+  aspect-ratio:1.25/1;
+  min-height:34px;
+  border-radius:8px;
+  border:1px solid rgba(17,24,39,.18);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);
+}
+.yarn-swatch span{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:9px;
+  line-height:1.2;
+  font-weight:750;
+  text-align:center;
+}
+.yarn-swatch:hover{
+  border-color:#aaa08f;
+  transform:translateY(-1px);
+}
+.yarn-swatch.selected{
+  border-color:#167b5b;
+  box-shadow:0 0 0 2px rgba(22,123,91,.16);
+}
+.yarn-swatch.selected i{
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.65);
+}
+.yarn-catalog-selected{
+  display:grid;
+  grid-template-columns:48px 1fr auto;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid #eadcc8;
+}
+.yarn-selected-preview{
+  width:46px;
+  height:46px;
+  border-radius:11px;
+  border:3px solid #fff;
+  box-shadow:0 0 0 1px #d8c8b3;
+}
+.yarn-catalog-selected b,
+.yarn-catalog-selected code{
+  display:block;
+}
+.yarn-catalog-selected b{
+  font-size:11px;
+  margin-bottom:2px;
+}
+.yarn-catalog-selected code{
+  font-size:12px;
+  color:#655d55;
+}
+.yarn-custom-picker{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:11px;
+  font-weight:800;
+  color:#5d574f;
+}
+.yarn-custom-picker input[type=color]{
+  width:42px!important;
+  height:38px!important;
+  min-height:38px!important;
+  padding:3px!important;
+  border-radius:9px!important;
+}
+
+@media(min-width:1025px){
+  .inventory-dialog{
+    width:min(820px,calc(100vw - 40px));
+  }
+}
+
+@media(min-width:761px) and (max-width:1024px){
+  .yarn-swatch-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
+}
+
+@media(max-width:760px){
+  .inventory-dialog .yarn-catalog-card{
+    padding:10px!important;
+  }
+  .yarn-catalog-tabs{
+    margin:0 -2px;
+  }
+  .yarn-catalog-tabs button{
+    min-height:30px;
+    padding:0 10px;
+    font-size:10px;
+  }
+  .yarn-swatch-grid{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:7px;
+  }
+  .yarn-swatch{
+    padding:5px;
+    border-radius:10px;
+  }
+  .yarn-swatch i{
+    min-height:32px;
+    border-radius:7px;
+  }
+  .yarn-swatch span{
+    font-size:8px;
+  }
+  .yarn-catalog-selected{
+    grid-template-columns:42px 1fr auto;
+  }
+  .yarn-selected-preview{
+    width:40px;
+    height:40px;
+  }
+  .yarn-custom-picker span{display:none;}
+}
