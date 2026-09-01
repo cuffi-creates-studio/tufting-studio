@@ -272,3 +272,65 @@
   .wh-device-grid{grid-template-columns:1fr!important}
   .wh-device-card{grid-template-columns:42px minmax(90px,.4fr) minmax(210px,1fr) auto!important;padding:10px 12px!important}
 }
+
+/* ==========================================================
+   WORK HOURS — HISTORY BUTTONS ONLY
+   1) Remove "Shiko historikun" toggle.
+   2) Keep history table visible.
+   3) Polish only the delete button in the history table.
+   No other Work Hours UI is changed.
+   ========================================================== */
+.work-hours-page .wh-history-toggle{
+  display:none!important;
+}
+
+.work-hours-page .wh-history-content{
+  display:block!important;
+  margin-top:10px!important;
+}
+
+/* Delete/action button in the last history-table column */
+.work-hours-page .wh-history-card table tbody td:last-child button,
+.work-hours-page .wh-table-wrap table tbody td:last-child button,
+.work-hours-page .wh-delete-btn,
+.work-hours-page .wh-history-delete{
+  min-width:74px!important;
+  height:36px!important;
+  padding:0 13px!important;
+  border:1px solid #f1b5ad!important;
+  border-radius:10px!important;
+  background:#fff1ef!important;
+  color:#d9483b!important;
+  font-size:13px!important;
+  font-weight:850!important;
+  line-height:1!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  cursor:pointer!important;
+  box-shadow:none!important;
+  transition:background .15s ease,border-color .15s ease,transform .15s ease!important;
+}
+.work-hours-page .wh-history-card table tbody td:last-child button:hover,
+.work-hours-page .wh-table-wrap table tbody td:last-child button:hover,
+.work-hours-page .wh-delete-btn:hover,
+.work-hours-page .wh-history-delete:hover{
+  background:#ffe5e1!important;
+  border-color:#ec8f84!important;
+  transform:translateY(-1px)!important;
+}
+.work-hours-page .wh-history-card table tbody td:last-child button svg,
+.work-hours-page .wh-table-wrap table tbody td:last-child button svg,
+.work-hours-page .wh-delete-btn svg,
+.work-hours-page .wh-history-delete svg{
+  width:16px!important;
+  height:16px!important;
+  stroke-width:2.2!important;
+}
+
+@media(max-width:760px){
+  .work-hours-page .wh-history-content{
+    display:block!important;
+  }
+}
