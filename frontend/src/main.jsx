@@ -6,6 +6,7 @@ import {I18nProvider} from './i18n/I18n'
 import './styles/global.css'
 import './styles/desktop-final.css'
 import './styles/desktop-inner-pages.css'
+import './styles/notebooks.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

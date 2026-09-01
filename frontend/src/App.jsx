@@ -14,6 +14,8 @@ import WorkHours from './pages/WorkHours'
 import Orders from './pages/Orders'
 import Inventory from './pages/Inventory'
 import Expenses from './pages/Expenses'
+import Guide from './pages/Guide'
+import Notebook from './pages/Notebook'
 
 function Guard({children}) {
   const isLoggedIn = localStorage.getItem('tufting_auth') === '1'
@@ -36,6 +38,8 @@ export default function App() {
         <Route path="orders" element={<Orders />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="expenses" element={<Expenses />} />
+        <Route path="guide" element={<Guide />} />
+        <Route path="notebook" element={<Notebook />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
