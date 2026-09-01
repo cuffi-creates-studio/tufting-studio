@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react'
 import {NavLink,Outlet,useNavigate} from 'react-router-dom'
-import {Home,FolderKanban,Images,WandSparkles,Projector,Calculator,Boxes,Settings,Menu,Search,LogOut,X,Globe2,Clock3,ClipboardList,PackageCheck,WalletCards} from 'lucide-react'
+import {Home,FolderKanban,Images,WandSparkles,Projector,Calculator,Boxes,Settings,Menu,Search,LogOut,X,Globe2,Clock3,ClipboardList,PackageCheck,WalletCards,BookOpen,NotebookPen} from 'lucide-react'
 import {useI18n} from '../i18n/I18n'
 import {signOut} from 'firebase/auth'
 import {auth} from '../lib/firebase'
@@ -37,6 +37,7 @@ export default function Shell(){
   ['/orders',ClipboardList,businessLabel('orders',lang),'biz-nav-orders'],
   ['/inventory',PackageCheck,businessLabel('inventory',lang),'biz-nav-inventory'],
   ['/expenses',WalletCards,businessLabel('expenses',lang),'biz-nav-expenses'],
+  ['/guide',BookOpen,t('guide')],['/notebook',NotebookPen,t('notebook')],
   ['/settings',Settings,t('settings')]
  ]
  const avatar=p.photo?<img src={p.photo} alt={p.name}/>:<span>{p.name.slice(0,2).toUpperCase()}</span>
