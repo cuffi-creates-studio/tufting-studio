@@ -373,3 +373,22 @@
   .wh-energy-live{margin-top:8px!important;padding:8px 9px!important;border-radius:11px!important;grid-template-columns:1fr auto auto!important;gap:7px!important}.wh-energy-live span{font-size:9px!important}.wh-energy-live b{font-size:10px!important}.wh-energy-live strong{font-size:12px!important}.wh-energy-live small{font-size:8px!important;line-height:1.25!important}
   .wh-history-card table{min-width:900px!important}
 }
+
+/* Device model presets: select model, wattage is automatic */
+.wh-device-model{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;align-items:center;min-width:0}
+.wh-device-model>span{grid-column:1/-1;font-size:9px;font-weight:850;color:#7a7167;text-transform:uppercase;letter-spacing:.06em}
+.wh-device-model select{min-width:0;width:100%;height:38px;border:1px solid #ddcfbd;border-radius:10px;background:#fffdf9;color:#172033;padding:0 9px;font-size:11px;font-weight:750;outline:none}
+.wh-device-model strong{min-width:58px;height:38px;border-radius:10px;background:#eef7f2;border:1px solid #bddfce;color:#087b56;display:grid;place-items:center;font-size:12px;white-space:nowrap}
+.wh-device-model select:disabled{opacity:.72;cursor:not-allowed}
+
+@media(min-width:761px){
+ .wh-device-card{grid-template-columns:48px minmax(145px,.75fr) minmax(250px,1.25fr) 108px}
+}
+
+@media(max-width:760px){
+ .wh-device-card{grid-template-columns:36px minmax(0,1fr) 72px!important;grid-template-areas:'icon main button' 'model model model'!important}
+ .wh-device-icon{grid-area:icon!important}.wh-device-main{grid-area:main!important}.wh-device-card>button{grid-area:button!important}.wh-device-model{grid-area:model!important;grid-template-columns:minmax(0,1fr) 60px!important}
+ .wh-device-model>span{display:none!important}
+ .wh-device-model select{height:34px!important;font-size:9px!important;border-radius:9px!important}
+ .wh-device-model strong{height:34px!important;min-width:60px!important;font-size:10px!important;border-radius:9px!important}
+}
