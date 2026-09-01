@@ -6,9 +6,64 @@ import {makeBusinessPdf,reportLinesFromRows} from '../lib/businessPdf'
 import '../styles/business-pc.css'
 
 const BALLS=[50,100,500]
+
+const YARN_PALETTE=[
+ {group:'neutral',hex:'#F8F6F0',sq:'E bardhë',en:'White',de:'Weiß'},
+ {group:'neutral',hex:'#F3E9D2',sq:'Ivory',en:'Ivory',de:'Elfenbein'},
+ {group:'neutral',hex:'#E8D9B7',sq:'Krem',en:'Cream',de:'Creme'},
+ {group:'neutral',hex:'#D8C3A5',sq:'Rërë',en:'Sand',de:'Sand'},
+ {group:'neutral',hex:'#CBB994',sq:'Bezhë',en:'Beige',de:'Beige'},
+ {group:'neutral',hex:'#B98A55',sq:'Camel',en:'Camel',de:'Camel'},
+ {group:'neutral',hex:'#9C846B',sq:'Taupe',en:'Taupe',de:'Taupe'},
+ {group:'neutral',hex:'#6A4B3A',sq:'Kafe',en:'Brown',de:'Braun'},
+ {group:'neutral',hex:'#4A332A',sq:'Kafe e errët',en:'Dark brown',de:'Dunkelbraun'},
+ {group:'neutral',hex:'#B8B6B1',sq:'Gri e hapur',en:'Light grey',de:'Hellgrau'},
+ {group:'neutral',hex:'#77777B',sq:'Gri',en:'Grey',de:'Grau'},
+ {group:'neutral',hex:'#3E4045',sq:'Antracit',en:'Charcoal',de:'Anthrazit'},
+ {group:'neutral',hex:'#171717',sq:'E zezë',en:'Black',de:'Schwarz'},
+
+ {group:'warm',hex:'#F6D85D',sq:'E verdhë',en:'Yellow',de:'Gelb'},
+ {group:'warm',hex:'#D7A629',sq:'Mustard',en:'Mustard',de:'Senf'},
+ {group:'warm',hex:'#F2B36A',sq:'Kajsi',en:'Apricot',de:'Aprikose'},
+ {group:'warm',hex:'#E88942',sq:'Portokalli',en:'Orange',de:'Orange'},
+ {group:'warm',hex:'#C86D49',sq:'Terrakota',en:'Terracotta',de:'Terrakotta'},
+ {group:'warm',hex:'#E77765',sq:'Koral',en:'Coral',de:'Koralle'},
+ {group:'warm',hex:'#A84C37',sq:'Tullë',en:'Brick',de:'Ziegelrot'},
+
+ {group:'pinkred',hex:'#F1C8C6',sq:'Rozë e zbehtë',en:'Blush',de:'Blush'},
+ {group:'pinkred',hex:'#D9A0A8',sq:'Rozë pluhur',en:'Dusty rose',de:'Altrosa'},
+ {group:'pinkred',hex:'#E47CA0',sq:'Rozë',en:'Pink',de:'Rosa'},
+ {group:'pinkred',hex:'#C95478',sq:'Mjedër',en:'Raspberry',de:'Himbeere'},
+ {group:'pinkred',hex:'#C7433D',sq:'E kuqe',en:'Red',de:'Rot'},
+ {group:'pinkred',hex:'#8A3448',sq:'Verë',en:'Wine',de:'Weinrot'},
+ {group:'pinkred',hex:'#612638',sq:'Bordo',en:'Burgundy',de:'Bordeaux'},
+
+ {group:'green',hex:'#C8E0CF',sq:'Mint',en:'Mint',de:'Mint'},
+ {group:'green',hex:'#A8B99B',sq:'Sage',en:'Sage',de:'Salbei'},
+ {group:'green',hex:'#BBC98F',sq:'Pistachio',en:'Pistachio',de:'Pistazie'},
+ {group:'green',hex:'#858A50',sq:'Olive',en:'Olive',de:'Olive'},
+ {group:'green',hex:'#68764D',sq:'Moss',en:'Moss',de:'Moos'},
+ {group:'green',hex:'#3E8464',sq:'Emerald',en:'Emerald',de:'Smaragd'},
+ {group:'green',hex:'#28533F',sq:'Jeshile pylli',en:'Forest green',de:'Waldgrün'},
+
+ {group:'blue',hex:'#C8E1E5',sq:'Blu akull',en:'Ice blue',de:'Eisblau'},
+ {group:'blue',hex:'#94C8D8',sq:'Blu qielli',en:'Sky blue',de:'Himmelblau'},
+ {group:'blue',hex:'#6F93B2',sq:'Denim',en:'Denim',de:'Denim'},
+ {group:'blue',hex:'#3F67A3',sq:'Blu mbretërore',en:'Royal blue',de:'Königsblau'},
+ {group:'blue',hex:'#263E63',sq:'Blu e errët',en:'Navy',de:'Marineblau'},
+ {group:'blue',hex:'#3B8582',sq:'Teal',en:'Teal',de:'Petrolgrün'},
+ {group:'blue',hex:'#2C6269',sq:'Petrol',en:'Petrol',de:'Petrol'},
+
+ {group:'violet',hex:'#C2B5D0',sq:'Lavandë',en:'Lavender',de:'Lavendel'},
+ {group:'violet',hex:'#AE8DA8',sq:'Mauve',en:'Mauve',de:'Mauve'},
+ {group:'violet',hex:'#825A75',sq:'Plum',en:'Plum',de:'Pflaume'},
+ {group:'violet',hex:'#573849',sq:'Aubergine',en:'Aubergine',de:'Aubergine'}
+]
+
+const YARN_GROUPS=['neutral','warm','pinkred','green','blue','violet']
 export default function Inventory(){
  const {lang}=useI18n(),tx=labels(lang),dialog=useRef(null)
- const [rows,setRows]=useState([]),[reports,setReports]=useState([]),[q,setQ]=useState(''),[editing,setEditing]=useState(null),[saving,setSaving]=useState(false),[form,setForm]=useState(empty()),[mobileFilter,setMobileFilter]=useState('all'),[mobileDetail,setMobileDetail]=useState(null)
+ const [rows,setRows]=useState([]),[reports,setReports]=useState([]),[q,setQ]=useState(''),[editing,setEditing]=useState(null),[saving,setSaving]=useState(false),[form,setForm]=useState(empty()),[paletteGroup,setPaletteGroup]=useState('neutral'),[mobileFilter,setMobileFilter]=useState('all'),[mobileDetail,setMobileDetail]=useState(null)
  async function load(){const[a,b]=await Promise.all([getInventory().catch(()=>[]),getBusinessReports('inventory').catch(()=>[])]);setRows(a);setReports(b)}
  useEffect(()=>{load()},[])
  const shown=useMemo(()=>rows.filter(r=>[r.name,r.hex,r.brand,r.yarn_type].join(' ').toLowerCase().includes(q.toLowerCase())),[rows,q])
@@ -40,7 +95,12 @@ export default function Inventory(){
     <section className="retro-field-card green"><div className="retro-field-title"><Tag/>{tx.brand}</div><input value={form.brand} onChange={e=>setForm(v=>({...v,brand:e.target.value}))} placeholder="p.sh. Kartopu, Alize..."/></section>
     <section className="retro-field-card purple"><div className="retro-field-title"><Palette/>{tx.color}</div><input required value={form.name} onChange={e=>setForm(v=>({...v,name:e.target.value}))} placeholder="p.sh. Rozë pastel"/></section>
     <section className="retro-field-card orange"><div className="retro-field-title"><Database/>{tx.ballG}</div><div className="choice-row">{BALLS.map(n=><button type="button" key={n} className={Number(form.ball_g)===n?'active gram':''} onClick={()=>setForm(v=>({...v,ball_g:n}))}>{n} g</button>)}</div></section>
-    <section className="retro-field-card coral color-card"><div className="retro-field-title"><Palette/>{tx.colorCard}</div><div className="color-preview-wrap"><span className="large-color-preview" style={{background:hex(form.hex)}}/><input type="color" value={hex(form.hex)} onChange={e=>setForm(v=>({...v,hex:e.target.value.toUpperCase()}))}/></div></section>
+    <section className="retro-field-card full color-card yarn-catalog-card">
+     <div className="retro-field-title"><Palette/>{tx.colorCatalog}</div>
+     <div className="yarn-catalog-tabs">{YARN_GROUPS.map(group=><button type="button" key={group} className={paletteGroup===group?'active':''} onClick={()=>setPaletteGroup(group)}>{groupLabel(group,lang)}</button>)}</div>
+     <div className="yarn-swatch-grid">{YARN_PALETTE.filter(c=>c.group===paletteGroup).map(c=><button type="button" key={c.hex} className={`yarn-swatch ${hex(form.hex)===c.hex?'selected':''}`} onClick={()=>setForm(v=>({...v,hex:c.hex,name:v.name.trim()?v.name:colorLabel(c,lang)}))} title={`${colorLabel(c,lang)} · ${c.hex}`} aria-label={`${colorLabel(c,lang)} ${c.hex}`}><i style={{background:c.hex}}/><span>{colorLabel(c,lang)}</span></button>)}</div>
+     <div className="yarn-catalog-selected"><span className="yarn-selected-preview" style={{background:hex(form.hex)}}/><div><b>{tx.selectedColor}</b><code>{hex(form.hex)}</code></div><label className="yarn-custom-picker"><span>{tx.otherColor}</span><input type="color" value={hex(form.hex)} onChange={e=>setForm(v=>({...v,hex:e.target.value.toUpperCase()}))}/></label></div>
+    </section>
     <section className="retro-field-card green"><div className="retro-field-title"><Database/>{tx.stock}</div><input type="number" min="0" value={form.stock_g} onChange={e=>setForm(v=>({...v,stock_g:e.target.value}))}/></section>
     <section className="retro-field-card blue"><div className="retro-field-title"><Hash/>{tx.hex}</div><input value={form.hex} onChange={e=>setForm(v=>({...v,hex:e.target.value}))}/></section>
     <section className="retro-field-card pink"><div className="retro-field-title">€ {tx.price}</div><input type="number" min="0" step="0.01" value={form.price_per_ball} onChange={e=>setForm(v=>({...v,price_per_ball:e.target.value}))}/></section>
@@ -81,8 +141,21 @@ function normalize(r){return{yarn_type:r.yarn_type||'Acrylic',name:r.name||'',he
 function num(v){return Number(v)||0}function money(v){return num(v).toFixed(2)}function hex(v){const s=String(v||'').trim();return /^#[0-9a-f]{6}$/i.test(s)?s.toUpperCase():'#FB7DA8'}
 function labelYarn(v,t){return v==='Wool'?t.wool:t.acrylic}
 function mobileBack(){if(typeof window==='undefined')return;if(window.history.length>1)window.history.back();else window.location.hash='#/'}
+function colorLabel(c,lang){return lang==='de'?c.de:lang==='en'?c.en:c.sq}
+function groupLabel(group,lang){
+ const names={
+  neutral:{sq:'Neutrale',en:'Neutrals',de:'Neutral'},
+  warm:{sq:'Të ngrohta',en:'Warm',de:'Warm'},
+  pinkred:{sq:'Rozë / Kuqe',en:'Pink / Red',de:'Rosa / Rot'},
+  green:{sq:'Jeshile',en:'Greens',de:'Grün'},
+  blue:{sq:'Blu',en:'Blues',de:'Blau'},
+  violet:{sq:'Vjollcë',en:'Violets',de:'Violett'}
+ }
+ const item=names[group]||names.neutral
+ return lang==='de'?item.de:lang==='en'?item.en:item.sq
+}
 function labels(lang){
- if(lang==='de')return{title:'Inventar',subtitle:'Verwalte Garnbestand, Farben und Preise.',export:'Export',search:'Material suchen...',add:'Material hinzufügen',yarnType:'Garnart',acrylic:'Acryl',wool:'Wolle',color:'Farbe',hex:'HEX-Code',brand:'Marke',ballG:'Ballgewicht',stock:'Gesamtbestand (g)',price:'Preis / Ball',alert:'Bestand',low:'Niedrig',summary:'Bestandsübersicht',total:'Gesamt',items:'Materialien',noStock:'Noch kein realer Bestand.',totalValue:'Inventarwert',colorCard:'Farbkarte',min:'Mindestbestand (g)',save:'Material speichern',saving:'Speichern…',cancel:'Schließen',edit:'Material bearbeiten',delete:'Löschen',empty:'Noch keine Materialien.',confirmDelete:'Dieses Material löschen?',dialogSubtitle:'Garn und Bestand sauber erfassen.',saved:'Gespeicherte PDFs',pdfTitle:'Tufting Studio – Inventar'}
- if(lang==='en')return{title:'Inventory',subtitle:'Manage yarn stock, colors and real prices.',export:'Export',search:'Search material...',add:'Add material',yarnType:'Yarn type',acrylic:'Acrylic',wool:'Wool',color:'Color',hex:'HEX code',brand:'Brand',ballG:'Ball weight',stock:'Total stock (g)',price:'Price / ball',alert:'Stock',low:'Low stock',summary:'Stock summary',total:'Total',items:'materials',noStock:'No real stock yet.',totalValue:'Inventory value',colorCard:'Color card',min:'Minimum stock (g)',save:'Save material',saving:'Saving…',cancel:'Close',edit:'Edit material',delete:'Delete',empty:'No inventory items yet.',confirmDelete:'Delete this material?',dialogSubtitle:'Record yarn and stock clearly.',saved:'Saved PDFs',pdfTitle:'Tufting Studio – Inventory'}
- return{title:'Inventari',subtitle:'Menaxho leshin, ngjyrat, markat dhe çmimet reale.',export:'Eksporto',search:'Kërko material...',add:'Shto material',yarnType:'Lloji i leshit',acrylic:'Akryl',wool:'Lesh',color:'Emri / Ngjyra',hex:'Kodi HEX',brand:'Marka',ballG:'Gramatura e topit',stock:'Stoku total (g)',price:'Çmimi / top',alert:'Alarm stok',low:'Stok i ulët',summary:'Përmbledhje stoku',total:'Totali',items:'lloje leshi',noStock:'Nuk ka ende stok real.',totalValue:'Vlera totale e inventarit',colorCard:'Karta e ngjyrës',min:'Minimumi i stokut (g)',save:'Ruaj materialin',saving:'Po ruhet…',cancel:'Mbyll',edit:'Redakto materialin',delete:'Fshi',empty:'Ende nuk ka materiale.',confirmDelete:'Ta fshij këtë material?',dialogSubtitle:'Shto një material të ri me të dhëna reale.',saved:'PDF / Faturat e ruajtura',pdfTitle:'Tufting Studio – Inventari'}
+ if(lang==='de')return{title:'Inventar',subtitle:'Verwalte Garnbestand, Farben und Preise.',export:'Export',search:'Material suchen...',add:'Material hinzufügen',yarnType:'Garnart',acrylic:'Acryl',wool:'Wolle',color:'Farbe',hex:'HEX-Code',brand:'Marke',ballG:'Ballgewicht',stock:'Gesamtbestand (g)',price:'Preis / Ball',alert:'Bestand',low:'Niedrig',summary:'Bestandsübersicht',total:'Gesamt',items:'Materialien',noStock:'Noch kein realer Bestand.',totalValue:'Inventarwert',colorCard:'Farbkarte',colorCatalog:'Garn-Farbkatalog',selectedColor:'Ausgewählt',otherColor:'Andere Farbe',min:'Mindestbestand (g)',save:'Material speichern',saving:'Speichern…',cancel:'Schließen',edit:'Material bearbeiten',delete:'Löschen',empty:'Noch keine Materialien.',confirmDelete:'Dieses Material löschen?',dialogSubtitle:'Garn und Bestand sauber erfassen.',saved:'Gespeicherte PDFs',pdfTitle:'Tufting Studio – Inventar'}
+ if(lang==='en')return{title:'Inventory',subtitle:'Manage yarn stock, colors and real prices.',export:'Export',search:'Search material...',add:'Add material',yarnType:'Yarn type',acrylic:'Acrylic',wool:'Wool',color:'Color',hex:'HEX code',brand:'Brand',ballG:'Ball weight',stock:'Total stock (g)',price:'Price / ball',alert:'Stock',low:'Low stock',summary:'Stock summary',total:'Total',items:'materials',noStock:'No real stock yet.',totalValue:'Inventory value',colorCard:'Color card',colorCatalog:'Yarn color catalog',selectedColor:'Selected',otherColor:'Other color',min:'Minimum stock (g)',save:'Save material',saving:'Saving…',cancel:'Close',edit:'Edit material',delete:'Delete',empty:'No inventory items yet.',confirmDelete:'Delete this material?',dialogSubtitle:'Record yarn and stock clearly.',saved:'Saved PDFs',pdfTitle:'Tufting Studio – Inventory'}
+ return{title:'Inventari',subtitle:'Menaxho leshin, ngjyrat, markat dhe çmimet reale.',export:'Eksporto',search:'Kërko material...',add:'Shto material',yarnType:'Lloji i leshit',acrylic:'Akryl',wool:'Lesh',color:'Emri / Ngjyra',hex:'Kodi HEX',brand:'Marka',ballG:'Gramatura e topit',stock:'Stoku total (g)',price:'Çmimi / top',alert:'Alarm stok',low:'Stok i ulët',summary:'Përmbledhje stoku',total:'Totali',items:'lloje leshi',noStock:'Nuk ka ende stok real.',totalValue:'Vlera totale e inventarit',colorCard:'Karta e ngjyrës',colorCatalog:'Katalogu i ngjyrave të leshit',selectedColor:'Ngjyra e zgjedhur',otherColor:'Ngjyrë tjetër',min:'Minimumi i stokut (g)',save:'Ruaj materialin',saving:'Po ruhet…',cancel:'Mbyll',edit:'Redakto materialin',delete:'Fshi',empty:'Ende nuk ka materiale.',confirmDelete:'Ta fshij këtë material?',dialogSubtitle:'Shto një material të ri me të dhëna reale.',saved:'PDF / Faturat e ruajtura',pdfTitle:'Tufting Studio – Inventari'}
 }
