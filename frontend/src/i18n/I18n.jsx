@@ -2,7 +2,7 @@ import React,{createContext,useContext,useMemo,useState} from 'react'
 
 const translations={
  en:{
-  dashboard:'Dashboard',projects:'Projects',gallery:'Gallery',design:'Design Studio',projector:'Projector',calculator:'Calculator',materials:'Materials',settings:'Settings',guide:'Visual Guide',notebook:'My Notes',
+  dashboard:'Dashboard',projects:'Projects',gallery:'Gallery',design:'Design Studio',projector:'Projector',calculator:'Calculator',materials:'Materials',settings:'Settings',notebook:'My Notes',
   hello:'Hello',studioOwner:'Studio Owner',thisWeek:'This Week',quickActions:'Quick Actions',recentProjects:'Recent Projects',
   newProject:'New Project',status:'Status',completed:'Completed',inProgress:'In Progress',back:'Back',calendar:'Calendar',statistics:'Statistics',appointments:'Appointments',
   noStats:'No statistics yet',noAppointments:'No appointments yet',addAppointment:'Add appointment',language:'Language',notifications:'Notifications',
@@ -24,7 +24,7 @@ const translations={
   calculationSaved:'Calculation saved',savedCalculations:'Saved calculations',numberOfColors:'Colors',projectsThisWeek:'Projects',calculationsThisWeek:'Calculations',weeklyCost:'Weekly cost'
  },
  de:{
-  dashboard:'Dashboard',projects:'Projekte',gallery:'Galerie',design:'Design Studio',projector:'Projektor',calculator:'Rechner',materials:'Materialien',settings:'Einstellungen',guide:'Visuelle Anleitung',notebook:'Meine Notizen',
+  dashboard:'Dashboard',projects:'Projekte',gallery:'Galerie',design:'Design Studio',projector:'Projektor',calculator:'Rechner',materials:'Materialien',settings:'Einstellungen',notebook:'Meine Notizen',
   hello:'Hallo',studioOwner:'Studioinhaber',thisWeek:'Diese Woche',quickActions:'Schnellaktionen',recentProjects:'Letzte Projekte',
   newProject:'Neues Projekt',status:'Status',completed:'Fertig',inProgress:'In Arbeit',back:'Zurück',calendar:'Kalender',statistics:'Statistiken',appointments:'Termine',
   noStats:'Noch keine Statistiken',noAppointments:'Noch keine Termine',addAppointment:'Termin hinzufügen',language:'Sprache',notifications:'Benachrichtigungen',
@@ -46,7 +46,7 @@ const translations={
   calculationSaved:'Berechnung gespeichert',savedCalculations:'Gespeicherte Berechnungen',numberOfColors:'Farben',projectsThisWeek:'Projekte',calculationsThisWeek:'Berechnungen',weeklyCost:'Wochenkosten'
  },
  sq:{
-  dashboard:'Paneli',projects:'Projektet',gallery:'Galeria',design:'Studio Dizajni',projector:'Projektori',calculator:'Llogaritësi',materials:'Materialet',settings:'Cilësimet',guide:'Udhëzuesi',notebook:'Shënimet e mia',
+  dashboard:'Paneli',projects:'Projektet',gallery:'Galeria',design:'Studio Dizajni',projector:'Projektori',calculator:'Llogaritësi',materials:'Materialet',settings:'Cilësimet',notebook:'Shënimet e mia',
   hello:'Përshëndetje',studioOwner:'Pronari i Studios',thisWeek:'Këtë javë',quickActions:'Veprime të shpejta',recentProjects:'Projektet e fundit',
   newProject:'Projekt i ri',status:'Statusi',completed:'Përfunduar',inProgress:'Në punë',back:'Mbrapa',calendar:'Kalendari',statistics:'Statistikat',appointments:'Terminet',
   noStats:'Ende nuk ka statistika',noAppointments:'Ende nuk ka termine',addAppointment:'Shto termin',language:'Gjuha',notifications:'Njoftimet',
